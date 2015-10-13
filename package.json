@@ -1,0 +1,41 @@
+{
+  "name": "log-ocd",
+  "version": "0.0.1",
+  "description": "Clean, Detailed, & Efficient Node.js Logging",
+  "main": "src/log-ocd.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/imaginate/log-ocd.git"
+  },
+  "author": "Adam Smith <adam@imaginate.life> (https://github.com/imaginate)",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/imaginate/log-ocd/issues"
+  },
+  "homepage": "https://github.com/imaginate/log-ocd",
+  "dependencies": {
+    "colors": "^1.1.2",
+    "lodash": "^3.10.1",
+    "node-are": "^0.1.0"
+  },
+  "devDependencies": {
+    "mocha": "^2.3.3",
+    "shelljs": "^0.5.1"
+  },
+  "scripts": {
+    "test": "node make test"
+  },
+  "keywords": [
+    "imaginate",
+    "javascript logger",
+    "javascript log",
+    "nodejs logger",
+    "nodejs log",
+    "node logger",
+    "node log",
+    "js logger",
+    "js log",
+    "logger",
+    "log"
+  ]
+}
