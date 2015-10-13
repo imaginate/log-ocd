@@ -1,0 +1,5 @@
+## DO NOT TRACK
+*.log
+.git
+logs
+node_modules
