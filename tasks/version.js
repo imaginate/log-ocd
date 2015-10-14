@@ -15,55 +15,73 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// DEFINE THE TASK METHODS
+// DEFINE & EXPORT THE TASK
 ////////////////////////////////////////////////////////////////////////////////
 
-/** @type {!Object<string, function>} */
-var methods = {};
+/** @type {!Task} */
+module.exports = newTask('version', 'all', {
+
+  /**
+   * @param {string} version
+   */
+  all: function all(version) {
+
+    /** @type {!Array<string>} */
+    var filepaths;
+
+    isSemVersion(version) || log.error(
+      'Invalid `version.all` Task Call',
+      'a new semantic version was not provided',
+      { argMap: true, version: version }
+    );
+
+    filepaths = retrieve.filepaths('.', {
+      validExts: '.js',
+      validDirs: 'parts|src',
+      invalidFiles: 'make.js'
+    }, true);
+    filepaths.push('package.json');
+
+    each(filepaths, function(/** string */ filepath) {
+      insertVersion(filepath, version);
+    });
+
+    log.pass('Completed `version.all` Task');
+  }
+});
+
+
+////////////////////////////////////////////////////////////////////////////////
+// DEFINE PRIVATE HELPERS
+////////////////////////////////////////////////////////////////////////////////
 
 /**
  * @param {string} version
+ * @return {boolean}
  */
-methods.all = function(version) {
+function isSemVersion(version) {
 
-  /** @type {!Array<string>} */
-  var filepaths;
   /** @type {!RegExp} */
   var regex;
 
   regex = /^[0-9][0-9]?\.[0-9][0-9]?\.[0-9][0-9]?$/;
-  ( version && regex.test(version) ) || log.error(
-    'Invalid `version.all` Task Call',
-    'a new semantic version was not provided',
-    { argMap: true, version: version }
-  );
+  return is._str(version) && regex.test(version);
+}
 
-  filepaths = retrieve.filepaths('.', {
-    validExts: '.js',
-    validDirs: 'parts|src',
-    invalidFiles: 'make.js'
-  }, true);
-  filepaths.push('tasks/minify.js')
+/**
+ * @param {string} filepath
+ * @param {string} version
+ */
+function insertVersion(filepath, version) {
 
-  regex = /\b(v?)[0-9][0-9]?\.[0-9][0-9]?\.[0-9][0-9]?\b/g;
-  each(filepaths, function(/** string */ filepath) {
-    retrieve.file(filepath)
-      .replace(regex, '$1' + version)
-      .to(filepath);
-  });
+  /** @type {!RegExp} */
+  var regex;
 
-  regex = /("version": ")[0-9][0-9]?\.[0-9][0-9]?\.[0-9][0-9]?/;
-  retrieve.file('package.json')
+  regex = /^.*\.json$/.test(filepath) ?
+    /("version": ")[0-9][0-9]?\.[0-9][0-9]?\.[0-9][0-9]?/
+    : /\b(v?)[0-9][0-9]?\.[0-9][0-9]?\.[0-9][0-9]?\b/g;
+
+  retrieve.file(filepath)
     .replace(regex, '$1' + version)
-    .to('package.json');
-
-  log.pass('Completed `version.all` Task');
-};
-
-
-////////////////////////////////////////////////////////////////////////////////
-// EXPORT THE TASK
-////////////////////////////////////////////////////////////////////////////////
-
-/** @type {!Task} */
-module.exports = newTask('version', 'all', methods);
+    .to(filepath);
+}
