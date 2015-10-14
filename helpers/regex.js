@@ -16,8 +16,6 @@
 
 'use strict';
 
-require('./vitals')(); // appends helper methods to global obj
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // DEFINE REGEX CONSTRUCTOR

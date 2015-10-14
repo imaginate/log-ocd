@@ -18,11 +18,6 @@
 
 'use strict';
 
-/** @type {Function<string, function>} */
-var log = require('./log');
-
-require('./vitals')(); // appends helper methods and objects to global obj
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // DEFINE TASK CONSTRUCTOR

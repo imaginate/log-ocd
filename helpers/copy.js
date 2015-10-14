@@ -18,12 +18,8 @@
 
 'use strict';
 
-/** @type {Function<string, function>} */
-var log = require('./log');
 /** @type {!Object} */
 var shell = require('shelljs');
-
-require('./vitals')(); // appends helper methods and objects to global obj
 
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -10,6 +10,7 @@
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
  * @see [Lodash]{@link https://github.com/lodash/lodash}
+ * @see [ShellJS]{@link https://github.com/shelljs/shelljs}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
@@ -20,36 +21,26 @@
 
 /** @type {!Object} */
 var fs = require('fs');
-/** @type {Function<string, function>} */
-var log = require('./log');
+/** @type {!Object} */
+var shell = require('shelljs');
 /** @type {function} */
 var forOwn = require('lodash/object/forOwn');
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// DEFINE MAIN FUNCTION
-////////////////////////////////////////////////////////////////////////////////
-
-/** @type {!Function<string, function>} */
-function Vitals() {
-  forOwn(Vitals, function(/** function */ method, /** string */ key) {
-    global[key] = method;
-  });
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// DEFINE PUBLIC LIBRARIES
+// APPEND FOUNDATION LIBRARIES
 ////////////////////////////////////////////////////////////////////////////////
 
 /** @type {Function<string, function>} */
-Vitals.is = require('node-are').is;
+global.log = require('./log');
 /** @type {Function<string, function>} */
-Vitals.are = require('node-are').are;
+global.is = require('node-are').is;
+/** @type {Function<string, function>} */
+global.are = require('node-are').are;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// DEFINE PUBLIC METHODS
+// APPEND SHORTCUT METHODS
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -58,7 +49,7 @@ Vitals.are = require('node-are').are;
  * @param {function} action
  * @return {boolean}
  */
-Vitals.loop = function(cycles, action) {
+global.loop = function(cycles, action) {
 
   is.num(cycles) || log.error(
     'Invalid `Vitals.loop` Call',
@@ -85,7 +76,7 @@ Vitals.loop = function(cycles, action) {
  * @param {*} prop
  * @return {boolean}
  */
-Vitals.has = function(obj, prop) {
+global.has = function(obj, prop) {
 
   is('?obj|func', obj) || log.error(
     'Invalid `Vitals.has` Call',
@@ -105,7 +96,7 @@ Vitals.has = function(obj, prop) {
  * @param {Object=} thisArg
  * @return {!Object}
  */
-Vitals.merge = require('lodash/object/merge');
+global.merge = require('lodash/object/merge');
 
 /**
  * A shortcut for iterating over object maps and arrays.
@@ -114,7 +105,7 @@ Vitals.merge = require('lodash/object/merge');
  * @param {function} action
  * @param {Object=} thisArg
  */
-Vitals.each = function(obj, action, thisArg) {
+global.each = function(obj, action, thisArg) {
 
   is('?obj|func', obj) || log.error(
     'Invalid `Vitals.each` Call',
@@ -145,7 +136,7 @@ Vitals.each = function(obj, action, thisArg) {
  * @param {number=} end [default= arr.length]
  * @return {!Array}
  */
-Vitals.slice = require('lodash/array/slice');
+global.slice = require('lodash/array/slice');
 
 /**
  * @see https://lodash.com/docs#fill
@@ -155,11 +146,26 @@ Vitals.slice = require('lodash/array/slice');
  * @param {number=} end [default= arr.length]
  * @return {!Array}
  */
-Vitals.fill = require('lodash/array/fill');
+global.fill = require('lodash/array/fill');
+
+/**
+ * @see https://github.com/shelljs/shelljs#execcommand--options--callback
+ * @param {string} command
+ * @param {Object=} options
+ * @param {boolean=} options.async [default= callback ? true : false]
+ * @param {boolean=} options.silent [default= false]
+ * @param {function=} callback
+ */
+global.exec = shell.exec;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// EXPORT LIBRARY
+// APPEND REMAINING LIBRARIES
 ////////////////////////////////////////////////////////////////////////////////
 
-module.exports = Vitals;
+/** @type {Function<string, function>} */
+global.copy = require('./copy');
+/** @type {!Object<string, function>} */
+global.retrieve = require('./retrieve');
+/** @type {function} */
+global.makeTask = require('./task');

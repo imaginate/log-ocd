@@ -16,8 +16,6 @@ var Regex = require('./regex')( /([\+\?\.\-\:\{\}\[\]\(\)\/\,\\\^\$\=\!])/g );
 /** @type {!Object} */
 var fs = require('fs');
 
-require('./vitals')(); // appends helper methods to global obj
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // DEFINE EXPORTS OBJ
@@ -39,7 +37,7 @@ var Retrieve = {};
  * @param {boolean=} deep - get all of the sub directories [default= false]
  * @return {!Array<string>}
  */
-Retrieve.dirs = function(dirpath, options, deep) {
+Retrieve.dirpaths = function(dirpath, options, deep) {
 
   /** @type {RegExp} */
   var valid;
@@ -47,7 +45,7 @@ Retrieve.dirs = function(dirpath, options, deep) {
   var invalid;
 
   is.dir(dirpath) || log.error(
-    'Invalid `Retrieve.dirs` Call', 'invalid `dirpath` param',
+    'Invalid `Retrieve.dirpaths` Call', 'invalid `dirpath` param',
     { argMap: true, dirpath: dirpath }
   );
 
@@ -70,7 +68,7 @@ Retrieve.dirs = function(dirpath, options, deep) {
   }
 
   if (deep === true) {
-    return Retrieve.dirs.deep(dirpath, {
+    return Retrieve.dirpaths.deep(dirpath, {
       pass:        true,
       validDirs:   valid,
       invalidDirs: invalid
@@ -94,7 +92,7 @@ Retrieve.dirs = function(dirpath, options, deep) {
  * @param {?(RegExp|Array<string>|string)=} options.invalidDirs
  * @return {!Array<string>}
  */
-Retrieve.dirs.deep = function(dirpath, options) {
+Retrieve.dirpaths.deep = function(dirpath, options) {
 
   /** @type {function(string, *): !Array<string>} */
   var get;
@@ -105,7 +103,7 @@ Retrieve.dirs.deep = function(dirpath, options) {
   /** @type {!Array<string>} */
   var kids;
 
-  get = Retrieve.dirs;
+  get = Retrieve.dirpaths;
   dirpath = dirpath.replace(/([^\/])$/, '$1/');
 
   dirs = get(dirpath, options);
@@ -142,7 +140,7 @@ Retrieve.dirs.deep = function(dirpath, options) {
  * @param {boolean=} deep - get all of the sub directory files [default= false]
  * @return {!Array<string>}
  */
-Retrieve.files = function(dirpath, options, deep) {
+Retrieve.filepaths = function(dirpath, options, deep) {
 
   /** @type {RegExp} */
   var validExts;
@@ -158,7 +156,7 @@ Retrieve.files = function(dirpath, options, deep) {
   var invalidFiles;
 
   is.dir(dirpath) || log.error(
-    'Invalid `Retrieve.files` Call',
+    'Invalid `Retrieve.filepaths` Call',
     'invalid `dirpath` param (i.e. must be a valid directory)',
     { argMap: true, dirpath: dirpath }
   );
@@ -210,7 +208,7 @@ Retrieve.files = function(dirpath, options, deep) {
   }
 
   if (deep === true) {
-    return Retrieve.files.deep(dirpath, {
+    return Retrieve.filepaths.deep(dirpath, {
       pass:         true,
       validExts:    validExts,
       validNames:   validNames,
@@ -250,7 +248,7 @@ Retrieve.files = function(dirpath, options, deep) {
  * @param {?(RegExp|Array<string>|string)=} options.invalidFiles - filename.ext
  * @return {!Array<string>}
  */
-Retrieve.files.deep = function(dirpath, options) {
+Retrieve.filepaths.deep = function(dirpath, options) {
 
   /** @type {function(string, Object): !Array<string>} */
   var get;
@@ -263,11 +261,11 @@ Retrieve.files.deep = function(dirpath, options) {
   /** @type {!Array<string>} */
   var files;
 
-  get = Retrieve.files;
+  get = Retrieve.filepaths;
   dirpath = dirpath.replace(/([^\/])$/, '$1/');
 
   options.pass = false;
-  dirs = Retrieve.dirs(dirpath, options, true);
+  dirs = Retrieve.dirpaths(dirpath, options, true);
   files = get(dirpath, options);
 
   each(dirs, function(/** string */ dir) {
