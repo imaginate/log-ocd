@@ -9,6 +9,7 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
+ * @see [Lodash]{@link https://github.com/lodash/lodash}
  * @see [ShellJS]{@link https://github.com/shelljs/shelljs}
  *
  * Annotations:
