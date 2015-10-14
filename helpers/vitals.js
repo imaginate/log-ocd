@@ -84,7 +84,6 @@ global.has = function(obj, prop) {
     { argMap: true, obj: obj, prop: prop }
   );
 
-  prop = is.str(prop) || is.num(prop) ? prop : String(prop);
   return !!obj && obj.hasOwnProperty(prop);
 };
 
