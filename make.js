@@ -49,17 +49,18 @@
  * -------------------------------------------
  * | Task    | Methods     | Default Methods |
  * | :------ | :---------- | :-------------- |
- * | compile | all         | all             |
- * | test    | all         | all             |
+ * | compile | main        | main            |
+ * | test    | main        | main            |
  * | version | all         | all             |
  * -------------------------------------------
  *
  * Values
- * ------------------------------------------------------------------
- * | Task    | Method | Acceptable Values | Example | Default Value |
- * | :------ | :----- | :---------------- | :------ | :------------ |
- * | version | all    | Semantic Version  | 1.2.4   | (none)        |
- * ------------------------------------------------------------------
+ * -----------------------------------------------------------------------------
+ * | Task    | Method | Acceptable Values | Example            | Default Value |
+ * | :------ | :----- | :---------------- | :----------------- | :------------ |
+ * | test    | *      | Mocha Cmd Opts    | bail+reporter=spec | (none)        |
+ * | version | all    | Semantic Version  | 1.2.4              | (none)        |
+ * -----------------------------------------------------------------------------
  */
 
 'use strict';
