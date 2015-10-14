@@ -62,4 +62,4 @@ methods.all = function() {
 ////////////////////////////////////////////////////////////////////////////////
 
 /** @type {!Task} */
-module.exports = makeTask('test', 'all', methods);
+module.exports = newTask('test', 'all', methods);

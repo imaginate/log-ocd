@@ -66,4 +66,4 @@ methods.all = function(version) {
 ////////////////////////////////////////////////////////////////////////////////
 
 /** @type {!Task} */
-module.exports = makeTask('version', 'all', methods);
+module.exports = newTask('version', 'all', methods);

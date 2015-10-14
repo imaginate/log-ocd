@@ -69,4 +69,4 @@ methods.all = function() {
 ////////////////////////////////////////////////////////////////////////////////
 
 /** @type {!Task} */
-module.exports = makeTask('compile', 'all', methods);
+module.exports = newTask('compile', 'all', methods);

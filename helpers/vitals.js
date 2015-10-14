@@ -167,4 +167,4 @@ global.copy = require('./copy');
 /** @type {!Object<string, function>} */
 global.retrieve = require('./retrieve');
 /** @type {function} */
-global.makeTask = require('./task');
+global.newTask = require('./task');
