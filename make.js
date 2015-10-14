@@ -124,7 +124,9 @@ each(tasks, function(/** string */ taskStr) {
   /** @type {string} */
   var defaultVal;
 
-  name = taskStr.replace(/^([a-z]+)(?:[^a-z].*)?$/i, '$1');
+  name = getName(taskStr);
+  methods = taskStr.split('-');
+  defaultVal = getVal( methods.shift() );
 
   is.file(taskDir + name + '.js') || log.error(
     'Invalid `make` Command',
@@ -134,11 +136,6 @@ each(tasks, function(/** string */ taskStr) {
 
   task = require(taskDir + name);
   task.name = name;
-
-  methods = taskStr.split('-');
-
-  defaultVal = methods.shift();
-  defaultVal = defaultVal.replace(/^[a-z]+(\=.*)?$/i, '$1');
 
   methods = methods.length ? methods : task.defaultMethods;
   methods = defaultVal ? methods.map(function(/** string */ method) {
@@ -150,12 +147,29 @@ each(tasks, function(/** string */ taskStr) {
     /** @type {string} */
     var val;
 
-    if ( /=/.test(method) ) {
-      val = method.split('=');
-      method = val[0];
-      val = val[1];
-    }
+    val = getVal(method);
+    val = val && val.slice(1);
+    method = getName(method);
 
     task.run(method, val);
   });
 });
+
+
+////////////////////////////////////////////////////////////////////////////////
+// PRIVATE HELPERS
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @param {string} str
+ */
+function getName(str) {
+  return str && str.replace(/^([a-z]+)(?:[^a-z].*)?$/i, '$1');
+}
+
+/**
+ * @param {string} str
+ */
+function getVal(str) {
+  return str && str.replace(/^[a-z]+(\=.*)?$/i, '$1');
+}
