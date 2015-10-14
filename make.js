@@ -12,6 +12,7 @@
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
  * @see [Lodash]{@link https://github.com/lodash/lodash}
+ * @see [ShellJS]{@link https://github.com/shelljs/shelljs}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
@@ -63,10 +64,7 @@
 
 'use strict';
 
-/** @type {Function<string, function>} */
-var log = require('./helpers/log');
-
-require('./helpers/vitals')(); // appends helpers to global obj
+require('./helpers/vitals'); // appends global helpers for all tasks
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -99,15 +97,21 @@ tasks = tasks.map(function(/** string */ task) {
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// RUN THE TASKS
+// PREP THE TASK DIRECTORY
 ////////////////////////////////////////////////////////////////////////////////
 
 taskDir = taskDir ? taskDir.replace(/([^\/])$/, '$1/') : './tasks/';
+
 is.dir(taskDir) || log.error(
   'Invalid `makefile` Config',
   'the tasks directory does not exist',
   { argMap: true, taskDir: taskDir }
 );
+
+
+////////////////////////////////////////////////////////////////////////////////
+// RUN THE TASKS
+////////////////////////////////////////////////////////////////////////////////
 
 each(tasks, function(/** string */ taskStr) {
 
