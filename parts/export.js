@@ -31,14 +31,16 @@
  */
 module.exports = function newLogOCD() {
 
+  /** @type {!Object} */
+  var instance = {};
   /** @type {!LogOCD} */
-  var LogOCD = logOCD.bind(logOCD);
+  var LogOCD = logOCD.bind(instance);
 
   each(logOCD, function(/** function */ method, /** string */ key) {
-    LogOCD[key] = method.bind(LogOCD);
+    LogOCD[key] = method.bind(instance);
   });
 
-  LogOCD._config = clone(CONFIG);
+  instance.config = clone(CONFIG);
 
   return LogOCD;
 };
