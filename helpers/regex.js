@@ -7,7 +7,6 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
- * @see [Lodash]{@link https://github.com/lodash/lodash}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}

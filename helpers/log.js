@@ -6,7 +6,7 @@
  * @copyright 2015 Adam A Smith <adam@imaginate.life> (https://github.com/imaginate)
  *
  * Supporting Libraries:
- * @see [Lodash]{@link https://github.com/lodash/lodash}
+ * @see [are]{@link https://github.com/imaginate/are}
  * @see [Colors]{@link https://www.npmjs.com/package/colors}
  *
  * Annotations:
@@ -22,16 +22,6 @@ var is = require('node-are').is;
 var are = require('node-are').are;
 /** @type {!Object} */
 var colors = require('colors/safe');
-/** @type {function} */
-var fill = require('lodash/array/fill');
-/** @type {function} */
-var merge = require('lodash/object/merge');
-/** @type {function} */
-var clone = require('lodash/lang/cloneDeep');
-/** @type {function} */
-var forOwn = require('lodash/object/forOwn');
-/** @type {function} */
-var sliceArr = require('lodash/array/slice');
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -107,7 +97,7 @@ var CONFIG = {
   }
 };
 /** @type {!Object} */
-var config = clone(CONFIG);
+var config = clone(CONFIG, true);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -126,7 +116,7 @@ function Log() {
   }
 
   logSpace(config.log.spaceBefore);
-  log(config.log.style, sliceArr(arguments));
+  log(config.log.style, slice(arguments));
   logSpace(config.log.spaceAfter);
   return true;
 }
@@ -149,7 +139,7 @@ Log.pass = function(header) {
 
   logSpace(config.pass.spaceBefore);
   logHeader('pass', header);
-  arguments.length > 1 && logSpace(1) && log('view', sliceArr(arguments, 1));
+  arguments.length > 1 && logSpace(1) && log('view', slice(arguments, 1));
   logSpace(config.pass.spaceAfter);
   return true;
 };
@@ -174,7 +164,7 @@ Log.error = function(header, msg) {
   logSpace(config.error.spaceBefore);
   logHeader('error', header);
   logDetails('plain', msg);
-  arguments.length > 2 && logSpace(1) && log('view', sliceArr(arguments, 2));
+  arguments.length > 2 && logSpace(1) && log('view', slice(arguments, 2));
   logSpace(config.error.spaceAfter);
   config.error.exit && process.exit(1);
   return true;
@@ -200,7 +190,7 @@ Log.warn = function(header, msg) {
   logSpace(config.warn.spaceBefore);
   logHeader('warn', header);
   logDetails('plain', msg);
-  arguments.length > 2 && logSpace(1) && log('view', sliceArr(arguments, 2));
+  arguments.length > 2 && logSpace(1) && log('view', slice(arguments, 2));
   logSpace(config.warn.spaceAfter);
   return true;
 };
@@ -223,7 +213,7 @@ Log.debug = function(header) {
 
   logSpace(config.debug.spaceBefore);
   logHeader('debug', header);
-  arguments.length > 1 && logSpace(1) && log('view', sliceArr(arguments, 1));
+  arguments.length > 1 && logSpace(1) && log('view', slice(arguments, 1));
   logSpace(config.debug.spaceAfter);
   return true;
 };
@@ -246,7 +236,7 @@ Log.fail = function(msg) {
 
   logSpace(config.fail.spaceBefore);
   logHeader('fail', msg);
-  arguments.length > 1 && log('fail', sliceArr(arguments, 1));
+  arguments.length > 1 && log('fail', slice(arguments, 1));
   logSpace(config.fail.spaceAfter);
   return true;
 };
@@ -278,7 +268,7 @@ Log.setConfig = function(prop, val) {
   }
 
   if (method === 'all') {
-    forOwn(config, function(/** !Object */ obj) {
+    each(config, function(/** !Object */ obj) {
       if ( has(obj, prop) ) {
         obj[prop] = val;
       }
@@ -295,18 +285,24 @@ Log.setConfig = function(prop, val) {
  */
 Log.resetConfig = function(method) {
   if ( is._str(method) && has(config, method) ) {
-    config[method] = clone( CONFIG[method] );
+    config[method] = clone(CONFIG[method]);
   }
   else {
-    config = clone(CONFIG);
+    config = clone(CONFIG, true);
   }
   return true;
 };
 
 
+////////////////////////////////////////////////////////////////////////////////
+// EXPORT LIBRARY
+////////////////////////////////////////////////////////////////////////////////
+
+module.exports = Log;
+
 
 ////////////////////////////////////////////////////////////////////////////////
-// DEFINE GENERAL HELPERS
+// PRIVATE HELPERS - GENERAL METHODS
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -324,45 +320,10 @@ function helperError(func, arg, val) {
   process.exit(1);
 }
 
-/**
- * @param {*} val
- * @return {string}
- */
-function makeStr(val) {
-  return ( is.str(val) ?
-    val || '""' : is.func(val) ?
-      'function() { ... } props => {' : is.arr(val) ?
-        '[ '+ val.join(', ') +' ]' : is.regex(val) ?
-          '/'+ val.source +'/'+ val.flags : is.obj(val) ?
-            '{' : String(val)
-  );
-}
-
-/**
- * @param {string} str
- * @return {boolean}
- */
-function hasAccent(str) {
-  is._str(str) || helperError('hasAccent', 'str', str);
-  return /`.+`/.test(str);
-}
-
-/**
- * @param {Object} obj
- * @param {string} prop
- * @return {boolean}
- */
-function has(obj, prop) {
-  if ( !is._obj(obj) ) {
-    return false;
-  }
-  return obj.hasOwnProperty(prop);
-}
-
 /** @type {!Object<string, function(*): boolean>} */
 var configProps = {
-  spaceBefore: function(val) { return is.num(val); },
-  spaceAfter: function(val) { return is.num(val); },
+  spaceBefore: is.num,
+  spaceAfter: is.num,
   style: function(val) { return is._str(val) && has(themes, val); },
   exit: is.bool
 };
@@ -378,8 +339,30 @@ function checkConfigVal(prop, val) {
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// DEFINE LOG HELPERS
+// PRIVATE HELPERS - LOGGING METHODS
 ////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @param {*} val
+ * @return {string}
+ */
+function makeStr(val) {
+  return is.str(val) ?
+    val || '""' : is.func(val) ?
+      'function() { ... } props => {' : is.arr(val) ?
+        '[ '+ val.join(', ') +' ]' : is.regex(val) ?
+          '/'+ val.source +'/'+ val.flags : is.obj(val) ?
+            '{' : String(val);
+}
+
+/**
+ * @param {string} str
+ * @return {boolean}
+ */
+function hasAccent(str) {
+  is._str(str) || helperError('hasAccent', 'str', str);
+  return /`.+`/.test(str);
+}
 
 /**
  * @param {string} style
@@ -391,13 +374,13 @@ function log(style, args) {
   has(themes, style) || helperError('log', 'style', style);
   is.arr(args) || helperError('log', 'args', args);
 
-  args.forEach(function(/** * */ val) {
+  each(args, function(/** * */ val) {
     if ( is.func(val) || ( is.obj(val) && !is('regex|arr', val) ) ) {
       val.argMap ? logArgs(val) : logObj(val, style);
     }
     else {
       console.log(is._str(val) && hasAccent(val) ?
-        val.split('`').map(function(/** string */ part, /** number */ i) {
+        map(val.split('`'), function(/** string */ part, /** number */ i) {
           return colors[ (i % 2 ? 'a' : '') + style ](part);
         }).join('')
         : colors[style]( makeStr(val) )
@@ -414,9 +397,9 @@ function logSpace(spaces) {
 
   is.num(spaces) || helperError('logSpace', 'spaces', spaces);
 
-  while (spaces--) {
+  each(spaces, function() {
     console.log('');
-  }
+  });
   return true;
 }
 
@@ -430,11 +413,11 @@ function logHeader(style, msg) {
   has(themes, style) || helperError('logHeader', 'style', style);
   is._str(msg) || helperError('logHeader', 'msg', msg);
 
-  msg = hasAccent(msg) ? msg.split('`').map(
+  msg = !hasAccent(msg) ? colors[style](msg) : map(msg.split('`'),
     function(/** string */ part, /** number */ i) {
       return colors[ (i % 2 ? 'a' : '') + style ](part);
     }
-  ).join('') : colors[style](msg);
+  ).join('');
   console.log( colors[style](' ') + msg + colors[style]('        ') );
 }
 
@@ -448,11 +431,11 @@ function logDetails(style, msg) {
   has(themes, style) || helperError('logDetails', 'style', style);
   is._str(msg) || helperError('logDetails', 'msg', msg);
 
-  msg = hasAccent(msg) ? msg.split('`').map(
+  msg = !hasAccent(msg) ? colors[style](msg) : map(msg.split('`'),
     function(/** string */ part, /** number */ i) {
       return colors[ (i % 2 ? 'a' : '') + style ](part);
     }
-  ).join('') : colors[style](msg);
+  ).join('');
   console.log( colors[style]('  - ') + msg );
 }
 
@@ -466,7 +449,7 @@ function logArgs(obj) {
 
   is._obj(obj) || helperError('logArgs', 'obj', obj);
 
-  forOwn(obj, function(/** * */ val, /** string */ key) {
+  each(obj, function(/** * */ val, /** string */ key) {
     if (key !== 'argMap') {
       str = makeStr(val);
       console.log( colors.plain(key + ': ') + colors.view(str) );
@@ -499,9 +482,9 @@ function logObj(obj, style, indent) {
   );
   indent = indent < 0 ? 0 : indent;
 
-  spaces = indent ? fill(Array(indent), '  ').join('') : '';
+  spaces = indent ? fill(indent, '  ').join('') : '';
 
-  forOwn(obj, function(/** * */ val, /** string */ key) {
+  each(obj, function(/** * */ val, /** string */ key) {
     str = makeStr(val);
     if ( is.func(val) || str === '{' ) {
       console.log( colors[style]('  ' + spaces + key + ': ' + str) );
@@ -518,7 +501,184 @@ function logObj(obj, style, indent) {
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// EXPORT LIBRARY
+// PRIVATE HELPERS - GENERAL METHODS
 ////////////////////////////////////////////////////////////////////////////////
 
-module.exports = Log;
+/**
+ * A shortcut for Object.prototype.hasOwnProperty that accepts null objects.
+ * @param {?(Object|function)} obj
+ * @param {*} prop
+ * @return {boolean}
+ */
+function has(obj, prop) {
+  return is._obj(obj) && obj.hasOwnProperty(prop);
+}
+
+/**
+ * A shortcut for Array.prototype.slice.call(obj, start).
+ * @param {Object} obj
+ * @param {number=} start [default= 0]
+ * @return {Array}
+ */
+function slice(obj, start) {
+
+  /** @type {!Array} */
+  var arr;
+  /** @type {number} */
+  var len;
+  /** @type {number} */
+  var i;
+
+  if ( !is.obj(obj) || !has(obj, 'length') ) {
+    return null;
+  }
+
+  len = obj.length;
+  start = !start ? 0 : start < 0 ? len + start : start;
+
+  arr = start < len ? new Array( (len - start) ) : [];
+  i = start - 1;
+  while (++i < len) {
+    arr[i] = obj[i];
+  }
+  return arr;
+}
+
+/**
+ * A shortcut for Array.prototype.map(obj, iteratee).
+ * @param {Object} obj
+ * @param {function(*, number): *} iteratee
+ * @return {Array}
+ */
+function map(obj, iteratee) {
+
+  /** @type {!Array} */
+  var arr;
+  /** @type {number} */
+  var i;
+
+  if ( !is.obj(obj) || !has(obj, 'length') ) {
+    return null;
+  }
+
+  i = obj.length;
+  arr = i ? new Array(i) : [];
+  while (i--) {
+    arr[i] = iteratee(obj[i], i);
+  }
+  return arr;
+}
+
+/**
+ * Creates a new object with the properties of the given object.
+ * @param {!Object} obj
+ * @param {boolean=} deep
+ * @return {!Object}
+ */
+function clone(obj, deep) {
+
+  /** @type {!Object} */
+  var newObj;
+  /** @type {string} */
+  var prop;
+
+  if ( !is.obj(obj) ) {
+    return null;
+  }
+
+  newObj = {};
+  for (prop in obj) {
+    if ( has(obj, prop) ) {
+      newObj[prop] = deep && is.obj( obj[prop] ) ?
+        clone(obj[prop], true) : obj[prop];
+    }
+  }
+  return newObj;
+}
+
+/**
+ * Appends an object's properties to an existing object.
+ * @param {(!Object|function)} dest
+ * @param {(!Object|function)} source
+ * @return {(!Object|function)}
+ */
+function merge(dest, source) {
+
+  /** @type {string} */
+  var prop;
+
+  for (prop in source) {
+    if ( has(source, prop) ) {
+      dest[prop] = source[prop];
+    }
+  }
+  return dest;
+}
+
+/**
+ * A shortcut for iterating over object maps and arrays or invoking an action a
+ *   set number of times.
+ * @param {!(Object|function|Array|number)} val
+ * @param {function(*, (string|number)=, (Object|function|Array)=)} iteratee
+ * @return {(Object|function|Array)}
+ */
+function each(val, iteratee) {
+
+  /** @type {(string|number)} */
+  var prop;
+  /** @type {number} */
+  var len;
+
+  if ( is._obj(val) ) {
+    if ( is._arr(val) ) {
+
+      // iterate over an array or arguments obj
+      val = slice(val);
+      len = val.length;
+      prop = -1;
+      while (++prop < len) {
+        iteratee(val[prop], prop, val);
+      }
+      return val;
+    }
+    else {
+
+      // iterate over an object's own props
+      val = clone(val) || val;
+      for (prop in val) {
+        if ( has(val, prop) ) {
+          iteratee(val[prop], prop, val);
+        }
+      }
+      return val;
+    }
+  }
+  else if ( is.num(val) ) {
+
+    // iterate specified number of times
+    while(cycles--) {
+      iteratee();
+    }
+  }
+  return null;
+}
+
+/**
+ * Fills an existing or new array with specified values.
+ * @param {(Array|number)} arr
+ * @param {*} val
+ * @return {Array}
+ */
+function fill(arr, val) {
+
+  /** @type {number} */
+  var i;
+
+  arr = is.num(arr) ? new Array(arr) : arr;
+  i = arr.length;
+  while (i--) {
+    arr[i] = val;
+  }
+  return arr;
+}
+

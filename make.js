@@ -11,7 +11,6 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
- * @see [Lodash]{@link https://github.com/lodash/lodash}
  * @see [ShellJS]{@link https://github.com/shelljs/shelljs}
  *
  * Annotations:
@@ -65,7 +64,7 @@
 
 'use strict';
 
-require('./helpers/vitals'); // appends global helpers for all tasks
+require('./helpers/vitals')('all'); // appends global helpers for all tasks
 
 
 ////////////////////////////////////////////////////////////////////////////////

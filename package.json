@@ -15,7 +15,6 @@
   "homepage": "https://github.com/imaginate/log-ocd",
   "dependencies": {
     "colors": "^1.1.2",
-    "lodash": "^3.10.1",
     "node-are": "^0.1.0"
   },
   "devDependencies": {
