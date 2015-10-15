@@ -18,6 +18,19 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// EXPORT REGEX FACTORY
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @param {!RegExp=} escapeChars
+ * @return {!Regex}
+ */
+module.exports = function newRegex(escapeChars) {
+  return new Regex(escapeChars);
+};
+
+
+////////////////////////////////////////////////////////////////////////////////
 // DEFINE REGEX CONSTRUCTOR
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -123,7 +136,7 @@ var Regex = function(escapeChars) {
 
 
   //////////////////////////////////////////////////////////////////////////
-  // CHECK FOR CUSTOM NEW INSTANCE CONFIG
+  // INSTANCE CONFIG
   //////////////////////////////////////////////////////////////////////
 
   is.regex(escapeChars) && this._set('escape', 'chars', escapeChars);
@@ -141,7 +154,7 @@ Regex.prototype.constructor = Regex;
  * @param {string} regex
  * @return {string}
  */
-Regex.escape = function escape(regex) {
+Regex.prototype.escape = function escape(regex) {
 
   is.str(regex) || log.error(
     'Invalid `Regex.escape` Call',
@@ -153,31 +166,24 @@ Regex.escape = function escape(regex) {
 };
 
 /**
- * @type {!{
- *   get: function(): !RegExp,
- *   set: function(!RegExp),
- *   reset: function
- * }}
+ * @param {!RegExp} chars
  */
-Regex.escape.chars = {
+Regex.prototype.setChars = function setChars(chars) {
 
-  get: function() {
-    return this._get('escape', 'chars');
-  },
+  is.regex(val) || log.error(
+    'Invalid `Regex.setChars` Call',
+    'invalid type for `chars` param',
+    { argMap: true, chars: chars }
+  );
 
-  set: function(val) {
-    is.regex(val) || log.error(
-      'Invalid `Regex.escape.chars.set` Call',
-      'invalid type for `val` param',
-      { argMap: true, val: val }
-    );
+  this._set('escape', 'chars', chars);
+};
 
-    this._set('escape', 'chars', val);
-  },
-
-  reset: function() {
-    this._reset('escape', 'chars');
-  }
+/**
+ * @type {function}
+ */
+Regex.prototype.resetChars = function resetChars() {
+  this._reset('escape', 'chars');
 };
 
 /**
@@ -185,7 +191,7 @@ Regex.escape.chars = {
  * @param {string=} flags - [default= '']
  * @return {!RegExp}
  */
-Regex.make = function make(regex, flags) {
+Regex.prototype.make = function make(regex, flags) {
 
   is._str(regex) || log.error(
     'Invalid `Regex.make` Call',
@@ -196,47 +202,3 @@ Regex.make = function make(regex, flags) {
   flags = is._str(flags) && /^[gimy]+$/.test(flags) ? flags : '';
   return new RegExp(regex, flags);
 };
-
-
-////////////////////////////////////////////////////////////////////////////////
-// EXPORT LIBRARY
-////////////////////////////////////////////////////////////////////////////////
-
-/**
- * @param {!RegExp=} escapeChars
- * @return {!Regex}
- */
-module.exports = function setupRegex(escapeChars) {
-
-  /** @type {!Regex} */
-  var regex;
-
-  regex = new Regex(escapeChars);
-  each(Regex, function(/** function */ method, /** string */ key) {
-    regex[key] = bindObj(method, regex);
-  });
-  return regex;
-};
-
-/**
- * @param {(function|!Object)} obj
- * @param {!Regex} regex
- * @return {(function|!Object)}
- */
-function bindObj(obj, regex) {
-
-  /** @type {(function|!Object)} */
-  var boundObj;
-
-  is._obj(obj) || log.error(
-    'Failed `Regex` Call',
-    'error in private helper `bindObj` (invalid type for `obj` param)',
-    { argMap: true, obj: obj, regex: regex }
-  );
-
-  boundObj = is.func(obj) ? obj.bind(regex) : {};
-  each(obj, function(/** (function|!Object) */ prop, /** string */ key) {
-    boundObj[key] = bindObj(prop, regex);
-  });
-  return boundObj;
-}
