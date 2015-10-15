@@ -10,7 +10,6 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
- * @see [Lodash]{@link https://github.com/lodash/lodash}
  * @see [Colors]{@link https://www.npmjs.com/package/colors}
  *
  * Annotations:
@@ -36,58 +35,7 @@ var colors = require('colors/safe');
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// LODASH METHODS
-////////////////////////////////////////////////////////////////////////////////
-
-/**
- * @see https://lodash.com/docs#fill
- * @param {!Array} arr
- * @param {*} val
- * @param {number=} start [default= 0]
- * @param {number=} end [default= arr.length]
- * @return {!Array}
- */
-var fill = require('lodash/array/fill');
-
-/**
- * @see https://lodash.com/docs#merge
- * @param {!Object} dest
- * @param {!Object...} sources
- * @param {function=} customizer
- * @param {Object=} thisArg
- * @return {!Object}
- */
-var merge = require('lodash/object/merge');
-
-/**
- * @see https://lodash.com/docs#cloneDeep
- * @param {*} val
- * @param {function=} customizer
- * @param {Object=} thisArg
- * @return {*}
- */
-var clone = require('lodash/lang/cloneDeep');
-
-/**
- * @see https://lodash.com/docs#forOwn
- * @param {!(Object|function|Array)} obj
- * @param {function} action
- * @param {Object=} thisArg
- */
-var forOwn = require('lodash/object/forOwn');
-
-/**
- * @see https://lodash.com/docs#slice
- * @param {!Array} arr
- * @param {number=} start [default= 0]
- * @param {number=} end [default= arr.length]
- * @return {!Array}
- */
-var sliceArr = require('lodash/array/slice');
-
-
-////////////////////////////////////////////////////////////////////////////////
-// OTHER METHODS
+// METHODS
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -101,14 +49,169 @@ function has(obj, prop) {
 }
 
 /**
- * A shortcut for iterating over object maps and arrays.
- * @param {!(Object|function|Array)} obj
- * @param {function} action
- * @param {Object=} thisArg
+ * A shortcut for Array.prototype.slice.call(obj, start).
+ * @param {Object} obj
+ * @param {number=} start [default= 0]
+ * @return {Array}
  */
-function each(obj, action, thisArg) {
-  thisArg = is._obj(thisArg) ? thisArg : null;
-  is.arr(obj) ?
-    obj.forEach(action, thisArg)
-    : obj && forOwn(obj, action, thisArg);
+function slice(obj, start) {
+
+  /** @type {!Array} */
+  var arr;
+  /** @type {number} */
+  var len;
+  /** @type {number} */
+  var i;
+
+  if ( !is.obj(obj) || !has(obj, 'length') ) {
+    return null;
+  }
+
+  len = obj.length;
+  start = !start ? 0 : start < 0 ? len + start : start;
+
+  arr = start < len ? new Array( (len - start) ) : [];
+  i = start - 1;
+  while (++i < len) {
+    arr[i] = obj[i];
+  }
+  return arr;
+}
+
+/**
+ * A shortcut for Array.prototype.map(obj, iteratee).
+ * @param {Object} obj
+ * @param {function(*, number): *} iteratee
+ * @return {Array}
+ */
+function map(obj, iteratee) {
+
+  /** @type {!Array} */
+  var arr;
+  /** @type {number} */
+  var i;
+
+  if ( !is.obj(obj) || !has(obj, 'length') ) {
+    return null;
+  }
+
+  i = obj.length;
+  arr = i ? new Array(i) : [];
+  while (i--) {
+    arr[i] = iteratee(obj[i], i);
+  }
+  return arr;
+}
+
+/**
+ * Creates a new object with the properties of the given object.
+ * @param {!Object} obj
+ * @param {boolean=} deep
+ * @return {!Object}
+ */
+function clone(obj, deep) {
+
+  /** @type {!Object} */
+  var newObj;
+  /** @type {string} */
+  var prop;
+
+  if ( !is.obj(obj) ) {
+    return null;
+  }
+
+  newObj = {};
+  for (prop in obj) {
+    if ( has(obj, prop) ) {
+      newObj[prop] = deep && is.obj( obj[prop] ) ?
+        clone(obj[prop], true) : obj[prop];
+    }
+  }
+  return newObj;
+}
+
+/**
+ * Appends an object's properties to an existing object.
+ * @param {(!Object|function)} dest
+ * @param {(!Object|function)} source
+ * @return {(!Object|function)}
+ */
+function merge(dest, source) {
+
+  /** @type {string} */
+  var prop;
+
+  for (prop in source) {
+    if ( has(source, prop) ) {
+      dest[prop] = source[prop];
+    }
+  }
+  return dest;
+}
+
+/**
+ * A shortcut for iterating over object maps and arrays or invoking an action a
+ *   set number of times.
+ * @param {!(Object|function|Array|number)} val
+ * @param {function(*, (string|number)=, (Object|function|Array)=)} iteratee
+ * @return {(Object|function|Array)}
+ */
+function each(val, iteratee) {
+
+  /** @type {(string|number)} */
+  var prop;
+  /** @type {number} */
+  var len;
+
+  if ( is._obj(val) ) {
+    if ( is._arr(val) ) {
+
+      // iterate over an array or arguments obj
+      val = slice(val);
+      len = val.length;
+      prop = -1;
+      while (++prop < len) {
+        iteratee(val[prop], prop, val);
+      }
+      return val;
+    }
+    else {
+
+      // iterate over an object's own props
+      val = clone(val) || val;
+      for (prop in val) {
+        if ( has(val, prop) ) {
+          iteratee(val[prop], prop, val);
+        }
+      }
+      return val;
+    }
+  }
+  else if ( is.num(val) ) {
+
+    // iterate specified number of times
+    while(cycles--) {
+      iteratee();
+    }
+  }
+  return null;
+}
+
+/**
+ * Fills an existing or new array with specified values.
+ * @param {(Array|number)} arr
+ * @param {*} val
+ * @return {Array}
+ */
+function fill(arr, val) {
+
+  /** @type {number} */
+  var i;
+
+  arr = is.num(arr) ? new Array(arr) : arr;
+  i = arr.length;
+  while (i--) {
+    arr[i] = val;
+  }
+  return arr;
 }
