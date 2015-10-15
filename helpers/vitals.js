@@ -9,7 +9,6 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
- * @see [Lodash]{@link https://github.com/lodash/lodash}
  * @see [ShellJS]{@link https://github.com/shelljs/shelljs}
  *
  * Annotations:
@@ -19,152 +18,74 @@
 
 'use strict';
 
+/** @type {Function<string, function>} */
+var is = require('node-are').is;
 /** @type {!Object} */
 var fs = require('fs');
-/** @type {!Object} */
-var shell = require('shelljs');
-/** @type {function} */
-var forOwn = require('lodash/object/forOwn');
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// APPEND FOUNDATION LIBRARIES
-////////////////////////////////////////////////////////////////////////////////
-
-/** @type {Function<string, function>} */
-global.log = require('./log');
-/** @type {Function<string, function>} */
-global.is = require('node-are').is;
-/** @type {Function<string, function>} */
-global.are = require('node-are').are;
-
-
-////////////////////////////////////////////////////////////////////////////////
-// APPEND SHORTCUT METHODS
+// EXPORT THE FACTORY METHOD
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Executes a function for a set number of times.
- * @param {number} cycles
- * @param {function} action
- * @return {boolean}
+ * @param {string...} includes - The vitals sections to append to the global. If
+ *   "all" is only given then all sections are appended.
  */
-global.loop = function(cycles, action) {
+module.exports = function Vitals(includes) {
 
-  is.num(cycles) || log.error(
-    'Invalid `Vitals.loop` Call',
-    'invalid type for `cycles` param',
-    { argMap: true, cycles: cycles }
-  );
+  /** @type {!Array} */
+  var sections;
+  /** @type {number} */
+  var len;
 
-  is.func(action) || log.error(
-    'Invalid `Vitals.loop` Call',
-    'invalid type for `action` param',
-    { argMap: true, action: action }
-  );
+  require('./vitals/basics');
 
-  cycles = cycles < 0 ? Math.abs(cycles) : cycles;
-  while(cycles--) {
-    action();
-  }
-  return true;
+  len = arguments.length;
+  sections = !len ? [] : len > 1 ?
+    slice(arguments) : includes !== 'all' ?
+      [ includes ] : getFilepaths('helpers/vitals/');
+
+  sections.forEach(function(/** string */ section) {
+    section = 'helpers/vitals/' + section.replace(/^(.*)(?:\.js)?$/, '$1.js');
+    is.file(section) && require(section);
+  })
 };
 
-/**
- * A shortcut for Object.prototype.hasOwnProperty that accepts null objects.
- * @param {?(Object|function)} obj
- * @param {*} prop
- * @return {boolean}
- */
-global.has = function(obj, prop) {
-
-  is('?obj|func', obj) || log.error(
-    'Invalid `Vitals.has` Call',
-    'invalid type for `obj` param',
-    { argMap: true, obj: obj, prop: prop }
-  );
-
-  return !!obj && obj.hasOwnProperty(prop);
-};
-
-/**
- * @see https://lodash.com/docs#merge
- * @param {!Object} dest
- * @param {!Object...} sources
- * @param {function=} customizer
- * @param {Object=} thisArg
- * @return {!Object}
- */
-global.merge = require('lodash/object/merge');
-
-/**
- * A shortcut for iterating over object maps and arrays.
- * @see https://lodash.com/docs#forOwn
- * @param {!(Object|function|Array)} obj
- * @param {function} action
- * @param {Object=} thisArg
- */
-global.each = function(obj, action, thisArg) {
-
-  is('?obj|func', obj) || log.error(
-    'Invalid `Vitals.each` Call',
-    'invalid type for `obj` param',
-    { argMap: true, obj: obj }
-  );
-
-  is.func(action) || log.error(
-    'Invalid `Vitals.each` Call',
-    'invalid type for `action` param',
-    { argMap: true, action: action }
-  );
-
-  thisArg = is._obj(thisArg) ? thisArg : null;
-
-  if ( is.arr(obj) ) {
-    obj.forEach(action, thisArg);
-  }
-  else {
-    obj && forOwn(obj, action, thisArg);
-  }
-};
-
-/**
- * @see https://lodash.com/docs#slice
- * @param {!Array} arr
- * @param {number=} start [default= 0]
- * @param {number=} end [default= arr.length]
- * @return {!Array}
- */
-global.slice = require('lodash/array/slice');
-
-/**
- * @see https://lodash.com/docs#fill
- * @param {!Array} arr
- * @param {*} val
- * @param {number=} start [default= 0]
- * @param {number=} end [default= arr.length]
- * @return {!Array}
- */
-global.fill = require('lodash/array/fill');
-
-/**
- * @see https://github.com/shelljs/shelljs#execcommand--options--callback
- * @param {string} command
- * @param {Object=} options
- * @param {boolean=} options.async [default= callback ? true : false]
- * @param {boolean=} options.silent [default= false]
- * @param {function=} callback
- */
-global.exec = shell.exec;
-
 
 ////////////////////////////////////////////////////////////////////////////////
-// APPEND REMAINING LIBRARIES
+// PRIVATE HELPER
 ////////////////////////////////////////////////////////////////////////////////
 
-/** @type {Function<string, function>} */
-global.copy = require('./copy');
-/** @type {!Object<string, function>} */
-global.retrieve = require('./retrieve');
-/** @type {function} */
-global.newTask = require('./task');
+/**
+ * A shortcut for Array.prototype.slice.call(obj, 0).
+ * @param {Object} obj
+ * @return {Array}
+ */
+function slice(obj) {
+
+  /** @type {!Array} */
+  var arr;
+  /** @type {number} */
+  var i;
+
+  i = obj.length;
+  arr = i ? new Array(i) : [];
+  while (i--) {
+    arr[i] = obj[i];
+  }
+  return arr;
+}
+
+/**
+ * Get all of the filepaths from a directory.
+ * @param {dirpath} dirpath
+ * @return {!Array<string>}
+ */
+function getFilepaths(dirpath) {
+
+  return fs.readdirSync(dirpath)
+    .filter(function(/** string */ filepath) {
+      return is.file(dirpath + filepath);
+    });
+}
