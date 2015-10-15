@@ -10,7 +10,6 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
- * @see [Lodash]{@link https://github.com/lodash/lodash}
  * @see [Colors]{@link https://www.npmjs.com/package/colors}
  *
  * Annotations:
@@ -23,14 +22,15 @@
 // SECTION: LOG HELPERS
 // *****************************************************************************
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // CONFIG METHODS
 ////////////////////////////////////////////////////////////////////////////////
 
 /** @type {!Object<string, function(*): boolean>} */
 var configProps = {
-  spaceBefore: is.num(val),
-  spaceAfter: is.num(val),
+  spaceBefore: is.num,
+  spaceAfter: is.num,
   style: function(val) { return is._str(val) && has(themes, val); },
   exit: is.bool
 };
@@ -40,7 +40,7 @@ var configProps = {
  * @param {string} val
  * @return {boolean}
  */
-function checkConfigVal(prop, val) {
+function isConfigProp(prop, val) {
   return is._str(prop) && has(configProps, prop) && configProps[prop](val);
 }
 
@@ -58,17 +58,30 @@ function hasAccent(str) {
 }
 
 /**
+ * @param {string} style
+ * @param {string} str
+ * @return {string}
+ */
+function getAccentStr(style, str) {
+  return hasAccent(str) ? map(str.split('`'),
+    function(/** string */ part, /** number */ i) {
+      return colors[ (i % 2 ? 'a' : '') + style ](part);
+    }
+  ).join('') : colors[style](str);
+}
+
+/**
  * @param {*} val
  * @return {string}
  */
 function makeLogStr(val) {
-  return ( is.str(val) ?
+  return is.str(val) ?
     val || '""' : is.func(val) ?
-      'function() { ... } props => {' : is.arr(val) ?
-        '[ '+ val.join(', ') +' ]' : is.regex(val) ?
-          '/'+ val.source +'/'+ val.flags : is.obj(val) ?
-            '{' : String(val)
-  );
+      '[ Function ]: {' : is.arr(val) ?
+        '[ '+ val.join(', ') +' ]' : is.args(val) ?
+          '[ '+ slice(val).join(', ') +' ]' : is.regex(val) ?
+            '/'+ val.source +'/'+ val.flags : is.obj(val) ?
+              '{' : String(val);
 }
 
 
@@ -79,23 +92,16 @@ function makeLogStr(val) {
 /**
  * @param {string} style
  * @param {!Array} args
+ * @param {boolean=} argMap
  */
-function log(style, args) {
-
-  is._str(style) || helperError('log', 'style', style);
-  has(themes, style) || helperError('log', 'style', style);
-  is.arr(args) || helperError('log', 'args', args);
-
-  args.forEach(function(/** * */ val) {
+function log(style, args, argMap) {
+  each(args, function(/** * */ val) {
     if ( is.func(val) || ( is.obj(val) && !is('regex|arr', val) ) ) {
-      val.argMap ? logArgs(val) : logObj(val, style);
+      val.argMap || argMap ? logArgMap(val) : logObj(val, style);
     }
     else {
-      console.log(is._str(val) && hasAccent(val) ?
-        val.split('`').map(function(/** string */ part, /** number */ i) {
-          return colors[ (i % 2 ? 'a' : '') + style ](part);
-        }).join('')
-        : colors[style]( makeStr(val) )
+      console.log(is._str(val) ?
+        getAccentStr(style, val) : colors[style]( makeLogStr(val) )
       );
     }
   });
@@ -103,16 +109,11 @@ function log(style, args) {
 
 /**
  * @param {number} spaces
- * @return {boolean}
  */
 function logSpace(spaces) {
-
-  is.num(spaces) || helperError('logSpace', 'spaces', spaces);
-
   while (spaces--) {
     console.log('');
   }
-  return true;
 }
 
 /**
@@ -120,17 +121,9 @@ function logSpace(spaces) {
  * @param {string} msg
  */
 function logHeader(style, msg) {
-
-  is._str(style) || helperError('logHeader', 'style', style);
-  has(themes, style) || helperError('logHeader', 'style', style);
-  is._str(msg) || helperError('logHeader', 'msg', msg);
-
-  msg = hasAccent(msg) ? msg.split('`').map(
-    function(/** string */ part, /** number */ i) {
-      return colors[ (i % 2 ? 'a' : '') + style ](part);
-    }
-  ).join('') : colors[style](msg);
-  console.log( colors[style](' ') + msg + colors[style]('        ') );
+  console.log(
+    colors[style](' ') + getAccentStr(style, msg) + colors[style]('        ')
+  );
 }
 
 /**
@@ -138,32 +131,20 @@ function logHeader(style, msg) {
  * @param {string} msg
  */
 function logDetails(style, msg) {
-
-  is._str(style) || helperError('logDetails', 'style', style);
-  has(themes, style) || helperError('logDetails', 'style', style);
-  is._str(msg) || helperError('logDetails', 'msg', msg);
-
-  msg = hasAccent(msg) ? msg.split('`').map(
-    function(/** string */ part, /** number */ i) {
-      return colors[ (i % 2 ? 'a' : '') + style ](part);
-    }
-  ).join('') : colors[style](msg);
-  console.log( colors[style]('  - ') + msg );
+  console.log( colors[style]('  - ') + getAccentStr(style, msg) );
 }
 
 /**
  * @param {!Object} obj
  */
-function logArgs(obj) {
+function logArgMap(obj) {
 
   /** @type {string} */
   var str;
 
-  is._obj(obj) || helperError('logArgs', 'obj', obj);
-
-  forOwn(obj, function(/** * */ val, /** string */ key) {
+  each(obj, function(/** * */ val, /** string */ key) {
     if (key !== 'argMap') {
-      str = makeStr(val);
+      str = makeLogStr(val);
       console.log( colors.plain(key + ': ') + colors.view(str) );
       if ( is.func(val) || str === '{' ) {
         logObj(val, 'view', -1);
@@ -184,20 +165,18 @@ function logObj(obj, style, indent) {
   /** @type {string} */
   var str;
 
-  is._obj(obj) || helperError('logObj', 'obj', obj);
+  style = style || 'view';
+  indent = indent || 0;
 
-  style = is._str(style) && has(themes, style) ? style : 'view';
-
-  indent = is._num(indent) ? indent : 0;
   indent || console.log(
-    colors[style]( is.func(obj) ? 'function() { ... } props => {' : '{' )
+    colors[style]( is.func(obj) ? '[ Function ]: {' : '{' )
   );
   indent = indent < 0 ? 0 : indent;
 
-  spaces = indent ? fill(Array(indent), '  ').join('') : '';
+  spaces = indent ? fill(indent, '  ').join('') : '';
 
-  forOwn(obj, function(/** * */ val, /** string */ key) {
-    str = makeStr(val);
+  each(obj, function(/** * */ val, /** string */ key) {
+    str = makeLogStr(val);
     if ( is.func(val) || str === '{' ) {
       console.log( colors[style]('  ' + spaces + key + ': ' + str) );
       logObj(val, style, (indent + 1));
