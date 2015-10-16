@@ -47,8 +47,8 @@ module.exports = function Vitals(includes) {
       [ includes ] : getFilepaths('helpers/vitals/');
 
   sections.forEach(function(/** string */ section) {
-    section = 'helpers/vitals/' + section.replace(/^(.*)(?:\.js)?$/, '$1.js');
-    is.file(section) && require(section);
+    section = section.replace(/^([^\.]*)(?:\.js)?$/, '$1.js');
+    is.file('helpers/vitals/' + section) && require('./vitals/' + section);
   })
 };
 
