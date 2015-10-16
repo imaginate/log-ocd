@@ -22,15 +22,25 @@
 // SECTION: GENERAL HELPERS
 // *****************************************************************************
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // LIBRARIES
 ////////////////////////////////////////////////////////////////////////////////
 
-/** @type {Function<string, function>} */
+/**
+ * @private
+ * @type {Function<string, function>}
+ */
 var is = require('node-are').is;
-/** @type {Function<string, function>} */
+/**
+ * @private
+ * @type {Function<string, function>}
+ */
 var are = require('node-are').are;
-/** @type {!Object} */
+/**
+ * @private
+ * @type {!Object}
+ */
 var colors = require('colors/safe');
 
 
@@ -40,6 +50,7 @@ var colors = require('colors/safe');
 
 /**
  * A shortcut for Object.prototype.hasOwnProperty that accepts null objects.
+ * @private
  * @param {?(Object|function)} obj
  * @param {*} prop
  * @return {boolean}
@@ -50,6 +61,7 @@ function has(obj, prop) {
 
 /**
  * A shortcut for Array.prototype.slice.call(obj, start).
+ * @private
  * @param {Object} obj
  * @param {number=} start [default= 0]
  * @return {Array}
@@ -80,6 +92,7 @@ function slice(obj, start) {
 
 /**
  * A shortcut for Array.prototype.map(obj, iteratee).
+ * @private
  * @param {Object} obj
  * @param {function(*, number): *} iteratee
  * @return {Array}
@@ -105,6 +118,7 @@ function map(obj, iteratee) {
 
 /**
  * Creates a new object with the properties of the given object.
+ * @private
  * @param {!Object} obj
  * @param {boolean=} deep
  * @return {!Object}
@@ -132,6 +146,7 @@ function clone(obj, deep) {
 
 /**
  * Appends an object's properties to an existing object.
+ * @private
  * @param {(!Object|function)} dest
  * @param {(!Object|function)} source
  * @return {(!Object|function)}
@@ -152,6 +167,7 @@ function merge(dest, source) {
 /**
  * A shortcut for iterating over object maps and arrays or invoking an action a
  *   set number of times.
+ * @private
  * @param {!(Object|function|Array|number)} val
  * @param {function(*, (string|number)=, (Object|function|Array)=)} iteratee
  * @return {(Object|function|Array)}
@@ -199,6 +215,7 @@ function each(val, iteratee) {
 
 /**
  * Fills an existing or new array with specified values.
+ * @private
  * @param {(Array|number)} arr
  * @param {*} val
  * @return {Array}

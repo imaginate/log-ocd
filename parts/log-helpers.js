@@ -27,21 +27,28 @@
 // CONFIG METHODS
 ////////////////////////////////////////////////////////////////////////////////
 
-/** @type {!Object<string, function(*): boolean>} */
-var configProps = {
+/**
+ * @private
+ * @type {!Object<string, function(*): boolean>}
+ * @const
+ */
+var CONFIG_PROPS = {
   spaceBefore: is.num,
   spaceAfter: is.num,
-  style: function(val) { return is._str(val) && has(themes, val); },
+  argMap: is.bool,
+  header: is.bool,
+  style: function(val) { return is._str(val) && has(THEMES, val); },
   exit: is.bool
 };
 
 /**
+ * @private
  * @param {string} prop
  * @param {string} val
  * @return {boolean}
  */
 function isConfigProp(prop, val) {
-  return is._str(prop) && has(configProps, prop) && configProps[prop](val);
+  return is._str(prop) && has(CONFIG_PROPS, prop) && CONFIG_PROPS[prop](val);
 }
 
 
@@ -50,6 +57,7 @@ function isConfigProp(prop, val) {
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * @private
  * @param {string} str
  * @return {boolean}
  */
@@ -58,6 +66,7 @@ function hasAccent(str) {
 }
 
 /**
+ * @private
  * @param {string} style
  * @param {string} str
  * @return {string}
@@ -71,6 +80,7 @@ function getAccentStr(style, str) {
 }
 
 /**
+ * @private
  * @param {*} val
  * @return {string}
  */
@@ -90,6 +100,7 @@ function makeLogStr(val) {
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * @private
  * @param {string} style
  * @param {!Array} args
  * @param {boolean=} argMap
@@ -108,15 +119,17 @@ function log(style, args, argMap) {
 }
 
 /**
+ * @private
  * @param {number} spaces
  */
-function logSpace(spaces) {
+function logSpaces(spaces) {
   while (spaces--) {
     console.log('');
   }
 }
 
 /**
+ * @private
  * @param {string} style
  * @param {string} msg
  */
@@ -127,6 +140,7 @@ function logHeader(style, msg) {
 }
 
 /**
+ * @private
  * @param {string} style
  * @param {string} msg
  */
@@ -135,6 +149,7 @@ function logDetails(style, msg) {
 }
 
 /**
+ * @private
  * @param {!Object} obj
  */
 function logArgMap(obj) {
@@ -154,6 +169,7 @@ function logArgMap(obj) {
 }
 
 /**
+ * @private
  * @param {!Object} obj
  * @param {string=} style
  * @param {number=} indent
