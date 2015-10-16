@@ -125,101 +125,6 @@ function setOptions(options, instance) {
 
 
 // *****************************************************************************
-// SECTION: CONFIG
-// *****************************************************************************
-
-
-////////////////////////////////////////////////////////////////////////////////
-// SET THEMES
-////////////////////////////////////////////////////////////////////////////////
-
-/**
- * @private
- * @type {!{
- *   error: (string|!Array<string>),
- *   warn:  (string|!Array<string>),
- *   pass:  (string|!Array<string>),
- *   debug: (string|!Array<string>),
- *   plain: (string|!Array<string>),
- *   view:  (string|!Array<string>),
- *   fail:  (string|!Array<string>)
- * }}
- * @const
- */
-var THEMES = {
-  error: [ 'white', 'bold', 'bgRed'    ],
-  warn:  [ 'white', 'bold', 'bgYellow' ],
-  pass:  [ 'white', 'bold', 'bgGreen'  ],
-  debug: [ 'white', 'bold', 'bgBlue'   ],
-  plain: 'white',
-  view:  'cyan',
-  fail:  'red'
-};
-
-// accent settings for each theme
-colors.setTheme(
-  merge(themes, {
-    aerror: [ 'yellow',  'bold', 'bgRed'    ],
-    awarn:  [ 'blue',    'bold', 'bgYellow' ],
-    apass:  [ 'yellow',  'bold', 'bgGreen'  ],
-    adebug: [ 'magenta', 'bold', 'bgBlue'   ],
-    aplain: 'magenta',
-    aview:  'magenta',
-    afail:  'yellow'
-  })
-);
-
-
-////////////////////////////////////////////////////////////////////////////////
-// DEFINE PRIVATE CONFIG
-////////////////////////////////////////////////////////////////////////////////
-
-/**
- * @private
- * @type {!Object}
- * @const
- */
-var CONFIG = {
-  log: {
-    style: 'plain',
-    spaceBefore: 1,
-    spaceAfter: 1,
-    argMap: false
-  },
-  pass: {
-    spaceBefore: 1,
-    spaceAfter: 1,
-    argMap: false,
-    header: true
-  },
-  error: {
-    spaceBefore: 1,
-    spaceAfter: 1,
-    argMap: false,
-    header: true,
-    exit: true
-  },
-  warn: {
-    spaceBefore: 1,
-    spaceAfter: 1,
-    argMap: false,
-    header: true
-  },
-  debug: {
-    spaceBefore: 1,
-    spaceAfter: 1,
-    argMap: false,
-    header: true
-  },
-  fail: {
-    spaceBefore: 1,
-    spaceAfter: 1,
-    argMap: false
-  }
-};
-
-
-// *****************************************************************************
 // SECTION: GENERAL HELPERS
 // *****************************************************************************
 
@@ -436,6 +341,101 @@ function fill(arr, val) {
 
 
 // *****************************************************************************
+// SECTION: CONFIG
+// *****************************************************************************
+
+
+////////////////////////////////////////////////////////////////////////////////
+// SET THEMES
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @private
+ * @type {!{
+ *   error: (string|!Array<string>),
+ *   warn:  (string|!Array<string>),
+ *   pass:  (string|!Array<string>),
+ *   debug: (string|!Array<string>),
+ *   plain: (string|!Array<string>),
+ *   view:  (string|!Array<string>),
+ *   fail:  (string|!Array<string>)
+ * }}
+ * @const
+ */
+var THEMES = {
+  error: [ 'white', 'bold', 'bgRed'    ],
+  warn:  [ 'white', 'bold', 'bgYellow' ],
+  pass:  [ 'white', 'bold', 'bgGreen'  ],
+  debug: [ 'white', 'bold', 'bgBlue'   ],
+  plain: 'white',
+  view:  'cyan',
+  fail:  'red'
+};
+
+// accent settings for each theme
+colors.setTheme(
+  merge(clone(THEMES), {
+    aerror: [ 'yellow',  'bold', 'bgRed'    ],
+    awarn:  [ 'blue',    'bold', 'bgYellow' ],
+    apass:  [ 'yellow',  'bold', 'bgGreen'  ],
+    adebug: [ 'magenta', 'bold', 'bgBlue'   ],
+    aplain: 'magenta',
+    aview:  'magenta',
+    afail:  'yellow'
+  })
+);
+
+
+////////////////////////////////////////////////////////////////////////////////
+// DEFINE PRIVATE CONFIG
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @private
+ * @type {!Object}
+ * @const
+ */
+var CONFIG = {
+  log: {
+    style: 'plain',
+    spaceBefore: 1,
+    spaceAfter: 1,
+    argMap: false
+  },
+  pass: {
+    spaceBefore: 1,
+    spaceAfter: 1,
+    argMap: false,
+    header: true
+  },
+  error: {
+    spaceBefore: 1,
+    spaceAfter: 1,
+    argMap: false,
+    header: true,
+    exit: true
+  },
+  warn: {
+    spaceBefore: 1,
+    spaceAfter: 1,
+    argMap: false,
+    header: true
+  },
+  debug: {
+    spaceBefore: 1,
+    spaceAfter: 1,
+    argMap: false,
+    header: true
+  },
+  fail: {
+    spaceBefore: 1,
+    spaceAfter: 1,
+    argMap: false
+  }
+};
+
+
+// *****************************************************************************
 // SECTION: LOG HELPERS
 // *****************************************************************************
 
@@ -518,17 +518,23 @@ function makeLogStr(val) {
 
 /**
  * @private
+ * @param {*...} vals
+ */
+var log = has(global, 'logOCDLogger') ? logOCDLogger : console.log;
+
+/**
+ * @private
  * @param {string} style
  * @param {!Array} args
  * @param {boolean=} argMap
  */
-function log(style, args, argMap) {
+function logAny(style, args, argMap) {
   each(args, function(/** * */ val) {
     if ( is.func(val) || ( is.obj(val) && !is('regex|arr', val) ) ) {
       val.argMap || argMap ? logArgMap(val) : logObj(val, style);
     }
     else {
-      console.log(is._str(val) ?
+      log(is._str(val) ?
         getAccentStr(style, val) : colors[style]( makeLogStr(val) )
       );
     }
@@ -541,7 +547,7 @@ function log(style, args, argMap) {
  */
 function logSpaces(spaces) {
   while (spaces--) {
-    console.log('');
+    log('');
   }
 }
 
@@ -551,7 +557,7 @@ function logSpaces(spaces) {
  * @param {string} msg
  */
 function logHeader(style, msg) {
-  console.log(
+  log(
     colors[style](' ') + getAccentStr(style, msg) + colors[style]('        ')
   );
 }
@@ -562,7 +568,7 @@ function logHeader(style, msg) {
  * @param {string} msg
  */
 function logDetails(style, msg) {
-  console.log( colors[style]('  - ') + getAccentStr(style, msg) );
+  log( colors[style]('  - ') + getAccentStr(style, msg) );
 }
 
 /**
@@ -577,7 +583,7 @@ function logArgMap(obj) {
   each(obj, function(/** * */ val, /** string */ key) {
     if (key !== 'argMap') {
       str = makeLogStr(val);
-      console.log( colors.plain(key + ': ') + colors.view(str) );
+      log( colors.plain(key + ': ') + colors.view(str) );
       if ( is.func(val) || str === '{' ) {
         logObj(val, 'view', -1);
       }
@@ -601,7 +607,7 @@ function logObj(obj, style, indent) {
   style = style || 'view';
   indent = indent || 0;
 
-  indent || console.log(
+  indent || log(
     colors[style]( is.func(obj) ? '[ Function ]: {' : '{' )
   );
   indent = indent < 0 ? 0 : indent;
@@ -611,14 +617,14 @@ function logObj(obj, style, indent) {
   each(obj, function(/** * */ val, /** string */ key) {
     str = makeLogStr(val);
     if ( is.func(val) || str === '{' ) {
-      console.log( colors[style]('  ' + spaces + key + ': ' + str) );
+      log( colors[style]('  ' + spaces + key + ': ' + str) );
       logObj(val, style, (indent + 1));
     }
     else {
-      console.log( colors[style]('  ' + spaces + key + ': ' + str + ',') );
+      log( colors[style]('  ' + spaces + key + ': ' + str + ',') );
     }
   });
-  console.log(
+  log(
     colors[style]( spaces + '}' + (indent ? ',' : '') )
   );
 }
@@ -647,7 +653,7 @@ function logOCD() {
   }
 
   logSpaces(this._config.log.spaceBefore);
-  log(this._config.log.style, arguments, this._config.log.argMap);
+  logAny(this._config.log.style, arguments, this._config.log.argMap);
   logSpaces(this._config.log.spaceAfter);
 
   return true;
@@ -679,7 +685,7 @@ logOCD.pass = function(header) {
 
     if (arguments.length > 1) {
       logSpaces(1);
-      log('plain', slice(arguments, 1));
+      logAny('plain', slice(arguments, 1), this._config.pass.argMap);
     }
   }
   else {
@@ -688,7 +694,7 @@ logOCD.pass = function(header) {
 
     if (arguments.length) {
       logSpaces(1);
-      log('plain', arguments);
+      logAny('plain', arguments, this._config.pass.argMap);
     }
   }
 
@@ -725,7 +731,7 @@ logOCD.error = function(header, msg) {
 
     if (arguments.length > 2) {
       logSpaces(1);
-      log('view', slice(arguments, 2));
+      logAny('view', slice(arguments, 2), this._config.error.argMap);
     }
   }
   else {
@@ -746,7 +752,7 @@ logOCD.error = function(header, msg) {
 
     if (arguments.length > 1) {
       logSpaces(1);
-      log('view', slice(arguments, 1));
+      logAny('view', slice(arguments, 1), this._config.error.argMap);
     }
   }
 
@@ -784,7 +790,7 @@ logOCD.warn = function(header, msg) {
 
     if (arguments.length > 2) {
       logSpaces(1);
-      log('view', slice(arguments, 2));
+      logAny('view', slice(arguments, 2), this._config.warn.argMap);
     }
   }
   else {
@@ -805,7 +811,7 @@ logOCD.warn = function(header, msg) {
 
     if (arguments.length > 1) {
       logSpaces(1);
-      log('view', slice(arguments, 1));
+      logAny('view', slice(arguments, 1), this._config.warn.argMap);
     }
   }
 
@@ -840,7 +846,7 @@ logOCD.debug = function(header) {
 
     if (arguments.length > 1) {
       logSpaces(1);
-      log('plain', slice(arguments, 1));
+      logAny('plain', slice(arguments, 1), this._config.debug.argMap);
     }
   }
   else {
@@ -849,7 +855,7 @@ logOCD.debug = function(header) {
 
     if (arguments.length) {
       logSpaces(1);
-      log('plain', arguments);
+      logAny('plain', arguments, this._config.debug.argMap);
     }
   }
 
@@ -877,8 +883,10 @@ logOCD.fail = function(msg) {
   }
 
   logSpaces(this._config.fail.spaceBefore);
-  log('fail', msg);
-  arguments.length > 1 && log('view', slice(arguments, 1));
+  logAny('fail', msg);
+  arguments.length > 1 && logAny(
+    'view', slice(arguments, 1), this._config.fail.argMap
+  );
   logSpaces(this._config.fail.spaceAfter);
 
   return true;

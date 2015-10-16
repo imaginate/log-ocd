@@ -101,17 +101,23 @@ function makeLogStr(val) {
 
 /**
  * @private
+ * @param {*...} vals
+ */
+var log = has(global, 'logOCDLogger') ? logOCDLogger : console.log;
+
+/**
+ * @private
  * @param {string} style
  * @param {!Array} args
  * @param {boolean=} argMap
  */
-function log(style, args, argMap) {
+function logAny(style, args, argMap) {
   each(args, function(/** * */ val) {
     if ( is.func(val) || ( is.obj(val) && !is('regex|arr', val) ) ) {
       val.argMap || argMap ? logArgMap(val) : logObj(val, style);
     }
     else {
-      console.log(is._str(val) ?
+      log(is._str(val) ?
         getAccentStr(style, val) : colors[style]( makeLogStr(val) )
       );
     }
@@ -124,7 +130,7 @@ function log(style, args, argMap) {
  */
 function logSpaces(spaces) {
   while (spaces--) {
-    console.log('');
+    log('');
   }
 }
 
@@ -134,7 +140,7 @@ function logSpaces(spaces) {
  * @param {string} msg
  */
 function logHeader(style, msg) {
-  console.log(
+  log(
     colors[style](' ') + getAccentStr(style, msg) + colors[style]('        ')
   );
 }
@@ -145,7 +151,7 @@ function logHeader(style, msg) {
  * @param {string} msg
  */
 function logDetails(style, msg) {
-  console.log( colors[style]('  - ') + getAccentStr(style, msg) );
+  log( colors[style]('  - ') + getAccentStr(style, msg) );
 }
 
 /**
@@ -160,7 +166,7 @@ function logArgMap(obj) {
   each(obj, function(/** * */ val, /** string */ key) {
     if (key !== 'argMap') {
       str = makeLogStr(val);
-      console.log( colors.plain(key + ': ') + colors.view(str) );
+      log( colors.plain(key + ': ') + colors.view(str) );
       if ( is.func(val) || str === '{' ) {
         logObj(val, 'view', -1);
       }
@@ -184,7 +190,7 @@ function logObj(obj, style, indent) {
   style = style || 'view';
   indent = indent || 0;
 
-  indent || console.log(
+  indent || log(
     colors[style]( is.func(obj) ? '[ Function ]: {' : '{' )
   );
   indent = indent < 0 ? 0 : indent;
@@ -194,14 +200,14 @@ function logObj(obj, style, indent) {
   each(obj, function(/** * */ val, /** string */ key) {
     str = makeLogStr(val);
     if ( is.func(val) || str === '{' ) {
-      console.log( colors[style]('  ' + spaces + key + ': ' + str) );
+      log( colors[style]('  ' + spaces + key + ': ' + str) );
       logObj(val, style, (indent + 1));
     }
     else {
-      console.log( colors[style]('  ' + spaces + key + ': ' + str + ',') );
+      log( colors[style]('  ' + spaces + key + ': ' + str + ',') );
     }
   });
-  console.log(
+  log(
     colors[style]( spaces + '}' + (indent ? ',' : '') )
   );
 }
