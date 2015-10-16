@@ -26,6 +26,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * @public
  * @return {!LogOCD}
  */
 module.exports = function newLogOCD() {
@@ -43,3 +44,12 @@ module.exports = function newLogOCD() {
 
   return LogOCD;
 };
+
+
+// INSERT config.js
+
+// INSERT gen-helpers.js
+
+// INSERT log-helpers.js
+
+// INSERT methods.js
