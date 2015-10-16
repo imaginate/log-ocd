@@ -68,7 +68,7 @@ function getFile(filepath) {
 function insertFile(contents, filename) {
   filename += '.js';
   return contents.replace(
-    new RegExp('  \\/\\/ INSERT ' + filename.replace(/\./g, '\\.') + '\\n'),
+    new RegExp(' *\\/\\/ INSERT ' + filename.replace(/\./g, '\\.') + '\\n'),
     getFile('parts/' + filename)
   );
 }
