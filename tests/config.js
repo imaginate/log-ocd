@@ -99,7 +99,7 @@ var tests = {
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// RUN THE TESTS
+// RUN THE RESET TESTS
 ////////////////////////////////////////////////////////////////////////////////
 
 describe('logOCD.resetConfig', function() {
@@ -126,9 +126,16 @@ describe('logOCD.resetConfig', function() {
 
 });
 
+
+////////////////////////////////////////////////////////////////////////////////
+// RUN THE SET TESTS
+////////////////////////////////////////////////////////////////////////////////
+
 describe('logOCD.setConfig', function() {
 
+
   describe('\n    all.<prop>', function() {
+
     describe('truthy', function() {
       each(tests.props.truthy, function(/** * */ val, /** string */ prop) {
         it(prop, function() {
@@ -136,6 +143,7 @@ describe('logOCD.setConfig', function() {
         });
       });
     });
+
     describe('falsy', function() {
       each(tests.props.falsy, function(/** * */ val, /** string */ prop) {
         it(prop, function() {
@@ -143,9 +151,12 @@ describe('logOCD.setConfig', function() {
         });
       });
     });
+
   });
 
+
   describe('\n    <method>.<prop>', function() {
+
     describe('\n      truthy', function() {
       each(tests.methods.truthy,
         function(/** !Array<string> */ props, /** string */ method) {
@@ -159,6 +170,7 @@ describe('logOCD.setConfig', function() {
         }
       );
     });
+
     describe('\n      falsy', function() {
       each(tests.methods.falsy,
         function(/** !Array<string> */ props, /** string */ method) {
@@ -172,13 +184,11 @@ describe('logOCD.setConfig', function() {
         }
       );
     });
+
   });
 
-  describe('\n  logging behavior', function() {
 
-    before(function() {
-      log.setConfig('error.exit', false);
-    });
+  describe('\n  logging behavior', function() {
 
     beforeEach(function() {
       log.resetConfig('log', 'pass');
@@ -187,19 +197,17 @@ describe('logOCD.setConfig', function() {
     it('config.log.spaceBefore', function() {
       testLog();
       log.setConfig('log.spaceBefore', 2);
-      testLog('', '', 'test', '');
+      testLog('test', '', '', 'test', '');
     });
+
     it('config.log.spaceAfter', function() {
       testLog();
       log.setConfig('log.spaceAfter', 0);
-      testLog('', 'test', undefined);
+      testLog('test', '', 'test', undefined);
     });
-    it('config.log.style', function() {
-      testLog();
-      log.setConfig('log.style', 'fail');
-      testLog('', 'test', '');
-    });
+
   });
+
 });
 
 
@@ -248,18 +256,19 @@ function failReset(method) {
 }
 
 /**
- * @param {*...} logs
+ * @param {string=} content
+ * @param {*...=} logs
  */
-function testLog() {
+function testLog(content) {
 
   if (!arguments.length) {
-    testLog('', 'test', '');
+    testLog('test', '', 'test', '');
     return;
   }
 
   logs = [];
-  log('test');
-  each(arguments, function(/** * */ val, /** number */ i) {
-    assert(val, logs[i]);
+  log(content);
+  each(slice(arguments, 1), function(/** * */ val, /** number */ i) {
+    assert(val, logs[--i]);
   });
 }
