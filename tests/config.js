@@ -102,20 +102,44 @@ var tests = {
 // RUN THE TESTS
 ////////////////////////////////////////////////////////////////////////////////
 
-describe('log-ocd config', function() {
+describe('logOCD.resetConfig', function() {
+
+  describe('truthy', function() {
+    it('all', function() {
+      passReset();
+      passReset( Object.keys(tests.methods.truthy) );
+    });
+    each(Object.keys(tests.methods.truthy), function(/** string */ method) {
+      it(method, function() {
+        passReset(method);
+      });
+    });
+  });
+
+  describe('falsy', function() {
+    each('nope false extinct'.split(' '), function(/** string */ method) {
+      it(method, function() {
+        failReset(method);
+      });
+    });
+  });
+
+});
+
+describe('logOCD.setConfig', function() {
 
   describe('\n    all.<prop>', function() {
     describe('truthy', function() {
       each(tests.props.truthy, function(/** * */ val, /** string */ prop) {
         it(prop, function() {
-          pass('all', prop, val);
+          passSet('all', prop, val);
         });
       });
     });
     describe('falsy', function() {
       each(tests.props.falsy, function(/** * */ val, /** string */ prop) {
         it(prop, function() {
-          fail('all', prop, val);
+          failSet('all', prop, val);
         });
       });
     });
@@ -128,7 +152,7 @@ describe('log-ocd config', function() {
           describe(method + '.<prop>', function() {
             each(props, function(/** string */ prop) {
               it(prop, function() {
-                pass(method, prop);
+                passSet(method, prop);
               });
             });
           });
@@ -141,7 +165,7 @@ describe('log-ocd config', function() {
           describe(method + '.<prop>', function() {
             each(props, function(/** string */ prop) {
               it(prop, function() {
-                fail(method, prop);
+                failSet(method, prop);
               });
             });
           });
@@ -151,9 +175,15 @@ describe('log-ocd config', function() {
   });
 
   describe('\n  logging behavior', function() {
-    beforeEach(function() {
-      log.resetConfig();
+
+    before(function() {
+      log.setConfig('error.exit', false);
     });
+
+    beforeEach(function() {
+      log.resetConfig('log', 'pass');
+    });
+
     it('config.log.spaceBefore', function() {
       testLog();
       log.setConfig('log.spaceBefore', 2);
@@ -182,7 +212,7 @@ describe('log-ocd config', function() {
  * @param {string} prop
  * @param {*=} val
  */
-function pass(method, prop, val) {
+function passSet(method, prop, val) {
   val = is.undefined(val) ? tests.props.truthy[prop] : val;
   val = log.setConfig(method + '.' + prop, val);
   assert(true, val);
@@ -193,9 +223,27 @@ function pass(method, prop, val) {
  * @param {string} prop
  * @param {*=} val
  */
-function fail(method, prop, val) {
+function failSet(method, prop, val) {
   val = is.undefined(val) ? tests.props.truthy[prop] : val;
   val = log.setConfig(method + '.' + prop, val);
+  assert(false, val);
+}
+
+/**
+ * @param {string=} method
+ */
+function passReset(method) {
+  val = !method ?
+    log.resetConfig() : is.arr(method) ?
+      log.resetConfig.apply(null, method) : log.resetConfig(method);
+  assert(true, val);
+}
+
+/**
+ * @param {string=} method
+ */
+function failReset(method) {
+  val = method ? log.resetConfig(method) : log.resetConfig();
   assert(false, val);
 }
 
