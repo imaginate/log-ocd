@@ -928,7 +928,6 @@ logOCD.setConfig = function(prop, val) {
     return false;
   }
 
-  prop = prop.toLowerCase();
   method = prop.replace(/^([a-z]+)\..*$/, '$1');
   method = has(CONFIG, method) || method === 'all' ? method : '';
   prop = prop.replace(/^[a-z]+\.(.*)$/, '$1');
