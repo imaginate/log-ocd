@@ -107,14 +107,14 @@ describe('log-ocd config', function() {
   describe('\n    all.<prop>', function() {
     describe('truthy', function() {
       each(tests.props.truthy, function(/** * */ val, /** string */ prop) {
-        it('all.' + prop, function() {
+        it(prop, function() {
           pass('all', prop, val);
         });
       });
     });
     describe('falsy', function() {
       each(tests.props.falsy, function(/** * */ val, /** string */ prop) {
-        it('all.' + prop, function() {
+        it(prop, function() {
           fail('all', prop, val);
         });
       });
@@ -122,12 +122,12 @@ describe('log-ocd config', function() {
   });
 
   describe('\n    <method>.<prop>', function() {
-    describe('truthy', function() {
+    describe('\n      truthy', function() {
       each(tests.methods.truthy,
         function(/** !Array<string> */ props, /** string */ method) {
           describe(method + '.<prop>', function() {
             each(props, function(/** string */ prop) {
-              it(method + '.' + prop, function() {
+              it(prop, function() {
                 pass(method, prop);
               });
             });
@@ -135,12 +135,12 @@ describe('log-ocd config', function() {
         }
       );
     });
-    describe('falsy', function() {
+    describe('\n      falsy', function() {
       each(tests.methods.falsy,
         function(/** !Array<string> */ props, /** string */ method) {
           describe(method + '.<prop>', function() {
             each(props, function(/** string */ prop) {
-              it(method + '.' + prop, function() {
+              it(prop, function() {
                 fail(method, prop);
               });
             });
