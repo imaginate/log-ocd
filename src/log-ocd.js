@@ -959,11 +959,26 @@ logOCD.setConfig = function(prop, val) {
 /**
  * @public
  * @this {!LogOCD}
- * @param {string=} method - if left undefined all methods get reset
+ * @param {string...=} methods - if left undefined all methods get reset
  */
-logOCD.resetConfig = function(method) {
-  if ( is._str(method) && has(CONFIG, method) ) {
-    this._config[method] = clone( CONFIG[method] );
+logOCD.resetConfig = function() {
+
+  /** @type {string} */
+  var method;
+  /** @type {number} */
+  var i;
+
+  if (arguments.length) {
+    i = arguments.length;
+    while (i--) {
+      method = arguments[i];
+      if ( is._str(method) && has(CONFIG, method) ) {
+        this._config[method] = clone( CONFIG[method] );
+      }
+      else {
+        return false;
+      }
+    }
   }
   else {
     this._config = clone(CONFIG, true);
