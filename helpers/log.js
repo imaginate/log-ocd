@@ -656,7 +656,7 @@ function each(val, iteratee) {
   else if ( is.num(val) ) {
 
     // iterate specified number of times
-    while(cycles--) {
+    while(val--) {
       iteratee();
     }
   }
