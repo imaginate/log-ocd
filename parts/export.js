@@ -40,7 +40,7 @@ module.exports = function newLogOCD() {
     LogOCD[key] = method.bind(instance);
   });
 
-  instance.config = clone(CONFIG);
+  instance._config = clone(CONFIG, true);
 
   return LogOCD;
 };
