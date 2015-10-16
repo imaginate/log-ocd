@@ -102,26 +102,30 @@ var tests = {
 // RUN THE RESET TESTS
 ////////////////////////////////////////////////////////////////////////////////
 
-describe('logOCD.resetConfig', function() {
+describe('logOCD.resetConfig\n', function() {
 
-  describe('truthy', function() {
-    it('all', function() {
-      passReset();
-      passReset( Object.keys(tests.methods.truthy) );
-    });
-    each(Object.keys(tests.methods.truthy), function(/** string */ method) {
-      it(method, function() {
-        passReset(method);
+  describe('<method>', function() {
+
+    describe('truthy', function() {
+      it('all', function() {
+        passReset();
+        passReset( Object.keys(tests.methods.truthy) );
+      });
+      each(Object.keys(tests.methods.truthy), function(/** string */ method) {
+        it(method, function() {
+          passReset(method);
+        });
       });
     });
-  });
 
-  describe('falsy', function() {
-    each('nope false extinct'.split(' '), function(/** string */ method) {
-      it(method, function() {
-        failReset(method);
+    describe('falsy', function() {
+      each('nope false extinct'.split(' '), function(/** string */ method) {
+        it(method, function() {
+          failReset(method);
+        });
       });
     });
+
   });
 
 });
@@ -131,10 +135,10 @@ describe('logOCD.resetConfig', function() {
 // RUN THE SET TESTS
 ////////////////////////////////////////////////////////////////////////////////
 
-describe('logOCD.setConfig', function() {
+describe('logOCD.setConfig\n', function() {
 
 
-  describe('\n    all.<prop>', function() {
+  describe('all.<prop>', function() {
 
     describe('truthy', function() {
       each(tests.props.truthy, function(/** * */ val, /** string */ prop) {
@@ -155,9 +159,9 @@ describe('logOCD.setConfig', function() {
   });
 
 
-  describe('\n    <method>.<prop>', function() {
+  describe('\n    <method>.<prop>\n', function() {
 
-    describe('\n      truthy', function() {
+    describe('truthy', function() {
       each(tests.methods.truthy,
         function(/** !Array<string> */ props, /** string */ method) {
           describe(method + '.<prop>', function() {
