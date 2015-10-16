@@ -52,7 +52,7 @@ var THEMES = {
 
 // accent settings for each theme
 colors.setTheme(
-  merge(themes, {
+  merge(clone(THEMES), {
     aerror: [ 'yellow',  'bold', 'bgRed'    ],
     awarn:  [ 'blue',    'bold', 'bgYellow' ],
     apass:  [ 'yellow',  'bold', 'bgGreen'  ],
