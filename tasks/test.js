@@ -65,9 +65,9 @@ function getOptions(options) {
   options = is.str(options) ? options.split('+') : [];
 
   defaults = {
-    reporter: 'dot',
-    slow: 5,
-    timeout: 1000
+    reporter: 'spec',
+    slow: 50,
+    timeout: 5000
   };
   result = '--colors ';
 
@@ -84,7 +84,7 @@ function getOptions(options) {
     result += '--' + hyphenate(option) + ' ' + val + ' ';
   });
 
-  return result;
+  return result + ' --require ./helpers/vitals/basics.js ';
 }
 
 /**
@@ -92,7 +92,8 @@ function getOptions(options) {
  * @param {string} tests
  */
 function runTests(options, tests) {
-  exec('node ./node_modules/mocha/bin/mocha ' + options + ' ' + tests);
+  options = options.replace(/([^ ])$/, '$1 ');
+  exec('node ./node_modules/mocha/bin/mocha ' + options + tests);
 }
 
 /**
