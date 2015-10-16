@@ -37,7 +37,6 @@ var log = require('../src/log-ocd.js')({
   error: { exit: false }
 });
 
-console.log(log);
 
 ////////////////////////////////////////////////////////////////////////////////
 // SETUP THE TESTS
@@ -92,7 +91,7 @@ var tests = {
       spaceAfter: '1',
       argMap: null,
       header: null,
-      style: 'fail',
+      style: 'false',
       exit: null
     }
   }
