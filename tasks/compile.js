@@ -34,7 +34,7 @@ module.exports = newTask('compile', 'main', {
     contents = getFileIntro('src/log-ocd.js');
     contents += getFile('parts/export.js');
 
-    parts = 'config methods helpers';
+    parts = 'config gen-helpers log-helpers methods';
 
     each(parts.split(' '), function(/** string */ filename) {
       contents = insertFile(contents, filename);
