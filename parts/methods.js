@@ -73,7 +73,7 @@ logOCD.pass = function(header) {
 
     if (arguments.length > 1) {
       logSpaces(1);
-      log('plain', slice(arguments, 1));
+      log('plain', slice(arguments, 1), this._config.pass.argMap);
     }
   }
   else {
@@ -82,7 +82,7 @@ logOCD.pass = function(header) {
 
     if (arguments.length) {
       logSpaces(1);
-      log('plain', arguments);
+      log('plain', arguments, this._config.pass.argMap);
     }
   }
 
@@ -119,7 +119,7 @@ logOCD.error = function(header, msg) {
 
     if (arguments.length > 2) {
       logSpaces(1);
-      log('view', slice(arguments, 2));
+      log('view', slice(arguments, 2), this._config.error.argMap);
     }
   }
   else {
@@ -140,7 +140,7 @@ logOCD.error = function(header, msg) {
 
     if (arguments.length > 1) {
       logSpaces(1);
-      log('view', slice(arguments, 1));
+      log('view', slice(arguments, 1), this._config.error.argMap);
     }
   }
 
@@ -178,7 +178,7 @@ logOCD.warn = function(header, msg) {
 
     if (arguments.length > 2) {
       logSpaces(1);
-      log('view', slice(arguments, 2));
+      log('view', slice(arguments, 2), this._config.warn.argMap);
     }
   }
   else {
@@ -199,7 +199,7 @@ logOCD.warn = function(header, msg) {
 
     if (arguments.length > 1) {
       logSpaces(1);
-      log('view', slice(arguments, 1));
+      log('view', slice(arguments, 1), this._config.warn.argMap);
     }
   }
 
@@ -234,7 +234,7 @@ logOCD.debug = function(header) {
 
     if (arguments.length > 1) {
       logSpaces(1);
-      log('plain', slice(arguments, 1));
+      log('plain', slice(arguments, 1), this._config.debug.argMap);
     }
   }
   else {
@@ -243,7 +243,7 @@ logOCD.debug = function(header) {
 
     if (arguments.length) {
       logSpaces(1);
-      log('plain', arguments);
+      log('plain', arguments, this._config.debug.argMap);
     }
   }
 
@@ -271,7 +271,7 @@ logOCD.fail = function(msg) {
   }
 
   logSpaces(this._config.fail.spaceBefore);
-  log('fail', msg);
+  log('fail', msg, this._config.fail.argMap);
   arguments.length > 1 && log('view', slice(arguments, 1));
   logSpaces(this._config.fail.spaceAfter);
 
