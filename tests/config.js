@@ -157,17 +157,17 @@ describe('log-ocd config', function() {
     it('config.log.spaceBefore', function() {
       testLog();
       log.setConfig('log.spaceBefore', 2);
-      testLog('', '', colorStr('test'), '');
+      testLog('', '', 'test', '');
     });
     it('config.log.spaceAfter', function() {
       testLog();
       log.setConfig('log.spaceAfter', 0);
-      testLog('', colorStr('test'), undefined);
+      testLog('', 'test', undefined);
     });
     it('config.log.style', function() {
       testLog();
       log.setConfig('log.style', 'fail');
-      testLog('', colorStr('test', 31), '');
+      testLog('', 'test', '');
     });
   });
 });
@@ -205,7 +205,7 @@ function fail(method, prop, val) {
 function testLog() {
 
   if (!arguments.length) {
-    testLog('', colorStr('test'), '');
+    testLog('', 'test', '');
     return;
   }
 
@@ -214,13 +214,4 @@ function testLog() {
   each(arguments, function(/** * */ val, /** number */ i) {
     assert(val, logs[i]);
   });
-}
-
-/**
- * @param {string} str
- * @param {number=} code [default= 37]
- * @return {string}
- */
-function colorStr(str, code) {
-  return '\x1B[' + (code || 37) + 'm' + str + '\x1B[39m';
 }
