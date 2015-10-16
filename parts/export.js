@@ -124,9 +124,9 @@ function setOptions(options, instance) {
   });
 }
 
-// INSERT config.js
-
 // INSERT gen-helpers.js
+
+// INSERT config.js
 
 // INSERT log-helpers.js
 
