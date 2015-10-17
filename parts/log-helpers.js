@@ -87,7 +87,7 @@ function getAccentStr(style, str) {
 function makeLogStr(val) {
   return is.str(val) ?
     val || '""' : is.func(val) ?
-      '[ Function ]: {' : is.arr(val) ?
+      '[Function] {' : is.arr(val) ?
         '[ '+ val.join(', ') +' ]' : is.args(val) ?
           '[ '+ slice(val).join(', ') +' ]' : is.regex(val) ?
             val.toString() : is.obj(val) ?
@@ -191,7 +191,7 @@ function logObj(obj, style, indent) {
   indent = indent || 0;
 
   indent || log(
-    colors[style]( is.func(obj) ? '[ Function ]: {' : '{' )
+    colors[style]( is.func(obj) ? '[Function] {' : '{' )
   );
   indent = indent < 0 ? 0 : indent;
 
