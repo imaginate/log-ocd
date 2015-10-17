@@ -63,7 +63,7 @@ function has(obj, prop) {
  * A shortcut for Array.prototype.slice.call(obj, start).
  * @private
  * @param {Object} obj
- * @param {number=} start [default= 0]
+ * @param {number=} start - negative numbers not allowed [default= 0]
  * @return {Array}
  */
 function slice(obj, start) {
@@ -73,20 +73,24 @@ function slice(obj, start) {
   /** @type {number} */
   var len;
   /** @type {number} */
+  var ii;
+  /** @type {number} */
   var i;
 
   if ( !is.obj(obj) || !has(obj, 'length') ) {
     return null;
   }
 
-  len = obj.length;
-  start = !start ? 0 : start < 0 ? len + start : start;
+  start = start || 0;
+  len = obj.length - start;
 
-  arr = start < len ? new Array( (len - start) ) : [];
-  i = start - 1;
+  arr = len ? new Array(len) : [];
+  ii = start;
+  i = -1;
   while (++i < len) {
-    arr[i] = obj[i];
+    arr[i] = obj[ii++];
   }
+
   return arr;
 }
 
