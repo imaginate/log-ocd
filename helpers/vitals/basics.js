@@ -120,6 +120,8 @@ global.slice = function slice(obj, start, end) {
   /** @type {number} */
   var len;
   /** @type {number} */
+  var ii;
+  /** @type {number} */
   var i;
 
   if ( !is.obj(obj) || !has(obj, 'length') ) {
@@ -135,9 +137,10 @@ global.slice = function slice(obj, start, end) {
       len + end : end;
 
   arr = start < end ? new Array( (end - start) ) : [];
-  i = start - 1;
-  while (++i < end) {
-    arr[i] = obj[i];
+  ii = start - 1;
+  i = 0;
+  while (++ii < end) {
+    arr[i++] = obj[ii];
   }
   return arr;
 };
