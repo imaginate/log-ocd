@@ -197,15 +197,15 @@ describe('logOCD.setConfig\n', function() {
     });
 
     it('config.log.spaceBefore', function() {
-      testLog();
+      testLog(log, [ 'test' ], [ '', 'test', '' ]);
       log.setConfig('log.spaceBefore', 2);
-      testLog('test', '', '', 'test', '');
+      testLog(log, [ 'test' ], [ '', '', 'test', '' ]);
     });
 
     it('config.log.spaceAfter', function() {
-      testLog();
+      testLog(log, [ 'test' ], [ '', 'test', '' ]);
       log.setConfig('log.spaceAfter', 0);
-      testLog('test', '', 'test', undefined);
+      testLog(log, [ 'test' ], [ '', 'test', undefined ]);
     });
   });
 });
@@ -256,19 +256,14 @@ function failReset(method) {
 }
 
 /**
- * @param {string=} content
- * @param {*...=} logs
+ * @param {function} method
+ * @param {!Array<string>} args
+ * @param {!Array<string>} results
  */
-function testLog(content) {
-
-  if (!arguments.length) {
-    testLog('test', '', 'test', '');
-    return;
-  }
-
+function testLog(method, args, results) {
   logs = [];
-  log(content);
-  each(slice(arguments, 1), function(/** * */ val, /** number */ i) {
-    assert(val, logs[--i]);
+  method.apply(null, args);
+  each(results, function(/** * */ val, /** number */ i) {
+    assert(val, logs[i]);
   });
 }
