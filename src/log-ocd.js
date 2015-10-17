@@ -507,7 +507,7 @@ function makeLogStr(val) {
       '[ Function ]: {' : is.arr(val) ?
         '[ '+ val.join(', ') +' ]' : is.args(val) ?
           '[ '+ slice(val).join(', ') +' ]' : is.regex(val) ?
-            '/'+ val.source +'/'+ val.flags : is.obj(val) ?
+            val.toString() : is.obj(val) ?
               '{' : String(val);
 }
 
