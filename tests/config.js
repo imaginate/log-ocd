@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------------------------------
- * LOG-OCD CONFIG TESTS
+ * LOG-OCD TESTS: CONFIG
  * -----------------------------------------------------------------------------
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
  *
@@ -16,32 +16,14 @@
  * @see [Closure Compiler specific JSDoc]{@link https://developers.google.com/closure/compiler/docs/js-for-compiler}
  */
 
-/** @type {function} */
-var assert = require('assert').strictEqual;
-
-// note: ../helpers/vitals/basics.js is auto-loaded
-
-
-////////////////////////////////////////////////////////////////////////////////
-// SETUP LOG-OCD FOR TESTS
-////////////////////////////////////////////////////////////////////////////////
-
-/** @type {!Array<string>} */
-var logs = [];
-
-/** @type {function} */
-global.logOCDLogger = function(str) {
-  logs.push(str);
-};
-
 /** @type {Function<string, function>} */
-var log = require('../src/log-ocd.js')({
+var logOCD = require('../src/log-ocd.js')({
   error: { exit: false }
 });
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// SETUP THE TESTS
+// THE CONFIG TESTS
 ////////////////////////////////////////////////////////////////////////////////
 
 /*
@@ -106,23 +88,27 @@ var tests = {
 
 describe('logOCD.resetConfig\n', function() {
 
-  describe('<method>', function() {
+  describe('resetConfig("<method>")', function() {
 
-    describe('truthy', function() {
-      it('all', function() {
+    describe('each should return true', function() {
+
+      /** @type {!Array<string>} */
+      var keys = Object.keys(tests.methods.truthy);
+
+      it('resetConfig() && resetConfig(' + keys.join(', ') + ')', function() {
         passReset();
-        passReset( Object.keys(tests.methods.truthy) );
+        passReset(keys);
       });
-      each(Object.keys(tests.methods.truthy), function(/** string */ method) {
-        it(method, function() {
+      each(keys, function(/** string */ method) {
+        it('resetConfig(' + method + ')', function() {
           passReset(method);
         });
       });
     });
 
-    describe('falsy', function() {
+    describe('each should return false', function() {
       each('nope false extinct'.split(' '), function(/** string */ method) {
-        it(method, function() {
+        it('resetConfig(' + method + ')', function() {
           failReset(method);
         });
       });
@@ -137,12 +123,11 @@ describe('logOCD.resetConfig\n', function() {
 
 describe('logOCD.setConfig\n', function() {
 
-
-  describe('all.<prop>', function() {
+  describe('setConfig("all.<prop>", val)', function() {
 
     describe('truthy', function() {
       each(tests.props.truthy, function(/** * */ val, /** string */ prop) {
-        it(prop, function() {
+        it('setConfig("all.' + prop + '", ' + val + ')', function() {
           passSet('all', prop, val);
         });
       });
@@ -190,22 +175,22 @@ describe('logOCD.setConfig\n', function() {
   });
 
 
-  describe('\n  logging behavior', function() {
+  describe('\n  logOCD.setConfig should change logging behavior', function() {
 
     beforeEach(function() {
-      log.resetConfig('log', 'pass');
+      logOCD.resetConfig('log', 'pass');
     });
 
     it('config.log.spaceBefore', function() {
-      testLog(log, [ 'test' ], [ '', 'test', '' ]);
-      log.setConfig('log.spaceBefore', 2);
-      testLog(log, [ 'test' ], [ '', '', 'test', '' ]);
+      testLog(logOCD, [ 'test' ], [ '', 'test', '' ]);
+      logOCD.setConfig('log.spaceBefore', 2);
+      testLog(logOCD, [ 'test' ], [ '', '', 'test', '' ]);
     });
 
     it('config.log.spaceAfter', function() {
-      testLog(log, [ 'test' ], [ '', 'test', '' ]);
-      log.setConfig('log.spaceAfter', 0);
-      testLog(log, [ 'test' ], [ '', 'test', undefined ]);
+      testLog(logOCD, [ 'test' ], [ '', 'test', '' ]);
+      logOCD.setConfig('log.spaceAfter', 0);
+      testLog(logOCD, [ 'test' ], [ '', 'test', undefined ]);
     });
   });
 });
@@ -222,7 +207,7 @@ describe('logOCD.setConfig\n', function() {
  */
 function passSet(method, prop, val) {
   val = is.undefined(val) ? tests.props.truthy[prop] : val;
-  val = log.setConfig(method + '.' + prop, val);
+  val = logOCD.setConfig(method + '.' + prop, val);
   assert(true, val);
 }
 
@@ -233,7 +218,7 @@ function passSet(method, prop, val) {
  */
 function failSet(method, prop, val) {
   val = is.undefined(val) ? tests.props.truthy[prop] : val;
-  val = log.setConfig(method + '.' + prop, val);
+  val = logOCD.setConfig(method + '.' + prop, val);
   assert(false, val);
 }
 
@@ -242,8 +227,8 @@ function failSet(method, prop, val) {
  */
 function passReset(method) {
   val = !method ?
-    log.resetConfig() : is.arr(method) ?
-      log.resetConfig.apply(null, method) : log.resetConfig(method);
+    logOCD.resetConfig() : is.arr(method) ?
+      logOCD.resetConfig.apply(null, method) : logOCD.resetConfig(method);
   assert(true, val);
 }
 
@@ -251,19 +236,6 @@ function passReset(method) {
  * @param {string=} method
  */
 function failReset(method) {
-  val = method ? log.resetConfig(method) : log.resetConfig();
+  val = method ? logOCD.resetConfig(method) : logOCD.resetConfig();
   assert(false, val);
-}
-
-/**
- * @param {function} method
- * @param {!Array<string>} args
- * @param {!Array<string>} results
- */
-function testLog(method, args, results) {
-  logs = [];
-  method.apply(null, args);
-  each(results, function(/** * */ val, /** number */ i) {
-    assert(val, logs[i]);
-  });
 }

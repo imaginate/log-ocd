@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------------------------------
- * LOG-OCD METHOD TESTS
+ * LOG-OCD TESTS: METHODS
  * -----------------------------------------------------------------------------
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
  *
@@ -16,24 +16,6 @@
  * @see [Closure Compiler specific JSDoc]{@link https://developers.google.com/closure/compiler/docs/js-for-compiler}
  */
 
-/** @type {function} */
-var assert = require('assert').strictEqual;
-
-// note: ../helpers/vitals/basics.js is auto-loaded
-
-
-////////////////////////////////////////////////////////////////////////////////
-// SETUP LOG-OCD FOR TESTS
-////////////////////////////////////////////////////////////////////////////////
-
-/** @type {!Array<string>} */
-var logs = [];
-
-/** @type {function} */
-global.logOCDLogger = function(str) {
-  logs.push(str);
-};
-
 /** @type {Function<string, function>} */
 var logOCD = require('../src/log-ocd.js')({
   all: {
@@ -45,7 +27,7 @@ var logOCD = require('../src/log-ocd.js')({
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// SETUP THE TESTS
+// THE MEHTODS TESTS
 ////////////////////////////////////////////////////////////////////////////////
 
 /*
@@ -159,20 +141,6 @@ each(tests.methods, function(/** function */ method, /** string */ name) {
 ////////////////////////////////////////////////////////////////////////////////
 // PRIVATE HELPERS
 ////////////////////////////////////////////////////////////////////////////////
-
-/**
- * @private
- * @param {function} method
- * @param {!Array<string>} args
- * @param {!Array<string>} results
- */
-function testLog(method, args, results) {
-  logs = [];
-  method.apply(null, args);
-  each(results, function(/** * */ val, /** number */ i) {
-    assert(val, logs[i]);
-  });
-}
 
 /**
  * @private
