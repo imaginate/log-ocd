@@ -887,7 +887,7 @@ logOCD.fail = function(msg) {
   }
 
   logSpaces(this._config.fail.spaceBefore);
-  logAny('fail', msg);
+  logAny('fail', [ msg ]);
   arguments.length > 1 && logAny(
     'view', slice(arguments, 1), this._config.fail.argMap
   );
