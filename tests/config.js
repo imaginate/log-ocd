@@ -19,6 +19,8 @@
 /** @type {function} */
 var assert = require('assert').strictEqual;
 
+// note: ../helpers/vitals/basics.js is auto-loaded
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // SETUP LOG-OCD FOR TESTS
@@ -125,9 +127,7 @@ describe('logOCD.resetConfig\n', function() {
         });
       });
     });
-
   });
-
 });
 
 
@@ -155,7 +155,6 @@ describe('logOCD.setConfig\n', function() {
         });
       });
     });
-
   });
 
 
@@ -188,7 +187,6 @@ describe('logOCD.setConfig\n', function() {
         }
       );
     });
-
   });
 
 
@@ -209,9 +207,7 @@ describe('logOCD.setConfig\n', function() {
       log.setConfig('log.spaceAfter', 0);
       testLog('test', '', 'test', undefined);
     });
-
   });
-
 });
 
 
