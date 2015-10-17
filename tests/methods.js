@@ -85,7 +85,8 @@ var tests = {
       [ 'header' ]
     ],
     error: [
-      //[ '' ]
+      [ 'header', 'msg: `accent` ...', { argMap: true, a: /regex/i } ],
+      [ 'header', 'msg' ]
     ],
     warn: [
       //[ '' ]
@@ -101,7 +102,7 @@ var tests = {
     log: [
       [ 
         'str',
-        '[ Function ]: {', '  a: func,', '}',
+        '[Function] {', '  a: func,', '}',
         '[ arr ]',
         '/regex/i',
         '{', '  a: obj,', '}'
@@ -110,10 +111,11 @@ var tests = {
     ],
     pass: [
       [ ' header        ', '', 'str' ],
-      [ ' header        ' ]
+      [ ' header        ', undefined, undefined ]
     ],
     error: [
-      //[ '' ]
+      [ ' header        ', '  - msg: accent ...', '', 'a: /regex/i' ],
+      [ ' header        ', '  - msg', undefined, undefined ]
     ],
     warn: [
       //[ '' ]
@@ -132,12 +134,17 @@ var tests = {
 // RUN THE TESTS
 ////////////////////////////////////////////////////////////////////////////////
 
-each(tests.methods, function(/** function */ log, /** string */ method) {
-  describe('logOCD.' + method + '\n', function() {
-    each(tests.args[method], function(/** !Array<*> */ args, /** number */ i) {
-      it('(' + args.join(', ') + ')', function() {
-        testLog(log, args, tests.results[method][i]);
-      })
+each(tests.methods, function(/** function */ method, /** string */ name) {
+
+  describe('logOCD.' + name + '\n', function() {
+    each(tests.args[name], function(/** !Array<*> */ args, /** number */ i) {
+
+      /** @type {!Array<*>} */
+      var results = tests.results[name][i];
+
+      it(testTitle(name, args, results), function() {
+        testLog(method, args, results);
+      });
     });
   });
 });
@@ -148,6 +155,7 @@ each(tests.methods, function(/** function */ log, /** string */ method) {
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * @private
  * @param {function} method
  * @param {!Array<string>} args
  * @param {!Array<string>} results
@@ -158,4 +166,80 @@ function testLog(method, args, results) {
   each(results, function(/** * */ val, /** number */ i) {
     assert(val, logs[i]);
   });
+}
+
+/**
+ * @private
+ * @param {string} name
+ * @param {!Array<string>} args
+ * @param {!Array<string>} results
+ * @return {string}
+ */
+function testTitle(name, args, results) {
+
+  /** @type {string} */
+  var result;
+  /** @type {number} */
+  var last;
+
+  result = name === 'log' ? name : 'log.' + name;
+  result += '(';
+  last = args.length - 1;
+  each(args, function(/** * */ arg, /** number */ i) {
+    result += makeValStr(arg) + ( i === last ? '' : ', ' );
+  });
+  result += ') ';
+
+  result += 'should log =>\n        ';
+  last = results.length;
+  each(results, function(/** * */ log, /** number */ i) {
+    result += (++i) + ') ' + makeValStr(log) + ( i === last ? '' : '\n        ' );
+  });
+
+  return result;
+}
+
+/**
+ * @private
+ * @param {*} val
+ * @return {string}
+ */
+function makeValStr(val) {
+  return is.obj(val) ?
+    getObjStr(val) : is.str(val) ?
+      '"' + val + '"' : String(val);
+}
+
+/**
+ * @private
+ * @param {(!Object|function)} obj
+ * @return {string}
+ */
+function getObjStr(obj) {
+
+  /** @type {!Array<string>} */
+  var keys;
+  /** @type {number} */
+  var last;
+  /** @type {string} */
+  var result;
+
+  if ( is.regex(obj) ) {
+    return obj.toString();
+  }
+
+  if ( is._arr(obj) ) {
+    result = is.args(obj) ? '[Arguments] [ ' : '[ ';
+    obj = slice(obj);
+    return result + obj.join(', ') + ' ]';
+  }
+
+  keys = Object.keys(obj);
+  last = keys.length - 1;
+
+  result = is.func(obj) ? '[Function] { ' : '{ ';
+  each(keys, function(/** string */ key, /** number */ i) {
+    result += key + ': ' + String( obj[key] ) + ( i === last ? '' : ', ' );
+  });
+  return result + ' }';
 }
