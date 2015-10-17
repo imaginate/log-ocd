@@ -89,13 +89,16 @@ var tests = {
       [ 'header', 'msg' ]
     ],
     warn: [
-      //[ '' ]
+      [ 'header', 'msg: `accent` ...', /regex/i ],
+      [ 'header', 'msg' ]
     ],
     debug: [
-      //[ '' ]
+      [ 'header', 'str' ],
+      [ 'header' ]
     ],
     fail: [
-      //[ '' ]
+      [ 'msg', 'str' ],
+      [ 'msg' ]
     ]
   },
   results: {
@@ -118,13 +121,16 @@ var tests = {
       [ ' header        ', '  - msg', undefined, undefined ]
     ],
     warn: [
-      //[ '' ]
+      [ ' header        ', '  - msg: accent ...', '', '/regex/i' ],
+      [ ' header        ', '  - msg', undefined, undefined ]
     ],
     debug: [
-      //[ '' ]
+      [ ' header        ', '', 'str' ],
+      [ ' header        ', undefined, undefined ]
     ],
     fail: [
-      //[ '' ]
+      [ 'msg', 'str' ],
+      [ 'msg', undefined ]
     ]
   }
 };
@@ -193,7 +199,10 @@ function testTitle(name, args, results) {
   result += 'should log =>\n        ';
   last = results.length;
   each(results, function(/** * */ log, /** number */ i) {
-    result += (++i) + ') ' + makeValStr(log) + ( i === last ? '' : '\n        ' );
+    if ( !is.undefined(log) ) {
+      result += ( ++i ) + ') ' + makeValStr(log);
+      result += i === last ? '' : '\n        ';
+    }
   });
 
   return result;
