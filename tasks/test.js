@@ -84,7 +84,7 @@ function getOptions(options) {
     result += '--' + hyphenate(option) + ' ' + val + ' ';
   });
 
-  return result + ' --require ./helpers/vitals/basics.js ';
+  return result + '--require ./tests/setup.js --globals logOCD ';
 }
 
 /**
