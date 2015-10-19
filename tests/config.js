@@ -81,36 +81,36 @@ var tests = {
   }
 };
 
+/** @type {!Array<string>} */
+var methods = Object.keys(tests.methods.truthy);
+/** @type {!Array<string>} */
+var props = Object.keys(tests.props.truthy);
+
 
 ////////////////////////////////////////////////////////////////////////////////
-// RUN THE RESET TESTS
+// RUN resetConfig TESTS
 ////////////////////////////////////////////////////////////////////////////////
 
-describe('logOCD.resetConfig\n', function() {
+describe('logOCD.resetConfig("<method>")\n', function() {
 
-  describe('resetConfig("<method>")', function() {
-
-    describe('each should return true', function() {
-
-      /** @type {!Array<string>} */
-      var keys = Object.keys(tests.methods.truthy);
-
-      it('resetConfig() && resetConfig(' + keys.join(', ') + ')', function() {
-        passReset();
-        passReset(keys);
-      });
-      each(keys, function(/** string */ method) {
-        it('resetConfig(' + method + ')', function() {
-          passReset(method);
-        });
+  describe('each should return true', function() {
+    it(getResetTitle(),function(){
+      passReset();
+    });
+    it(getResetTitle(methods), function() {
+      passReset(methods);
+    });
+    each(methods, function(/** string */ method) {
+      it(getResetTitle(method), function() {
+        passReset(method);
       });
     });
+  });
 
-    describe('each should return false', function() {
-      each('nope false extinct'.split(' '), function(/** string */ method) {
-        it('resetConfig(' + method + ')', function() {
-          failReset(method);
-        });
+  describe('\n    each should return false', function() {
+    each('nope false extinct'.split(' '), function(/** string */ method) {
+      it(getResetTitle(method), function() {
+        failReset(method);
       });
     });
   });
@@ -118,76 +118,69 @@ describe('logOCD.resetConfig\n', function() {
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// RUN THE SET TESTS
+// RUN setConfig TESTS
 ////////////////////////////////////////////////////////////////////////////////
 
-describe('logOCD.setConfig\n', function() {
+describe('logOCD.setConfig("<method>.<prop>", val)\n', function() {
 
-  describe('setConfig("all.<prop>", val)', function() {
 
-    describe('truthy', function() {
+  describe('each should return true', function() {
+
+    describe(getSetTitle('all'), function() {
       each(tests.props.truthy, function(/** * */ val, /** string */ prop) {
-        it('setConfig("all.' + prop + '", ' + val + ')', function() {
+        it(getSetTitle('all', prop, val), function() {
           passSet('all', prop, val);
         });
       });
     });
 
-    describe('falsy', function() {
-      each(tests.props.falsy, function(/** * */ val, /** string */ prop) {
-        it(prop, function() {
-          failSet('all', prop, val);
+    each(methods, function(/** string */ method) {
+      describe(getSetTitle(method), function() {
+        each(tests.methods.truthy[method], function(/** string */ prop) {
+          it(getSetTitle(true, method, prop), function() {
+            passSet(method, prop);
+          });
         });
       });
     });
   });
 
 
-  describe('\n    <method>.<prop>\n', function() {
+  describe('\n    each should return false', function() {
 
-    describe('truthy', function() {
-      each(tests.methods.truthy,
-        function(/** !Array<string> */ props, /** string */ method) {
-          describe(method + '.<prop>', function() {
-            each(props, function(/** string */ prop) {
-              it(prop, function() {
-                passSet(method, prop);
-              });
-            });
-          });
-        }
-      );
+    describe(getSetTitle('all'), function() {
+      each(tests.props.falsy, function(/** * */ val, /** string */ prop) {
+        it(getSetTitle('all', prop, val), function() {
+          failSet('all', prop, val);
+        });
+      });
     });
 
-    describe('\n      falsy', function() {
-      each(tests.methods.falsy,
-        function(/** !Array<string> */ props, /** string */ method) {
-          describe(method + '.<prop>', function() {
-            each(props, function(/** string */ prop) {
-              it(prop, function() {
-                failSet(method, prop);
-              });
-            });
+    each(methods, function(/** string */ method) {
+      describe(getSetTitle(method), function() {
+        each(tests.methods.falsy[method], function(/** string */ prop) {
+          it(getSetTitle(false, method, prop), function() {
+            failSet(method, prop);
           });
-        }
-      );
+        });
+      });
     });
   });
 
 
-  describe('\n  logOCD.setConfig should change logging behavior', function() {
+  describe('each should change logging behavior', function() {
 
     beforeEach(function() {
       logOCD.resetConfig('log', 'pass');
     });
 
-    it('config.log.spaceBefore', function() {
+    it(getSetTitle('log', 'spaceBefore', 2), function() {
       testLog(logOCD, [ 'test' ], [ '', 'test', '' ]);
       logOCD.setConfig('log.spaceBefore', 2);
       testLog(logOCD, [ 'test' ], [ '', '', 'test', '' ]);
     });
 
-    it('config.log.spaceAfter', function() {
+    it(getSetTitle('log', 'spaceAfter', 0), function() {
       testLog(logOCD, [ 'test' ], [ '', 'test', '' ]);
       logOCD.setConfig('log.spaceAfter', 0);
       testLog(logOCD, [ 'test' ], [ '', 'test', undefined ]);
@@ -239,3 +232,37 @@ function failReset(method) {
   val = method ? logOCD.resetConfig(method) : logOCD.resetConfig();
   assert(false, val);
 }
+
+/**
+ * @param {(string|!Array<string>)=} method
+ * @return {string}
+ */
+function getResetTitle(method) {
+  method = is.arr(method) ? method.join('", "') : method;
+  return method ? 'resetConfig("' + method + '")' : 'resetConfig()';
+}
+
+/**
+ * @param {boolean=} props - truthy or falsy
+ * @param {string=} method
+ * @param {string=} prop
+ * @param {*=} val
+ * @return {string}
+ */
+function getSetTitle(props, method, prop, val) {
+  if ( is.bool(props) ) {
+    val = props ? tests.props.truthy[prop] : tests.props.falsy[prop];
+  }
+  else {
+    val = prop;
+    prop = method;
+    method = props;
+  }
+  val = is.undefined(val) ?
+    'val' : is.string(val) ?
+      '"' + val + '"' : val;
+  method = method || '<method>';
+  prop = prop || '<prop>';
+  return 'setConfig("' + method + '.' + prop + '", ' + val + ')';
+}
+
