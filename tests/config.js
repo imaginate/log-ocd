@@ -185,6 +185,18 @@ describe('logOCD.setConfig("<method>.<prop>", val)\n', function() {
       logOCD.setConfig('log.spaceAfter', 0);
       testLog(logOCD, [ 'test' ], [ '', 'test', undefined ]);
     });
+
+    it(getSetTitle('log', 'argMap', true), function() {
+      testLog(logOCD, [ { a: 'test' } ], [ '', '{', '  a: test', '}', '' ]);
+      logOCD.setConfig('log.argMap', true);
+      testLog(logOCD, [ { a: 'test' } ], [ '', 'a: test', '' ]);
+    });
+
+    it(getSetTitle('pass', 'header', false), function() {
+      testLog(logOCD, [ 'test' ], [ '', ' test        ', '' ]);
+      logOCD.setConfig('pass.header', false);
+      testLog(logOCD, [ 'test' ], [ '', ' Pass        ', '', 'test', '' ]);
+    });
   });
 });
 
