@@ -123,53 +123,37 @@ describe('logOCD.resetConfig("<method>")\n', function() {
 
 describe('logOCD.setConfig("<method>.<prop>", val)\n', function() {
 
-
   describe('each should return true', function() {
-
-    describe(getSetTitle('all'), function() {
-      each(tests.props.truthy, function(/** * */ val, /** string */ prop) {
-        it(getSetTitle('all', prop, val), function() {
-          passSet('all', prop, val);
-        });
+    each(tests.props.truthy, function(/** * */ val, /** string */ prop) {
+      it(getSetTitle('all', prop, val), function() {
+        passSet('all', prop, val);
       });
     });
-
     each(methods, function(/** string */ method) {
-      describe(getSetTitle(method), function() {
-        each(tests.methods.truthy[method], function(/** string */ prop) {
-          it(getSetTitle(true, method, prop), function() {
-            passSet(method, prop);
-          });
+      each(tests.methods.truthy[method], function(/** string */ prop) {
+        it(getSetTitle(true, method, prop), function() {
+          passSet(method, prop);
         });
       });
     });
   });
-
 
   describe('\n    each should return false', function() {
-
-    describe(getSetTitle('all'), function() {
-      each(tests.props.falsy, function(/** * */ val, /** string */ prop) {
-        it(getSetTitle('all', prop, val), function() {
-          failSet('all', prop, val);
-        });
+    each(tests.props.falsy, function(/** * */ val, /** string */ prop) {
+      it(getSetTitle('all', prop, val), function() {
+        failSet('all', prop, val);
       });
     });
-
     each(methods, function(/** string */ method) {
-      describe(getSetTitle(method), function() {
-        each(tests.methods.falsy[method], function(/** string */ prop) {
-          it(getSetTitle(false, method, prop), function() {
-            failSet(method, prop);
-          });
+      each(tests.methods.falsy[method], function(/** string */ prop) {
+        it(getSetTitle(false, method, prop), function() {
+          failSet(method, prop);
         });
       });
     });
   });
 
-
-  describe('each should change logging behavior', function() {
-
+  describe('\n    each should change logging behavior', function() {
     beforeEach(function() {
       logOCD.resetConfig('log', 'pass');
     });
@@ -187,15 +171,15 @@ describe('logOCD.setConfig("<method>.<prop>", val)\n', function() {
     });
 
     it(getSetTitle('log', 'argMap', true), function() {
-      testLog(logOCD, [ { a: 'test' } ], [ '', '{', '  a: test', '}', '' ]);
+      testLog(logOCD, [ { a: 'test' } ], [ '', '{', '  a: test,', '}', '' ]);
       logOCD.setConfig('log.argMap', true);
       testLog(logOCD, [ { a: 'test' } ], [ '', 'a: test', '' ]);
     });
 
     it(getSetTitle('pass', 'header', false), function() {
-      testLog(logOCD, [ 'test' ], [ '', ' test        ', '' ]);
+      testLog(logOCD.pass, [ 'test' ], [ '', ' test        ', '' ]);
       logOCD.setConfig('pass.header', false);
-      testLog(logOCD, [ 'test' ], [ '', ' Pass        ', '', 'test', '' ]);
+      testLog(logOCD.pass, [ 'test' ], [ '', ' Pass        ', '', 'test', '' ]);
     });
   });
 });
