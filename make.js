@@ -6,6 +6,8 @@
  *   Tasks are executed in the order given. Tasks may be repeated. You may view
  *   each task's source code in the "tasks" directory as "taskname.js".
  *
+ * @see [makefile docs](https://github.com/imaginate/log-ocd/blob/master/docs/makefile.md)
+ *
  * @author Adam Smith <adam@imaginate.life> (https://github.com/imaginate)
  * @copyright 2015 Adam A Smith <adam@imaginate.life> (https://github.com/imaginate)
  *
@@ -16,50 +18,6 @@
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
  * @see [Closure Compiler specific JSDoc]{@link https://developers.google.com/closure/compiler/docs/js-for-compiler}
- */
-
-/*
- * -----------------------------------------------------------------------------
- * MAKE COMMAND EXAMPLES
- * -----------------------------------------------------------------------------
- * `$ node make <task>`
- * `$ node make --<task>`
- * `$ node make --task-<method>`
- * `$ node make --task-<method>-<method>`
- * `$ node make --task-<method>=<value>`
- * `$ node make --task=<defaultValue>-<method>-<method>`
- * `$ node make --task=<defaultValue>-<method>-<method>-<method>=<value>`
- */
-
-/*
- * -----------------------------------------------------------------------------
- * MAKE SHORTCUTS
- * -----------------------------------------------------------------------------
- * `$ node make`       => `$ node make --dev`
- * `$ node make --dev` => `$ node make --compile`
- */
-
-/*
- * -----------------------------------------------------------------------------
- * MAKE TASKS
- * -----------------------------------------------------------------------------
- *
- * Methods
- * -------------------------------------------
- * | Task    | Methods     | Default Methods |
- * | :------ | :---------- | :-------------- |
- * | compile | main        | main            |
- * | test    | main        | main            |
- * | version | all         | all             |
- * -------------------------------------------
- *
- * Values
- * -----------------------------------------------------------------------------
- * | Task    | Method | Acceptable Values | Example            | Default Value |
- * | :------ | :----- | :---------------- | :----------------- | :------------ |
- * | test    | *      | Mocha Cmd Opts    | bail+reporter=spec | (none)        |
- * | version | all    | Semantic Version  | 1.2.4              | (none)        |
- * -----------------------------------------------------------------------------
  */
 
 'use strict';
