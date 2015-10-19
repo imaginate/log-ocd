@@ -124,7 +124,10 @@ var tests = {
 
 each(tests.methods, function(/** function */ method, /** string */ name) {
 
-  describe('logOCD.' + name + '\n', function() {
+  /** @type {string} */
+  var title = 'logOCD' + ( name === 'log' ? '' : '.' + name ) + '(...)';
+
+  describe(title, function() {
     each(tests.args[name], function(/** !Array<*> */ args, /** number */ i) {
 
       /** @type {!Array<*>} */
@@ -156,7 +159,7 @@ function testTitle(name, args, results) {
   /** @type {number} */
   var last;
 
-  result = name === 'log' ? name : 'log.' + name;
+  result = name;
   result += '(';
   last = args.length - 1;
   each(args, function(/** * */ arg, /** number */ i) {

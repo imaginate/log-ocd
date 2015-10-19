@@ -91,7 +91,7 @@ var props = Object.keys(tests.props.truthy);
 // RUN resetConfig TESTS
 ////////////////////////////////////////////////////////////////////////////////
 
-describe('logOCD.resetConfig("<method>")\n', function() {
+describe('logOCD.resetConfig("<method>")', function() {
 
   describe('each should return true', function() {
     it(getResetTitle(),function(){
@@ -107,7 +107,7 @@ describe('logOCD.resetConfig("<method>")\n', function() {
     });
   });
 
-  describe('\n    each should return false', function() {
+  describe('each should return false', function() {
     each('nope false extinct'.split(' '), function(/** string */ method) {
       it(getResetTitle(method), function() {
         failReset(method);
@@ -121,7 +121,7 @@ describe('logOCD.resetConfig("<method>")\n', function() {
 // RUN setConfig TESTS
 ////////////////////////////////////////////////////////////////////////////////
 
-describe('logOCD.setConfig("<method>.<prop>", val)\n', function() {
+describe('logOCD.setConfig("<method>.<prop>", val)', function() {
 
   describe('each should return true', function() {
     each(tests.props.truthy, function(/** * */ val, /** string */ prop) {
@@ -138,7 +138,7 @@ describe('logOCD.setConfig("<method>.<prop>", val)\n', function() {
     });
   });
 
-  describe('\n    each should return false', function() {
+  describe('each should return false', function() {
     each(tests.props.falsy, function(/** * */ val, /** string */ prop) {
       it(getSetTitle('all', prop, val), function() {
         failSet('all', prop, val);
@@ -153,7 +153,7 @@ describe('logOCD.setConfig("<method>.<prop>", val)\n', function() {
     });
   });
 
-  describe('\n    each should change logging behavior', function() {
+  describe('each should change logging behavior', function() {
     beforeEach(function() {
       logOCD.resetConfig('log', 'pass');
     });
