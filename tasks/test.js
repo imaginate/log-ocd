@@ -19,28 +19,73 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 /** @type {!Task} */
-module.exports = newTask('test', 'main', {
+module.exports = newTask('test', 'all', {
 
   /**
    * @param {string=} options
    */
-  main: function main(options) {
+  all: function all(options) {
 
-    /** @type {string} */
-    var source;
     /** @type {string} */
     var tests;
+    /** @type {string} */
+    var title;
 
     options = getOptions(options);
+    tests = './tests/*.js';
+    title = 'All';
 
     configLog();
 
-    source = './src/log-ocd.js';
-    tests = './tests/*.js';
-
-    logStart(source);
+    logStart(title);
     runTests(options, tests);
-    logFinish(source);
+    logFinish(title);
+
+    resetLog();
+  },
+
+  /**
+   * @param {string=} options
+   */
+  config: function config(options) {
+
+    /** @type {string} */
+    var tests;
+    /** @type {string} */
+    var title;
+
+    options = getOptions(options);
+    tests = './tests/config.js';
+    title = 'Config Method';
+
+    configLog();
+
+    logStart(title);
+    runTests(options, tests);
+    logFinish(title);
+
+    resetLog();
+  },
+
+  /**
+   * @param {string=} options
+   */
+  logs: function logs(options) {
+
+    /** @type {string} */
+    var tests;
+    /** @type {string} */
+    var title;
+
+    options = getOptions(options);
+    tests = './tests/methods.js';
+    title = 'Logging Method';
+
+    configLog();
+
+    logStart(title);
+    runTests(options, tests);
+    logFinish(title);
 
     resetLog();
   }
@@ -97,17 +142,17 @@ function runTests(options, tests) {
 }
 
 /**
- * @param {string} source
+ * @param {string} title
  */
-function logStart(source) {
-  log.debug('Testing `' + source + '`');
+function logStart(title) {
+  log.debug('Starting ' + title + ' Tests');
 }
 
 /**
- * @param {string} source
+ * @param {string} title
  */
-function logFinish(source) {
-  log.pass('Finished testing `' + source + '`');
+function logFinish(title) {
+  log.pass('Finished ' + title + ' Tests');
 }
 
 /** @type {function} */
