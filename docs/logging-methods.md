@@ -1,10 +1,10 @@
 # The Logging Methods
 - [logOCD](#logocd)
-- [logOCD.pass](#logocd.pass)
-- [logOCD.error](#logocd.error)
-- [logOCD.warn](#logocd.warn)
-- [logOCD.debug](#logocd.debug)
-- [logOCD.fail](#logocd.fail)
+- [logOCD.pass](#logocdpass)
+- [logOCD.error](#logocderror)
+- [logOCD.warn](#logocdwarn)
+- [logOCD.debug](#logocddebug)
+- [logOCD.fail](#logocdfail)
 
 
 ## logOCD

@@ -1,6 +1,6 @@
 # The Config Methods
-- [logOCD.setConfig](#logocd.setconfig)
-- [logOCD.resetConfig](#logocd.resetconfig)
+- [logOCD.setConfig](#logocdsetconfig)
+- [logOCD.resetConfig](#logocdresetconfig)
 
 ## logOCD.setConfig
 Allows you to update the config settings at any time.
