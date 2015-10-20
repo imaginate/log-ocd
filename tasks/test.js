@@ -55,7 +55,7 @@ module.exports = newTask('test', 'all', {
     var title;
 
     options = getOptions(options);
-    tests = './tests/config.js';
+    tests = './tests/config-methods.js';
     title = 'Config Method';
 
     configLog();
@@ -78,7 +78,7 @@ module.exports = newTask('test', 'all', {
     var title;
 
     options = getOptions(options);
-    tests = './tests/methods.js';
+    tests = './tests/logging-methods.js';
     title = 'Logging Method';
 
     configLog();
