@@ -2,21 +2,22 @@
 [_log-ocd_](https://github.com/imaginate/log-ocd) is the best way to handle logging for Node.js. It is easy to use and makes all logs more legible. Forget ``` console.log ``` and start using [_log-ocd_](https://github.com/imaginate/log-ocd) today!
 
 ```javascript
+// You can set the config for each or all methods with the constructor or
 var log = require('log-ocd')({
-  all: { argMap: true },
+  all:   { argMap: true },
   error: { exit: false }
 });
+// with the setConfig and resetConfig methods
+log.setConfig('fail.spaceBefore', 0);
+log.setConfig('pass.spaceAfter', 0);
+log.resetConfig('pass');
 
 log('a quick message');
-log.pass('A `Success` Story');
-log.error('A `Failure`', 'with some `guidance`', { and: 'all', the: 'meaty', states: 'shown' });
+log.fail('a quick slip');
+log.pass('A `Success` Story', { argMap: true, and: 'an', object: 'with' }, { some: 'superfluous', extra: 'details' });
+log.error('A `Failure`', 'with some `guidance`', { and: 'an', arg: 'Map', with: 'all', the: 'meaty', states: 'shown' });
 log.warn('A Word of `Caution`', 'with a story of `danger`');
 log.debug('A Beacon of `Hope`', [ 'with', 'all', 'the', 'juicy', 'details' ], /you want to know/g);
-log.fail('a quick slip');
-
-log.setConfig('all.spaceBefore', 0);
-log.setConfig('warn.header', false);
-log.resetConfig();
 ```
 <img src="http://www.algorithmiv.com/images/log-ocd-example.png" alt="log-ocd Example" />
 
