@@ -389,3 +389,36 @@ function newMethodTheme(props) {
   theme = seal(theme);
   return merge(theme, props);
 }
+
+/**
+ * @typedef {!{
+ *   default: !MethodTheme,
+ *   log:     ?MethodTheme,
+ *   pass:    ?MethodTheme,
+ *   error:   ?MethodTheme,
+ *   warn:    ?MethodTheme,
+ *   debug:   ?MethodTheme,
+ *   fail:    ?MethodTheme
+ * }} LogOCDTheme
+ */
+
+/**
+ * A factory method for LogOCDTheme objects.
+ * @private
+ * @param {Object<string, ?MethodTheme>} props
+ * @return {!LogOCDTheme}
+ */
+function newLogOCDTheme(props) {
+
+  /** @type {!LogOCDTheme} */
+  var theme;
+
+  theme = newMap('LogOCDTheme');
+  theme = newProps(theme, [
+    'default', 'log', 'pass', 'error', 'warn', 'debug', 'fail'
+  ], null, function(/** * */ val) {
+    return is.null(val) || ( is.obj(val) && obj._TYPE === 'MethodTheme' );
+  });
+  theme = seal(theme);
+  return merge(theme, props);
+}
