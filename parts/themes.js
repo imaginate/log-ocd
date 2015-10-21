@@ -29,6 +29,7 @@
 
 /**
  * @typedef {{
+ *   __TYPE:  string,
  *   color:   string,
  *   bg:      string,
  *   bold:    boolean,
@@ -45,8 +46,8 @@
 /**
  * A factory method for Style objects.
  * @private
- * @param {Object=} props - [default= null]
- * @return {?Style} - Returns null if no props are given.
+ * @param {Object<string, (string|boolean)>=} props - [default= null]
+ * @return {?Style} Returns null if no props are given.
  */
 function newStyle(props) {
 
@@ -57,10 +58,11 @@ function newStyle(props) {
     return null;
   }
 
-  style = newMap('color, bg', '', 'str');
-  style = newProps(
-    'bold, dim, inverse, italic, reset, strikethrough, underline', false, 'bool'
-  );
+  style = newMap('Style');
+  style = newProps(style, 'color, bg', '', 'str');
+  style = newProps(style, [
+    'bold', 'dim', 'inverse', 'italic', 'reset', 'strikethrough', 'underline'
+  ], false, 'bool');
   style = seal(style);
   return merge(style, props);
 }
