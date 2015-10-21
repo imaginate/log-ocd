@@ -50,9 +50,9 @@ var colors = require('colors/safe');
 
 /**
  * @private
- * @param {?(Array<string>|string)=} props - [default= null] If props is a
- *   string newMap uses one of the chars in the following list as the separator
- *   (chars listed in order of use):  ", "  ","  "|"  " "
+ * @param {?(Object<string, *>|Array<string>|string)=} props - [default= null]
+ *   If props is a string newMap uses one of the chars in the following list as
+ *   the separator (chars listed in order of use):  ", "  ","  "|"  " "
  * @param {*=} propVal - [default= null] The value for all props if an array or
  *   string is used for the props param.
  * @param {(string|function(*): boolean)=} staticType - [default= "*"] If
@@ -88,9 +88,8 @@ function newMap(props, propVal, staticType) {
     staticType = propVal;
   }
 
-  staticType = is('func=', staticType) ?
-    staticType : has(is, staticType) ?
-      is[staticType] : function(val) { return is(staticType, val); }
+  staticType = is('func=', staticType) ? staticType : has(is, staticType) ?
+    is[staticType] : function(val) { return is(staticType, val); };
 
   obj = {};
   each(props, function(/** * */ val, /** string */ key) {
@@ -110,6 +109,66 @@ function newMap(props, propVal, staticType) {
   });
 
   return Object.create(null, obj);
+}
+
+/**
+ * @private
+ * @param {!Object} map
+ * @param {?(Object<string, *>|Array<string>|string)} props - If props is a
+ *   string newProps uses one of the chars in the following list as the
+ *   separator (chars listed in order of use):  ", "  ","  "|"  " "
+ * @param {*=} propVal - [default= null] The value for all props if an array or
+ *   string is used for the props param.
+ * @param {(string|function(*): boolean)=} staticType - [default= "*"] If
+ *   staticType is a string newProps uses an [is method]{@link https://github.com/imaginate/are/blob/master/docs/is-methods.md}
+ *   or the [is main function]{@link https://github.com/imaginate/are/blob/master/docs/is-main-func.md}
+ *   to check all new values.
+ * @return {!Object}
+ */
+function newProps(map, props, propVal, staticType) {
+
+  /** @type {!Array<string>} */
+  var keys;
+  /** @type {!Object} */
+  var obj;
+
+  if ( is('!str|arr', props) ) {
+    keys = is.arr(props) ? props : props.split(
+      /, /.test(props) ?
+        ', ' : /,/.test(props) ?
+          ',' : /\|/.test(props) ?
+            '|' : ' '
+    );
+    props = {};
+    each(keys, function(/** string */ key) {
+      props[key] = propVal;
+    });
+  }
+  else {
+    staticType = propVal;
+  }
+
+  staticType = is('func=', staticType) ? staticType : has(is, staticType) ?
+    is[staticType] : function(val) { return is(staticType, val); };
+
+  obj = {};
+  each(props, function(/** * */ val, /** string */ key) {
+    obj[key] = {
+      value: val,
+      writable: true,
+      enumerable: true,
+      configurable: false
+    };
+    if (staticType) {
+      obj[key].set = function(val) {
+        if ( staticType(val) ) {
+          this[key] = val;
+        }
+      };
+    }
+  });
+
+  return Object.defineProperties(map, obj);
 }
 
 
@@ -172,7 +231,7 @@ function slice(obj, start) {
  * @param {function(*, number): *} iteratee
  * @return {Array}
  */
-function map(obj, iteratee) {
+function mapArr(obj, iteratee) {
 
   /** @type {!Array} */
   var arr;

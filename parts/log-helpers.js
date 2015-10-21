@@ -72,7 +72,7 @@ function hasAccent(str) {
  * @return {string}
  */
 function getAccentStr(style, str) {
-  return hasAccent(str) ? map(str.split('`'),
+  return hasAccent(str) ? mapArr(str.split('`'),
     function(/** string */ part, /** number */ i) {
       return colors[ (i % 2 ? 'a' : '') + style ](part);
     }
