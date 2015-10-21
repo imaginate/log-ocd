@@ -107,20 +107,24 @@ function newProps(map, props, propVal, staticType) {
 
   obj = {};
   each(props, function(/** * */ val, /** string */ key) {
-    obj[key] = {
-      __proto__: null,
-      value: val,
-      writable: true,
-      enumerable: true,
-      configurable: false
-    };
-    if (staticType) {
-      obj[key].set = function(val) {
-        if ( staticType(val) ) {
-          this[key] = val;
-        }
+    obj[key] = staticType ? {
+        __proto__: null,
+        get: function() { return val; },
+        set: function(value) {
+          if ( staticType(value) ) {
+            val = value;
+          }
+        },
+        enumerable: true,
+        configurable: false
+      }
+      : {
+        __proto__: null,
+        value: val,
+        writable: true,
+        enumerable: true,
+        configurable: false
       };
-    }
   });
 
   return Object.defineProperties(map, obj);
