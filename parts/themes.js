@@ -23,3 +23,44 @@
 // *****************************************************************************
 
 
+////////////////////////////////////////////////////////////////////////////////
+// CONSTRUCTORS
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @typedef {{
+ *   color:   string,
+ *   bg:      string,
+ *   bold:    boolean,
+ *   dim:     boolean,
+ *   hidden:  boolean,
+ *   inverse: boolean,
+ *   italic:  boolean,
+ *   reset:   boolean,
+ *   strikethrough: boolean,
+ *   underline:     boolean
+ * }} Style
+ */
+
+/**
+ * A factory method for Style objects.
+ * @private
+ * @param {Object=} props - [default= null]
+ * @return {?Style} - Returns null if no props are given.
+ */
+function newStyle(props) {
+
+  /** @type {!Style} */
+  var style;
+
+  if (!props) {
+    return null;
+  }
+
+  style = newMap('color, bg', '', 'str');
+  style = newProps(
+    'bold, dim, inverse, italic, reset, strikethrough, underline', false, 'bool'
+  );
+  style = seal(style);
+  return merge(style, props);
+}
