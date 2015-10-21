@@ -297,7 +297,7 @@ function newArgMapTheme(key, value) {
  */
 function newTypeThemes(props) {
 
-  /** @type {!BasicTypeThemes} */
+  /** @type {!TypeThemes} */
   var themes;
 
   if (!props) {
@@ -322,4 +322,36 @@ function newTypeThemes(props) {
   });
   themes = seal(themes);
   return merge(themes, props);
+}
+
+/**
+ * @typedef {{
+ *   default: ?Style,
+ *   accent:  ?Style
+ * }} AccentTheme
+ */
+
+/**
+ * A factory method for AccentTheme objects.
+ * @private
+ * @param {?(Style|Object<string, ?Style>)=} props - [default= null]
+ * @return {?AccentTheme} Returns null if no props are given.
+ */
+function newAccentTheme(props) {
+
+  /** @type {!AccentTheme} */
+  var theme;
+
+  if (!props) {
+    return null;
+  }
+
+  props = props._TYPE === 'Style' ? { default: props } : props;
+
+  theme = newMap('AccentTheme');
+  theme = newProps(theme, 'default, accent', null, function(/** * */ val) {
+    return is.null(val) || ( is.obj(val) && obj._TYPE === 'Style' );
+  });
+  theme = seal(theme);
+  return merge(theme, props);
 }
