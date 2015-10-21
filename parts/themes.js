@@ -355,3 +355,37 @@ function newAccentTheme(props) {
   theme = seal(theme);
   return merge(theme, props);
 }
+
+/**
+ * @typedef {{
+ *   header: ?AccentTheme,
+ *   msg:    ?AccentTheme,
+ *   args:   ?TypeThemes
+ * }} MethodTheme
+ */
+
+/**
+ * A factory method for MethodTheme objects.
+ * @private
+ * @param {Object<string, ?(AccentTheme|TypeThemes)>=} props - [default= null]
+ * @return {?MethodTheme} Returns null if no props are given.
+ */
+function newMethodTheme(props) {
+
+  /** @type {!MethodTheme} */
+  var theme;
+
+  if (!props) {
+    return null;
+  }
+
+  theme = newMap('MethodTheme');
+  theme = newProps(theme, 'header, msg', null, function(/** * */ val) {
+    return is.null(val) || ( is.obj(val) && obj._TYPE === 'AccentTheme' );
+  });
+  theme = newProp(theme, 'args', null, function(/** * */ val) {
+    return is.null(val) || ( is.obj(val) && obj._TYPE === 'TypeThemes' );
+  });
+  theme = seal(theme);
+  return merge(theme, props);
+}
