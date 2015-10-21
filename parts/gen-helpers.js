@@ -45,6 +45,75 @@ var colors = require('colors/safe');
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// CONSTRUCTORS
+///////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @private
+ * @param {?(Array<string>|string)=} props - [default= null] If props is a
+ *   string newMap uses one of the chars in the following list as the separator
+ *   (chars listed in order of use):  ", "  ","  "|"  " "
+ * @param {*=} propVal - [default= null] The value for all props if an array or
+ *   string is used for the props param.
+ * @param {(string|function(*): boolean)=} staticType - [default= "*"] If
+ *   staticType is a string newMap uses an [is method]{@link https://github.com/imaginate/are/blob/master/docs/is-methods.md}
+ *   or the [is main function]{@link https://github.com/imaginate/are/blob/master/docs/is-main-func.md}
+ *   to check all new values.
+ * @return {!Object}
+ */
+function newMap(props, propVal, staticType) {
+
+  /** @type {!Array<string>} */
+  var keys;
+  /** @type {!Object} */
+  var obj;
+
+  if ( is.null(props) ) {
+    return Object.create(null);
+  }
+
+  if ( is('!str|arr', props) ) {
+    keys = is.arr(props) ? props : props.split(
+      /, /.test(props) ?
+        ', ' : /,/.test(props) ?
+          ',' : /\|/.test(props) ?
+            '|' : ' '
+    );
+    props = {};
+    each(keys, function(/** string */ key) {
+      props[key] = propVal;
+    });
+  }
+  else {
+    staticType = propVal;
+  }
+
+  staticType = is('func=', staticType) ?
+    staticType : has(is, staticType) ?
+      is[staticType] : function(val) { return is(staticType, val); }
+
+  obj = {};
+  each(props, function(/** * */ val, /** string */ key) {
+    obj[key] = {
+      value: val,
+      writable: true,
+      enumerable: true,
+      configurable: false
+    };
+    if (staticType) {
+      obj[key].set = function(val) {
+        if ( staticType(val) ) {
+          this[key] = val;
+        }
+      };
+    }
+  });
+
+  return Object.create(null, obj);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // METHODS
 ////////////////////////////////////////////////////////////////////////////////
 
