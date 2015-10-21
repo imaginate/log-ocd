@@ -281,14 +281,18 @@ function clone(obj, deep) {
 /**
  * Appends an object's properties to an existing object.
  * @private
- * @param {(!Object|function)} dest
- * @param {(!Object|function)} source
- * @return {(!Object|function)}
+ * @param {!(Object|function)} dest
+ * @param {?(Object|function)} source
+ * @return {?(Object|function)}
  */
 function merge(dest, source) {
 
   /** @type {string} */
   var prop;
+
+  if (!source) {
+    return dest;
+  }
 
   for (prop in source) {
     if ( has(source, prop) ) {
