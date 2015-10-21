@@ -253,7 +253,7 @@ function mapArr(obj, iteratee) {
 /**
  * Creates a new object with the properties of the given object.
  * @private
- * @param {!Object} obj
+ * @param {Object} obj
  * @param {boolean=} deep
  * @return {!Object}
  */
@@ -296,6 +296,60 @@ function merge(dest, source) {
     }
   }
   return dest;
+}
+
+/**
+ * Seals an object.
+ * @private
+ * @param {Object} obj
+ * @param {boolean=} deep
+ * @return {!Object}
+ */
+function seal(obj, deep) {
+
+  /** @type {string} */
+  var prop;
+
+  if ( !is._obj(obj) ) {
+    return obj;
+  }
+
+  if (deep) {
+    for (prop in obj) {
+      if ( has(obj, prop) ) {
+        obj[prop] = seal(obj[prop], true);
+      }
+    }
+  }
+
+  return Object.seal(obj);
+}
+
+/**
+ * Freezes an object.
+ * @private
+ * @param {!Object} obj
+ * @param {boolean=} deep
+ * @return {!Object}
+ */
+function freeze(obj, deep) {
+
+  /** @type {string} */
+  var prop;
+
+  if ( !is._obj(obj) ) {
+    return obj;
+  }
+
+  if (deep) {
+    for (prop in obj) {
+      if ( has(obj, prop) ) {
+        obj[prop] = freeze(obj[prop], true);
+      }
+    }
+  }
+
+  return Object.freeze(obj);
 }
 
 /**
