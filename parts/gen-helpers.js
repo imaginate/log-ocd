@@ -55,7 +55,7 @@ var colors = require('colors/safe');
  */
 function newMap(mapType) {
   return Object.create(null, {
-    __TYPE: {
+    _TYPE: {
       __proto__: null,
       value: mapType,
       writable: false,
@@ -81,7 +81,7 @@ function newProp(map, key, val, staticType) {
   staticType = is('func=', staticType) ? staticType : has(is, staticType) ?
     is[staticType] : function(val) { return is(staticType, val); };
 
-  map = Object.defineProperty(map, key, staticType ? {
+  return Object.defineProperty(map, key, staticType ? {
       __proto__: null,
       get: function() { return val; },
       set: function(value) {
@@ -100,9 +100,6 @@ function newProp(map, key, val, staticType) {
       configurable: false
     }
   );
-  map[key] = val;
-
-  return map;
 }
 
 /**
