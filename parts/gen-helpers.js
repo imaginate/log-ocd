@@ -68,6 +68,46 @@ function newMap(mapType) {
 /**
  * @private
  * @param {!Object} map
+ * @param {string} key
+ * @param {*} val
+ * @param {(string|function(*): boolean)=} staticType - [default= "*"] If
+ *   staticType is a string newProps uses an [is method]{@link https://github.com/imaginate/are/blob/master/docs/is-methods.md}
+ *   or the [is main function]{@link https://github.com/imaginate/are/blob/master/docs/is-main-func.md}
+ *   to check all new values.
+ * @return {!Object}
+ */
+function newProp(map, key, val, staticType) {
+
+  staticType = is('func=', staticType) ? staticType : has(is, staticType) ?
+    is[staticType] : function(val) { return is(staticType, val); };
+
+  map = Object.defineProperty(map, key, staticType ? {
+      __proto__: null,
+      get: function() { return val; },
+      set: function(value) {
+        if ( staticType(value) ) {
+          val = value;
+        }
+      },
+      enumerable: true,
+      configurable: false
+    }
+    : {
+      __proto__: null,
+      value: val,
+      writable: true,
+      enumerable: true,
+      configurable: false
+    }
+  );
+  map[key] = val;
+
+  return map;
+}
+
+/**
+ * @private
+ * @param {!Object} map
  * @param {!(Object<string, *>|Array<string>|string)} props - If props is a
  *   string newProps uses one of the chars in the following list as the
  *   separator (chars listed in order of use):  ", "  ","  "|"  " "
