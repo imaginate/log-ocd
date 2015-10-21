@@ -94,6 +94,7 @@ function newMap(props, propVal, staticType) {
   obj = {};
   each(props, function(/** * */ val, /** string */ key) {
     obj[key] = {
+      __proto__: null,
       value: val,
       writable: true,
       enumerable: true,
@@ -114,7 +115,7 @@ function newMap(props, propVal, staticType) {
 /**
  * @private
  * @param {!Object} map
- * @param {?(Object<string, *>|Array<string>|string)} props - If props is a
+ * @param {!(Object<string, *>|Array<string>|string)} props - If props is a
  *   string newProps uses one of the chars in the following list as the
  *   separator (chars listed in order of use):  ", "  ","  "|"  " "
  * @param {*=} propVal - [default= null] The value for all props if an array or
@@ -154,6 +155,7 @@ function newProps(map, props, propVal, staticType) {
   obj = {};
   each(props, function(/** * */ val, /** string */ key) {
     obj[key] = {
+      __proto__: null,
       value: val,
       writable: true,
       enumerable: true,
