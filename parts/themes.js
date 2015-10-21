@@ -177,3 +177,93 @@ function newTypeTheme(values, styles) {
   });
   return seal(theme);
 }
+
+/**
+ * @typedef {{
+ *   default:   ?Style,
+ *   null:      ?TypeTheme,
+ *   undefined: ?TypeTheme,
+ *   boolean:   ?TypeTheme,
+ *   string:    ?TypeTheme,
+ *   number:    ?TypeTheme,
+ *   nan:       ?TypeTheme,
+ *   object:    ?TypeTheme,
+ *   function:  ?TypeTheme,
+ *   regexp:    ?TypeTheme,
+ *   array:     ?TypeTheme,
+ *   args:      ?TypeTheme,
+ *   element:   ?TypeTheme,
+ *   document:  ?TypeTheme
+ * }} BasicTypeThemes
+ */
+
+/**
+ * A factory method for BasicTypeThemes objects.
+ * @private
+ * @param {?(Style|Object<string, ?(Style|TypeTheme)>)=} props - [default= null]
+ * @return {?BasicTypeThemes} Returns null if no props are given.
+ */
+function newBasicTypeThemes(props) {
+
+  /** @type {!BasicTypeThemes} */
+  var themes;
+
+  if (!props) {
+    return null;
+  }
+
+  props = props._TYPE === 'Style' ? { default: props } : props;
+
+  themes = newMap('BasicTypeThemes');
+  themes = newProp(themes, 'default', null, function(/** * */ val) {
+    return is.null(val) || ( is.obj(val) && obj._TYPE === 'Style' );
+  });
+  themes = newProps(themes, [
+    'null', 'undefined', 'boolean', 'string', 'number',
+    'nan', 'object', 'function', 'regexp', 'array',
+    'args', 'element', 'document'
+  ], null, function(/** * */ val) {
+    return is.null(val) || ( is.obj(val) && obj._TYPE === 'TypeTheme' );
+  });
+  themes = seal(themes);
+  return merge(themes, props);
+}
+
+/**
+ * @typedef {{
+ *   key:   ?TypeTheme,
+ *   value: ?BasicTypeThemes
+ * }} ArgMapTheme
+ */
+
+/**
+ * A factory method for ArgMapTheme objects.
+ * @private
+ * @param {?TypeTheme=} key - [default= null]
+ * @param {?(Style|BasicTypeThemes)=} value - [default= null] Must state key
+ *   param to supply a value param.
+ * @return {?ArgMapTheme} Returns null if no key and value are given.
+ */
+function newArgMapTheme(key, value) {
+
+  /** @type {!ArgMapTheme} */
+  var theme;
+
+  if (!key && !value) {
+    return null;
+  }
+
+  key = key || null;
+  value = !value ?
+    null : value._TYPE === 'Style' ?
+      newBasicTypeThemes(value) : value;
+
+  theme = newMap('ArgMapTheme');
+  theme = newProp(theme, 'key', key, function(/** * */ val) {
+    return is.null(val) || ( is.obj(val) && obj._TYPE === 'TypeTheme' );
+  });
+  theme = newProp(theme, 'value', value, function(/** * */ val) {
+    return is.null(val) || ( is.obj(val) && obj._TYPE === 'BasicTypeThemes' );
+  });
+  return seal(theme);
+}
