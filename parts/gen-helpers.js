@@ -56,7 +56,9 @@ var colors = require('colors/safe');
  * @return {boolean}
  */
 function has(obj, prop) {
-  return is._obj(obj) && obj.hasOwnProperty(prop);
+  return is._obj(obj) && ('hasOwnProperty' in obj ?
+    obj.hasOwnProperty(prop) : prop in obj
+  );
 }
 
 /**
