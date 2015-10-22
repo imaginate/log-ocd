@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------------------------------
- * LOG-OCD THEMES
+ * LOG-OCD THEME SETUP
  * -----------------------------------------------------------------------------
  * @version 0.0.1
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
@@ -27,78 +27,282 @@
  * @type {!LogOCDTheme}
  */
 var logOCDTheme = newLogOCDTheme({
+
   default: newMethodTheme({
+    // default header
     header: newAccentTheme({
-      default: newStyle({}),
-      accent: newStyle({})
+      default: newStyle({
+        color: 'white',
+        bg:    'black',
+        bold:  true
+      }),
+      marker: '`',
+      accent: newStyle({
+        color: 'magenta',
+        bg:    'black',
+        bold:  true
+      })
     }),
+    // default msg
     msg: newAccentTheme({
-      default: newStyle({}),
-      accent: newStyle({})
+      default: newStyle({
+        color: 'white'
+      }),
+      marker: '`',
+      accent: newStyle({
+        color: 'magenta'
+      })
     }),
+    // default args
     args: newTypeThemes({
-      default: newStyle({}),
+      default: newStyle({
+        color: 'white'
+      }),
+      // default null
       null: newTypeTheme({
-        values: newTypeValues({}),
-        styles: newTypeStyles({})
+        values: newTypeValues({
+          placeholder: 'null'
+        }),
+        styles: newTypeStyles({
+          default: newStyle({
+            color: 'magenta'
+          })
+        })
       }),
+      // default undefined
       undefined: newTypeTheme({
-        values: newTypeValues({}),
-        styles: newTypeStyles({})
+        values: newTypeValues({
+          placeholder: 'undefined'
+        }),
+        styles: newTypeStyles({
+          default: newStyle({
+            color: 'magenta'
+          })
+        })
       }),
+      // default boolean
       boolean: newTypeTheme({
         values: newTypeValues({}),
-        styles: newTypeStyles({})
+        styles: newTypeStyles({
+          default: newStyle({
+            color: 'magenta'
+          })
+        })
       }),
+      // default string
       string: newTypeTheme({
-        values: newTypeValues({}),
-        styles: newTypeStyles({})
+        values: newTypeValues({
+          separators: ' +',
+          brackets:   '"',
+          indent:     '  ',
+          limit:      150
+        }),
+        styles: newTypeStyles({
+          separators: newStyle({
+            color: 'red'
+          }),
+          default: newStyle({
+            color: 'yellow'
+          }),
+          brackets: newStyle({
+            color: 'yellow'
+          })
+        })
       }),
+      // default number
       number: newTypeTheme({
         values: newTypeValues({}),
-        styles: newTypeStyles({})
+        styles: newTypeStyles({
+          default: newStyle({
+            color: 'magenta'
+          })
+        })
       }),
+      // default nan
       nan: newTypeTheme({
-        values: newTypeValues({}),
-        styles: newTypeStyles({})
+        values: newTypeValues({
+          placeholder: 'NaN'
+        }),
+        styles: newTypeStyles({
+          default: newStyle({
+            color: 'magenta'
+          })
+        })
       }),
+      // default object
       object: newTypeTheme({
-        values: newTypeValues({}),
-        styles: newTypeStyles({})
+        values: newTypeValues({
+          separators: ', ',
+          outBracket: '}',
+          inBracket:  '{',
+          indent:     '  ',
+          limit:      150
+        }),
+        styles: newTypeStyles({
+          separators: newStyle({
+            color: 'white'
+          }),
+          default: newStyle({
+            color: 'white'
+          }),
+          brackets: newStyle({
+            color: 'white'
+          })
+        })
       }),
+      // default function
       function: newTypeTheme({
-        values: newTypeValues({}),
-        styles: newTypeStyles({})
+        values: newTypeValues({
+          separators: ', ',
+          outBracket: '}',
+          inBracket:  '{',
+          indent:     '  ',
+          intro:      '[Function] ',
+          limit:      150
+        }),
+        styles: newTypeStyles({
+          separators: newStyle({
+            color: 'white'
+          }),
+          default: newStyle({
+            color: 'white'
+          }),
+          brackets: newStyle({
+            color: 'white'
+          }),
+          intro: newStyle({
+            color: 'white'
+          })
+        })
       }),
+      // default regexp
       regexp: newTypeTheme({
-        values: newTypeValues({}),
-        styles: newTypeStyles({})
+        values: newTypeValues({
+          brackets: '/'
+        }),
+        styles: newTypeStyles({
+          default: newStyle({
+            color: 'white'
+          }),
+          brackets: newStyle({
+            color: 'yellow'
+          }),
+          flags: newStyle({
+            color: 'yellow'
+          })
+        })
       }),
+      // default array
       array: newTypeTheme({
-        values: newTypeValues({}),
-        styles: newTypeStyles({})
+        values: newTypeValues({
+          separators: ', ',
+          outBracket: ']',
+          inBracket:  '[',
+          indent:     '  ',
+          limit:      150
+        }),
+        styles: newTypeStyles({
+          separators: newStyle({
+            color: 'white'
+          }),
+          default: newStyle({
+            color: 'white'
+          }),
+          brackets: newStyle({
+            color: 'white'
+          })
+        })
       }),
+      // default arguments
       args: newTypeTheme({
-        values: newTypeValues({}),
-        styles: newTypeStyles({})
+        values: newTypeValues({
+          separators: ', ',
+          outBracket: ']',
+          inBracket:  '[',
+          indent:     '  ',
+          intro:      '[Arguments] ',
+          limit:      150
+        }),
+        styles: newTypeStyles({
+          separators: newStyle({
+            color: 'white'
+          }),
+          default: newStyle({
+            color: 'white'
+          }),
+          brackets: newStyle({
+            color: 'white'
+          }),
+          intro: newStyle({
+            color: 'white'
+          })
+        })
       }),
+      // default element
       element: newTypeTheme({
-        values: newTypeValues({}),
-        styles: newTypeStyles({})
+        values: newTypeValues({
+          separators: ', ',
+          outBracket: '}',
+          inBracket:  '{',
+          indent:     '  ',
+          intro:      '[Element] ',
+          limit:      150
+        }),
+        styles: newTypeStyles({
+          separators: newStyle({
+            color: 'white'
+          }),
+          default: newStyle({
+            color: 'white'
+          }),
+          brackets: newStyle({
+            color: 'white'
+          }),
+          intro: newStyle({
+            color: 'white'
+          })
+        })
       }),
+      // default document
       document: newTypeTheme({
-        values: newTypeValues({}),
-        styles: newTypeStyles({})
+        values: newTypeValues({
+          separators: ', ',
+          outBracket: '}',
+          inBracket:  '{',
+          indent:     '  ',
+          intro:      '[Document] ',
+          limit:      150
+        }),
+        styles: newTypeStyles({
+          separators: newStyle({
+            color: 'white'
+          }),
+          default: newStyle({
+            color: 'white'
+          }),
+          brackets: newStyle({
+            color: 'white'
+          }),
+          intro: newStyle({
+            color: 'white'
+          })
+        })
       }),
+      // default argMap
       argMap: newArgMapTheme({
         key: newTypeTheme({
-          values: newTypeValues({}),
-          styles: newTypeStyles({})
+          values: newTypeValues({
+            separators: ': '
+          }),
+          styles: newTypeStyles({
+            color: 'cyan'
+          })
         }),
-        value: newStyle({})
+        value: newBasicTypeThemes()
       })
     })
   }),
+
   log:     newMethodTheme({}),
   pass:    newMethodTheme({}),
   error:   newMethodTheme({}),
