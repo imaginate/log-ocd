@@ -184,8 +184,14 @@ function logObj(obj, style, indent) {
 
   /** @type {string} */
   var spaces;
+  /** @type {!Array<string>} */
+  var keys;
+  /** @type {number} */
+  var last;
   /** @type {string} */
   var str;
+  /** * */
+  var val;
 
   style = style || 'view';
   indent = indent || 0;
@@ -197,14 +203,21 @@ function logObj(obj, style, indent) {
 
   spaces = indent ? fill(indent, '  ').join('') : '';
 
-  each(obj, function(/** * */ val, /** string */ key) {
+  keys = objKeys(obj);
+  last = keys.length - 1;
+  each(keys, function(/** string */ key, /** number */ i) {
+    val = obj[key];
     str = makeLogStr(val);
     if ( is.func(val) || str === '{' ) {
       log( colors[style]('  ' + spaces + key + ': ' + str) );
       logObj(val, style, (indent + 1));
     }
     else {
-      log( colors[style]('  ' + spaces + key + ': ' + str + ',') );
+      log(
+        colors[style](
+          '  ' + spaces + key + ': ' + str + ( i !== last ? ',' : '' )
+        )
+      );
     }
   });
   log(
