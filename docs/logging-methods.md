@@ -8,7 +8,7 @@
 
 
 ## logOCD
-Handles all basic logging.
+Handles all basic logging (also accessible via ``` logOCD.log ```).
 
 | Param | Type  |
 | :---- | :---- |
