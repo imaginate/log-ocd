@@ -151,6 +151,130 @@ var colors = require('colors/safe');
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// CONSTRUCTORS
+///////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @private
+ * @param {string} mapType
+ * @return {!Object}
+ */
+function newMap(mapType) {
+  return Object.create(null, {
+    _TYPE: {
+      __proto__: null,
+      value: mapType,
+      writable: false,
+      enumerable: false,
+      configurable: false
+    }
+  });
+}
+
+/**
+ * @private
+ * @param {!Object} map
+ * @param {string} key
+ * @param {*} val
+ * @param {(string|function(*): boolean)=} staticType - [default= "*"] If
+ *   staticType is a string newProps uses an [is method]{@link https://github.com/imaginate/are/blob/master/docs/is-methods.md}
+ *   or the [is main function]{@link https://github.com/imaginate/are/blob/master/docs/is-main-func.md}
+ *   to check all new values.
+ * @return {!Object}
+ */
+function newProp(map, key, val, staticType) {
+
+  staticType = is('func=', staticType) ? staticType : has(is, staticType) ?
+    is[staticType] : function(val) { return is(staticType, val); };
+
+  return Object.defineProperty(map, key, staticType ? {
+      __proto__: null,
+      get: function() { return val; },
+      set: function(value) {
+        if ( staticType(value) ) {
+          val = value;
+        }
+      },
+      enumerable: true,
+      configurable: false
+    }
+    : {
+      __proto__: null,
+      value: val,
+      writable: true,
+      enumerable: true,
+      configurable: false
+    }
+  );
+}
+
+/**
+ * @private
+ * @param {!Object} map
+ * @param {!(Object<string, *>|Array<string>|string)} props - If props is a
+ *   string newProps uses one of the chars in the following list as the
+ *   separator (chars listed in order of use):  ", "  ","  "|"  " "
+ * @param {*=} propVal - [default= null] The value for all props if an array or
+ *   string is used for the props param.
+ * @param {(string|function(*): boolean)=} staticType - [default= "*"] If
+ *   staticType is a string newProps uses an [is method]{@link https://github.com/imaginate/are/blob/master/docs/is-methods.md}
+ *   or the [is main function]{@link https://github.com/imaginate/are/blob/master/docs/is-main-func.md}
+ *   to check all new values.
+ * @return {!Object}
+ */
+function newProps(map, props, propVal, staticType) {
+
+  /** @type {!Array<string>} */
+  var keys;
+  /** @type {!Object} */
+  var obj;
+
+  if ( is('!str|arr', props) ) {
+    keys = is.arr(props) ? props : props.split(
+      /, /.test(props) ?
+        ', ' : /,/.test(props) ?
+          ',' : /\|/.test(props) ?
+            '|' : ' '
+    );
+    props = {};
+    each(keys, function(/** string */ key) {
+      props[key] = propVal;
+    });
+  }
+  else {
+    staticType = propVal;
+  }
+
+  staticType = is('func=', staticType) ? staticType : has(is, staticType) ?
+    is[staticType] : function(val) { return is(staticType, val); };
+
+  obj = {};
+  each(props, function(/** * */ val, /** string */ key) {
+    obj[key] = staticType ? {
+        __proto__: null,
+        get: function() { return val; },
+        set: function(value) {
+          if ( staticType(value) ) {
+            val = value;
+          }
+        },
+        enumerable: true,
+        configurable: false
+      }
+      : {
+        __proto__: null,
+        value: val,
+        writable: true,
+        enumerable: true,
+        configurable: false
+      };
+  });
+
+  return Object.defineProperties(map, obj);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // METHODS
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -162,7 +286,9 @@ var colors = require('colors/safe');
  * @return {boolean}
  */
 function has(obj, prop) {
-  return is._obj(obj) && obj.hasOwnProperty(prop);
+  return is._obj(obj) && ('hasOwnProperty' in obj ?
+    obj.hasOwnProperty(prop) : prop in obj
+  );
 }
 
 /**
@@ -207,7 +333,7 @@ function slice(obj, start) {
  * @param {function(*, number): *} iteratee
  * @return {Array}
  */
-function map(obj, iteratee) {
+function mapArr(obj, iteratee) {
 
   /** @type {!Array} */
   var arr;
@@ -227,9 +353,35 @@ function map(obj, iteratee) {
 }
 
 /**
+ * Gets an object's property keys.
+ * @private
+ * @param {?(Object|function)} obj
+ * @return {Array<string>}
+ */
+function objKeys(obj) {
+
+  /** @type {string} */
+  var prop;
+  /** @type {!Array<string>} */
+  var arr;
+
+  if (!obj) {
+    return null;
+  }
+
+  arr = [];
+  for (prop in obj) {
+    if ( has(obj, prop) ) {
+      arr.push(prop);
+    }
+  }
+  return arr;
+}
+
+/**
  * Creates a new object with the properties of the given object.
  * @private
- * @param {!Object} obj
+ * @param {Object} obj
  * @param {boolean=} deep
  * @return {!Object}
  */
@@ -257,14 +409,18 @@ function clone(obj, deep) {
 /**
  * Appends an object's properties to an existing object.
  * @private
- * @param {(!Object|function)} dest
- * @param {(!Object|function)} source
- * @return {(!Object|function)}
+ * @param {!(Object|function)} dest
+ * @param {?(Object|function)} source
+ * @return {?(Object|function)}
  */
 function merge(dest, source) {
 
   /** @type {string} */
   var prop;
+
+  if (!source) {
+    return dest;
+  }
 
   for (prop in source) {
     if ( has(source, prop) ) {
@@ -272,6 +428,60 @@ function merge(dest, source) {
     }
   }
   return dest;
+}
+
+/**
+ * Seals an object.
+ * @private
+ * @param {Object} obj
+ * @param {boolean=} deep
+ * @return {!Object}
+ */
+function seal(obj, deep) {
+
+  /** @type {string} */
+  var prop;
+
+  if ( !is._obj(obj) ) {
+    return obj;
+  }
+
+  if (deep) {
+    for (prop in obj) {
+      if ( has(obj, prop) ) {
+        obj[prop] = seal(obj[prop], true);
+      }
+    }
+  }
+
+  return Object.seal(obj);
+}
+
+/**
+ * Freezes an object.
+ * @private
+ * @param {!Object} obj
+ * @param {boolean=} deep
+ * @return {!Object}
+ */
+function freeze(obj, deep) {
+
+  /** @type {string} */
+  var prop;
+
+  if ( !is._obj(obj) ) {
+    return obj;
+  }
+
+  if (deep) {
+    for (prop in obj) {
+      if ( has(obj, prop) ) {
+        obj[prop] = freeze(obj[prop], true);
+      }
+    }
+  }
+
+  return Object.freeze(obj);
 }
 
 /**
@@ -391,7 +601,7 @@ colors.setTheme(
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// DEFINE PRIVATE CONFIG
+// DEFAULT CONFIG
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -493,7 +703,7 @@ function hasAccent(str) {
  * @return {string}
  */
 function getAccentStr(style, str) {
-  return hasAccent(str) ? map(str.split('`'),
+  return hasAccent(str) ? mapArr(str.split('`'),
     function(/** string */ part, /** number */ i) {
       return colors[ (i % 2 ? 'a' : '') + style ](part);
     }
@@ -605,8 +815,14 @@ function logObj(obj, style, indent) {
 
   /** @type {string} */
   var spaces;
+  /** @type {!Array<string>} */
+  var keys;
+  /** @type {number} */
+  var last;
   /** @type {string} */
   var str;
+  /** * */
+  var val;
 
   style = style || 'view';
   indent = indent || 0;
@@ -618,14 +834,21 @@ function logObj(obj, style, indent) {
 
   spaces = indent ? fill(indent, '  ').join('') : '';
 
-  each(obj, function(/** * */ val, /** string */ key) {
+  keys = objKeys(obj);
+  last = keys.length - 1;
+  each(keys, function(/** string */ key, /** number */ i) {
+    val = obj[key];
     str = makeLogStr(val);
     if ( is.func(val) || str === '{' ) {
       log( colors[style]('  ' + spaces + key + ': ' + str) );
       logObj(val, style, (indent + 1));
     }
     else {
-      log( colors[style]('  ' + spaces + key + ': ' + str + ',') );
+      log(
+        colors[style](
+          '  ' + spaces + key + ': ' + str + ( i !== last ? ',' : '' )
+        )
+      );
     }
   });
   log(
@@ -662,6 +885,14 @@ function logOCD() {
 
   return true;
 }
+
+/**
+ * @public
+ * @this {!LogOCD}
+ * @param {*...} args
+ * @return {boolean}
+ */
+logOCD.log = logOCD;
 
 /**
  * @public
