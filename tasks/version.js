@@ -13,6 +13,11 @@
 
 'use strict';
 
+/** @type {!Object} */
+var crypto = require('crypto');
+/** @type {!Object} */
+var fs = require('fs');
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // DEFINE & EXPORT THE TASK
@@ -47,6 +52,25 @@ module.exports = newTask('version', 'all', {
     });
 
     log.pass('Completed `version.all` Task');
+  },
+
+  /**
+   * @type {function}
+   */
+  hash: function hash() {
+
+    /** @type {!Array<string>} */
+    var filepaths;
+
+    filepaths = retrieve.filepaths('.', {
+      validExts: 'jpg|png|gif|jpeg'
+    }, false);
+
+    each(filepaths, function(/** string */ filepath) {
+      copy.file( filepath, hashFile(filepath) );
+    });
+
+    log.pass('Completed `version.hash` Task');
   }
 });
 
@@ -84,4 +108,24 @@ function insertVersion(filepath, version) {
   retrieve.file(filepath)
     .replace(regex, '$1' + version)
     .to(filepath);
+}
+
+/**
+ * @param {string} filepath
+ * @return {string}
+ */
+function hashFile(filepath) {
+
+  /** @type {Buffer} */
+  var content;
+  /** @type {string} */
+  var hash;
+
+  content = retrieve.file(filepath, null);
+  hash = crypto.createHash('sha1')
+    .update(content)
+    .digest('hex')
+    .slice(0, 20);
+
+  return filepath.replace(/^(.*)(\.[a-z]{2,5})$/i, '$1-' + hash + '$2');
 }
