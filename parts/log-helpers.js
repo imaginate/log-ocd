@@ -156,6 +156,17 @@ function logDetails(style, msg) {
 
 /**
  * @private
+ * @param {!Stack} stack
+ */
+function logStack(stack) {
+  log( colors.plain('Stacktrace:') );
+  each(stack, function(/** string */ line) {
+    log( colors.plain('  ' + line) );
+  });
+}
+
+/**
+ * @private
  * @param {!Object} obj
  */
 function logArgMap(obj) {
