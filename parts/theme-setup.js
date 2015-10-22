@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------------
  * LOG-OCD THEME SETUP
  * -----------------------------------------------------------------------------
- * @version 0.0.1
+ * @version 1.0.0
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
  *
  * @author Adam Smith <adam@imaginate.life> (https://github.com/imaginate)
