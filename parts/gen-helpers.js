@@ -247,6 +247,32 @@ function mapArr(obj, iteratee) {
 }
 
 /**
+ * Gets an object's property keys.
+ * @private
+ * @param {?(Object|function)} obj
+ * @return {Array<string>}
+ */
+function objKeys(obj) {
+
+  /** @type {string} */
+  var prop;
+  /** @type {!Array<string>} */
+  var arr;
+
+  if (!obj) {
+    return null;
+  }
+
+  arr = [];
+  for (prop in obj) {
+    if ( has(obj, prop) ) {
+      arr.push(prop);
+    }
+  }
+  return arr;
+}
+
+/**
  * Creates a new object with the properties of the given object.
  * @private
  * @param {Object} obj
