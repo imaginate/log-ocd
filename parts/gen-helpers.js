@@ -171,7 +171,7 @@ function newProps(map, props, propVal, staticType) {
 Error.stackTraceLimit = 12;
 
 /**
- * @typedef {!Object<string, string>} Stack
+ * @typedef {!Array<string>} Stack
  */
 
 /**
@@ -182,27 +182,17 @@ function newStack() {
 
   /** @type {!Array<string>} */
   var stack;
-  /** @type {!Object} */
-  var props;
-  /** @type {!Object} */
-  var map;
-  /** @type {string} */
-  var key;
 
   stack = new Error().stack
     .replace(/\r\n?/g, '\n')
     .replace(/^.*\n.*\n.*\n\s+at/, '')
     .split(/\n\s+at/);
 
-  props = {};
-  each(stack, function(/** string */ line, /** number */ i) {
-    key = ( ++i < 10 ? ' ' : '' ) + i + ')';
-    props[key] = line;
+  stack = mapArr(stack, function(/** string */ line, /** number */ i) {
+    return ( ++i < 10 ? ' ' : '' ) + i + ')' + line;
   });
 
-  map = newMap('Stack');
-  map = newProps(map, props);
-  return freeze(map);
+  return freeze(stack);
 }
 
 
