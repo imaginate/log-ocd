@@ -87,10 +87,10 @@ var tests = {
     log: [
       [ 
         'str',
-        '[Function] {', '  a: func,', '}',
+        '[Function] {', '  a: func', '}',
         '[ arr ]',
         '/regex/i',
-        '{', '  a: obj,', '}'
+        '{', '  a: obj', '}'
       ],
       [ 'a: arg1', 'b: arg2' ]
     ],

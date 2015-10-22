@@ -171,7 +171,7 @@ describe('logOCD.setConfig("<method>.<prop>", val)', function() {
     });
 
     it(getSetTitle('log', 'argMap', true), function() {
-      testLog(logOCD, [ { a: 'test' } ], [ '', '{', '  a: test,', '}', '' ]);
+      testLog(logOCD, [ { a: 'test' } ], [ '', '{', '  a: test', '}', '' ]);
       logOCD.setConfig('log.argMap', true);
       testLog(logOCD, [ { a: 'test' } ], [ '', 'a: test', '' ]);
     });
