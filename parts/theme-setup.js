@@ -303,32 +303,103 @@ var logOCDTheme = newLogOCDTheme({
     })
   }),
 
-  log:     newMethodTheme({}),
-  pass:    newMethodTheme({}),
-  error:   newMethodTheme({}),
-  warn:    newMethodTheme({}),
-  debug:   newMethodTheme({}),
-  fail:    newMethodTheme({})
-});
+  log: newMethodTheme(),
 
-// DEFAULT THEMES
-// {
-//   error: [ 'white', 'bold', 'bgRed'    ],
-//   warn:  [ 'white', 'bold', 'bgYellow' ],
-//   pass:  [ 'white', 'bold', 'bgGreen'  ],
-//   debug: [ 'white', 'bold', 'bgBlue'   ],
-//   plain: 'white',
-//   view:  'cyan',
-//   fail:  'red'
-// }
-// {
-//   aerror: [ 'yellow',  'bold', 'bgRed'    ],
-//   awarn:  [ 'blue',    'bold', 'bgYellow' ],
-//   apass:  [ 'yellow',  'bold', 'bgGreen'  ],
-//   adebug: [ 'magenta', 'bold', 'bgBlue'   ],
-//   aplain: 'magenta',
-//   aview:  'magenta',
-//   afail:  'yellow'
-// }
+  pass: newMethodTheme({
+    header: newAccentTheme({
+      default: newStyle({
+        color: 'white',
+        bg:    'green',
+        bold:  true
+      }),
+      marker: '`',
+      accent: newStyle({
+        color: 'yellow',
+        bg:    'green',
+        bold:  true
+      })
+    })
+  }),
+
+  error: newMethodTheme({
+    header: newAccentTheme({
+      default: newStyle({
+        color: 'white',
+        bg:    'red',
+        bold:  true
+      }),
+      marker: '`',
+      accent: newStyle({
+        color: 'yellow',
+        bg:    'red',
+        bold:  true
+      })
+    }),
+
+    msg: newAccentTheme({
+      default: newStyle({
+        color: 'white'
+      }),
+      marker: '`',
+      accent: newStyle({
+        color: 'magenta'
+      })
+    })
+  }),
+
+  warn: newMethodTheme({
+    header: newAccentTheme({
+      default: newStyle({
+        color: 'white',
+        bg:    'yellow',
+        bold:  true
+      }),
+      marker: '`',
+      accent: newStyle({
+        color: 'blue',
+        bg:    'yellow',
+        bold:  true
+      })
+    }),
+
+    msg: newAccentTheme({
+      default: newStyle({
+        color: 'white'
+      }),
+      marker: '`',
+      accent: newStyle({
+        color: 'magenta'
+      })
+    })
+  }),
+
+  debug: newMethodTheme({
+    header: newAccentTheme({
+      default: newStyle({
+        color: 'white',
+        bg:    'blue',
+        bold:  true
+      }),
+      marker: '`',
+      accent: newStyle({
+        color: 'magenta',
+        bg:    'blue',
+        bold:  true
+      })
+    })
+  }),
+
+  fail: newMethodTheme({
+    msg: newAccentTheme({
+      default: newStyle({
+        color: 'red'
+      }),
+      marker: '`',
+      accent: newStyle({
+        color: 'yellow'
+      })
+    })
+  })
+});
 
 colors.setTheme();
