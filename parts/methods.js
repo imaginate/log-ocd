@@ -50,6 +50,14 @@ function logOCD() {
 /**
  * @public
  * @this {!LogOCD}
+ * @param {*...} args
+ * @return {boolean}
+ */
+logOCD.log = logOCD;
+
+/**
+ * @public
+ * @this {!LogOCD}
  * @param {string=} header - Only optional if the header config is disabled.
  * @param {*...=} args
  * @return {boolean}
