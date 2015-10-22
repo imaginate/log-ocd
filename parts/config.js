@@ -91,23 +91,27 @@ var CONFIG = {
     spaceAfter: 1,
     argMap: false,
     header: true,
+    stack: true,
     exit: true
   },
   warn: {
     spaceBefore: 1,
     spaceAfter: 1,
     argMap: false,
-    header: true
+    header: true,
+    stack: false
   },
   debug: {
     spaceBefore: 1,
     spaceAfter: 1,
     argMap: false,
-    header: true
+    header: true,
+    stack: false
   },
   fail: {
     spaceBefore: 1,
     spaceAfter: 1,
-    argMap: false
+    argMap: false,
+    stack: false
   }
 };

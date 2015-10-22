@@ -38,6 +38,7 @@ var CONFIG_PROPS = {
   argMap: is.bool,
   header: is.bool,
   style: function(val) { return is._str(val) && has(THEMES, val); },
+  stack: is.bool,
   exit: is.bool
 };
 
