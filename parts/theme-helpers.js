@@ -71,11 +71,13 @@ function newStyle(props) {
  * @typedef {{
  *   placeholder: ?string,
  *   separators: ?string,
+ *   outBracket: ?string,
+ *   inBracket: ?string,
  *   brackets: ?string,
- *   accents: ?string,
  *   ending: ?string,
+ *   indent: ?string,
  *   intro: ?string,
- *   flags: ?string
+ *   limit: ?number
  * }} TypeValues
  */
 
@@ -96,20 +98,21 @@ function newTypeValues(props) {
 
   values = newMap('TypeValues');
   values = newProps(values, [
-    'placeholder', 'separators', 'brackets',
-    'accents', 'ending', 'intro', 'flags'
+    'placeholder', 'separators', 'outBracket', 'inBracket',
+    'brackets', 'ending', 'indent', 'intro'
   ], null, '?str');
+  values = newProp(values, 'limit', null, '?num');
   values = seal(values);
   return merge(values, props);
 }
 
 /**
  * @typedef {{
- *   placeholder: ?Style,
  *   separators: ?Style,
  *   brackets: ?Style,
- *   accents: ?Style,
+ *   default: ?Style,
  *   ending: ?Style,
+ *   indent: ?Style,
  *   intro: ?Style,
  *   flags: ?Style
  * }} TypeStyles
@@ -132,8 +135,7 @@ function newTypeStyles(props) {
 
   styles = newMap('TypeStyles');
   styles = newProps(styles, [
-    'placeholder', 'separators', 'brackets',
-    'accents', 'ending', 'intro', 'flags'
+    'separators', 'brackets', 'default', 'ending', 'indent', 'intro', 'flags'
   ], null, function(/** * */ val) {
     return is.null(val) || ( is.obj(val) && obj._TYPE === 'Style' );
   });
@@ -327,6 +329,7 @@ function newTypeThemes(props) {
 /**
  * @typedef {{
  *   default: ?Style,
+ *   marker:  ?string,
  *   accent:  ?Style
  * }} AccentTheme
  */
@@ -349,6 +352,9 @@ function newAccentTheme(props) {
   props = props._TYPE === 'Style' ? { default: props } : props;
 
   theme = newMap('AccentTheme');
+  theme = newProp(theme, 'marker', null, function(/** * */ val) {
+    return is.null(val) || is._str(val);
+  });
   theme = newProps(theme, 'default, accent', null, function(/** * */ val) {
     return is.null(val) || ( is.obj(val) && obj._TYPE === 'Style' );
   });
