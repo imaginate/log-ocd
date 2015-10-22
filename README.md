@@ -19,7 +19,7 @@ log.error('A `Failure`', 'with some `guidance`', { and: 'an', arg: 'Map', with: 
 log.warn('A Word of `Caution`', 'with a story of `danger`');
 log.debug('A Beacon of `Hope`', [ 'with', 'all', 'the', 'juicy', 'details' ], /you want to know/g);
 ```
-<img src="http://www.algorithmiv.com/images/log-ocd-example.png" alt="log-ocd Example" />
+<img src="http://www.algorithmiv.com/images/log-ocd/example-8d3aad09c366c65dc7a0.png" alt="log-ocd Example" />
 
 
 ## Getting Started
