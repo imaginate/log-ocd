@@ -797,9 +797,9 @@ function logArgMap(obj) {
   each(obj, function(/** * */ val, /** string */ key) {
     if (key !== 'argMap') {
       str = makeLogStr(val);
-      log( colors.plain(key + ': ') + colors.view(str) );
+      log( colors.view(key + ': ') + colors.plain(str) );
       if ( is.func(val) || str === '{' ) {
-        logObj(val, 'view', -1);
+        logObj(val, 'plain', -1);
       }
     }
   });
@@ -824,7 +824,7 @@ function logObj(obj, style, indent) {
   /** * */
   var val;
 
-  style = style || 'view';
+  style = style || 'plain';
   indent = indent || 0;
 
   indent || log(
