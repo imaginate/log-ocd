@@ -167,6 +167,44 @@ function newProps(map, props, propVal, staticType) {
   return Object.defineProperties(map, obj);
 }
 
+/** @type {number} */
+Error.stackTraceLimit = 12;
+
+/**
+ * @typedef {!Object<string, string>} Stack
+ */
+
+/**
+ * @private
+ * @return {!Stack}
+ */
+function newStack() {
+
+  /** @type {!Array<string>} */
+  var stack;
+  /** @type {!Object} */
+  var props;
+  /** @type {!Object} */
+  var map;
+  /** @type {string} */
+  var key;
+
+  stack = new Error().stack
+    .replace(/\r\n?/g, '\n')
+    .replace(/^.*\n.*\n.*\n\s+at/, '')
+    .split(/\n\s+at/);
+
+  props = {};
+  each(stack, function(/** string */ line, /** number */ i) {
+    key = ( ++i < 10 ? ' ' : '' ) + i + ')';
+    props[key] = line;
+  });
+
+  map = newMap('Stack');
+  map = newProps(map, props);
+  return freeze(map);
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // METHODS
