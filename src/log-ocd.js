@@ -176,22 +176,26 @@ function newMap(mapType) {
  * @param {!Object} map
  * @param {string} key
  * @param {*} val
- * @param {(string|function(*): boolean)=} staticType - [default= "*"] If
- *   staticType is a string newProps uses an [is method]{@link https://github.com/imaginate/are/blob/master/docs/is-methods.md}
- *   or the [is main function]{@link https://github.com/imaginate/are/blob/master/docs/is-main-func.md}
- *   to check all new values.
+ * @param {(string|function(*, *): boolean)=} staticType - [default= "*"] If
+ *   staticType is a string newProps uses the [is main function]{@link https://github.com/imaginate/are/blob/master/docs/is-main-func.md}
+ *   from the [are library]{@link https://github.com/imaginate/are} to check all
+ *   new values (e.g. is(staticType, newVal)). If staticType is a function it
+ *   will be given two params, newValue and currentValue, and expected to return
+ *   true if the currentValue should be set to the newValue (note: an error is
+ *   not thrown if it returns false).
  * @return {!Object}
  */
 function newProp(map, key, val, staticType) {
 
-  staticType = is('func=', staticType) ? staticType : has(is, staticType) ?
-    is[staticType] : function(val) { return is(staticType, val); };
+  staticType = is('func=', staticType) ? staticType : function(/** * */ val) {
+    return is(staticType, val);
+  };
 
   return Object.defineProperty(map, key, staticType ? {
       __proto__: null,
       get: function() { return val; },
       set: function(value) {
-        if ( staticType(value) ) {
+        if ( staticType(value, val) ) {
           val = value;
         }
       },
@@ -216,10 +220,13 @@ function newProp(map, key, val, staticType) {
  *   separator (chars listed in order of use):  ", "  ","  "|"  " "
  * @param {*=} propVal - [default= null] The value for all props if an array or
  *   string is used for the props param.
- * @param {(string|function(*): boolean)=} staticType - [default= "*"] If
- *   staticType is a string newProps uses an [is method]{@link https://github.com/imaginate/are/blob/master/docs/is-methods.md}
- *   or the [is main function]{@link https://github.com/imaginate/are/blob/master/docs/is-main-func.md}
- *   to check all new values.
+ * @param {(string|function(*, *): boolean)=} staticType - [default= "*"] If
+ *   staticType is a string newProps uses the [is main function]{@link https://github.com/imaginate/are/blob/master/docs/is-main-func.md}
+ *   from the [are library]{@link https://github.com/imaginate/are} to check all
+ *   new values (e.g. is(staticType, newVal)). If staticType is a function it
+ *   will be given two params, newValue and currentValue, and expected to return
+ *   true if the currentValue should be set to the newValue (note: an error is
+ *   not thrown if it returns false).
  * @return {!Object}
  */
 function newProps(map, props, propVal, staticType) {
@@ -245,8 +252,9 @@ function newProps(map, props, propVal, staticType) {
     staticType = propVal;
   }
 
-  staticType = is('func=', staticType) ? staticType : has(is, staticType) ?
-    is[staticType] : function(val) { return is(staticType, val); };
+  staticType = is('func=', staticType) ? staticType : function(/** * */ val) {
+    return is(staticType, val);
+  };
 
   obj = {};
   each(props, function(/** * */ val, /** string */ key) {
@@ -254,7 +262,7 @@ function newProps(map, props, propVal, staticType) {
         __proto__: null,
         get: function() { return val; },
         set: function(value) {
-          if ( staticType(value) ) {
+          if ( staticType(value, val) ) {
             val = value;
           }
         },
@@ -309,8 +317,8 @@ function newStack() {
   regex = /^([^\(]+\()?(.*\/)?([^\/]+\.[a-z]+):([0-9]+):([0-9]+)\)?$/i;
   stack = new Error().stack
     .replace(/\r\n?/g, '\n') // normalize line breaks
-    .replace(/\\/g, '/') // normalize slashes
-    .replace(/^.*\n.*\n.*\n\s+at /, '') // remove log-ocd traces
+    .replace(/\\/g, '/')     // normalize slashes
+    .replace(/^.*\n.*\n.*\n\s+at /, '') // remove message and log-ocd traces
     .split(/\n\s+at /)
     .map(function(/** string */ str, /** number */ i) {
       arr = slice(regex.exec(str), 1);
@@ -318,7 +326,7 @@ function newStack() {
       trace = newMap('Trace');
       trace = newProps(trace, {
         pos:    ( ++i < 10 ? ' ' : '' ) + i,
-        event:  arr.shift() || '',
+        event:  arr.shift() || '(none)',
         dir:    arr.shift() || '',
         file:   arr.shift(),
         line:   arr.shift(),
@@ -326,6 +334,18 @@ function newStack() {
       });
       return freeze(trace);
     });
+
+  stack = newProps(stack, 'event, file, line, column', 0,
+    function(/** number */ newVal, /** number */ currentVal) {
+      return newVal > currentVal;
+    }
+  );
+  each(stack, function(/** !Trace */ trace) {
+    stack.event  = trace.event.length;
+    stack.file   = trace.file.length;
+    stack.line   = trace.line.length;
+    stack.column = trace.column.length;
+  });
 
   return freeze(stack);
 }
@@ -591,23 +611,24 @@ function each(val, iteratee) {
 }
 
 /**
- * Fills an existing or new array with specified values.
+ * Fills a string with specified values.
  * @private
- * @param {(Array|number)} arr
- * @param {*} val
- * @return {Array}
+ * @param {number} count
+ * @param {string} val
+ * @return {string}
  */
-function fill(arr, val) {
+function fillStr(count, val) {
 
+  /** @type {string} */
+  var str;
   /** @type {number} */
   var i;
 
-  arr = is.num(arr) ? new Array(arr) : arr;
-  i = arr.length;
-  while (i--) {
-    arr[i] = val;
+  str = '';
+  while (count--) {
+    str += val;
   }
-  return arr;
+  return str;
 }
 
 
@@ -634,13 +655,15 @@ function fill(arr, val) {
  * @const
  */
 var THEMES = {
-  error: [ 'white', 'bold', 'bgRed'    ],
-  warn:  [ 'white', 'bold', 'bgYellow' ],
-  pass:  [ 'white', 'bold', 'bgGreen'  ],
-  debug: [ 'white', 'bold', 'bgBlue'   ],
-  plain: 'white',
-  view:  'cyan',
-  fail:  'red'
+  error:  [ 'white', 'bold', 'bgRed'    ],
+  warn:   [ 'white', 'bold', 'bgYellow' ],
+  pass:   [ 'white', 'bold', 'bgGreen'  ],
+  debug:  [ 'white', 'bold', 'bgBlue'   ],
+  plain:    'white',
+  view:     'cyan',
+  fail:     'red',
+  ostack:   'white',
+  estack: [ 'white', 'bgBlue' ]
 };
 
 // accent settings for each theme
@@ -852,20 +875,35 @@ function logDetails(style, msg) {
  * @param {!Stack} stack
  */
 function logStack(stack) {
-  log( colors.plain('Stacktrace:') );
-  each(stack, function(/** !Trace */ trace) {
-    log(
-      colors.plain(' ' + trace.pos + ') ') +
-      (trace.event && (
-        colors.view('event: ') + colors.plain(trace.event + ' ')
-      )) +
-      (trace.dir && (
-        colors.view('dir: ') + colors.plain(trace.dir + ' ')
-      )) +
-      colors.view('file: ') + colors.plain(trace.file + ' ') +
-      colors.view('line: ') + colors.plain(trace.line + ' ') +
-      colors.view('column: ') + colors.plain(trace.column + ' ')
-    );
+
+  /** @type {function} */
+  var color;
+  /** @type {string} */
+  var str;
+
+  str = fillStr(stack.event - 10, ' ');
+  str += '  file';
+  str += fillStr(stack.file - 4, ' ');
+  str += fillStr(stack.line, ' ');
+  str += 'line';
+  str += fillStr(stack.column, ' ');
+  str += 'column ';
+  log( colors.error(' Stacktrace') + colors.bgRed(str) );
+
+  each(stack, function(/** !Trace */ trace, /** number */ i) {
+    color = i % 2 ? colors.estack : colors.ostack;
+    str = ' ' + trace.event;
+    str += fillStr(stack.event - trace.event.length, ' ');
+    str += '  ' + trace.file;
+    str += fillStr(stack.file - trace.file.length, ' ');
+    str += '    ';
+    str += fillStr(stack.line - trace.line.length, ' ');
+    str += trace.line;
+    str += '      ';
+    str += fillStr(stack.column - trace.column.length, ' ');
+    str += trace.column + ' ';
+    log( color(str) );
+    //trace.dir && log( color(' - ' + trace.dir) );
   });
 }
 
@@ -916,7 +954,7 @@ function logObj(obj, style, indent) {
   );
   indent = indent < 0 ? 0 : indent;
 
-  spaces = indent ? fill(indent, '  ').join('') : '';
+  spaces = fillStr(indent, '  ');
 
   keys = objKeys(obj);
   last = keys.length - 1;
