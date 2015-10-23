@@ -109,6 +109,11 @@ logOCD.pass = function(header) {
  */
 logOCD.error = function(header, msg) {
 
+  /** @type {?Stack} */
+  var stack;
+
+  stack = this._config.error.stack ? newStack() : null;
+
   logSpaces(this._config.error.spaceBefore);
 
   if (this._config.error.header) {
@@ -124,6 +129,7 @@ logOCD.error = function(header, msg) {
 
     logHeader('error', header);
     logDetails('plain', msg);
+    stack && logStack(stack);
 
     if (arguments.length > 2) {
       logSpaces(1);
@@ -145,6 +151,7 @@ logOCD.error = function(header, msg) {
 
     logHeader('error', 'Error');
     logDetails('plain', msg);
+    stack && logStack(stack);
 
     if (arguments.length > 1) {
       logSpaces(1);
@@ -168,6 +175,11 @@ logOCD.error = function(header, msg) {
  */
 logOCD.warn = function(header, msg) {
 
+  /** @type {?Stack} */
+  var stack;
+
+  stack = this._config.warn.stack ? newStack() : null;
+
   logSpaces(this._config.warn.spaceBefore);
 
   if (this._config.warn.header) {
@@ -183,6 +195,7 @@ logOCD.warn = function(header, msg) {
 
     logHeader('warn', header);
     logDetails('plain', msg);
+    stack && logStack(stack);
 
     if (arguments.length > 2) {
       logSpaces(1);
@@ -204,6 +217,7 @@ logOCD.warn = function(header, msg) {
 
     logHeader('warn', 'Warning');
     logDetails('plain', msg);
+    stack && logStack(stack);
 
     if (arguments.length > 1) {
       logSpaces(1);
@@ -225,6 +239,11 @@ logOCD.warn = function(header, msg) {
  */
 logOCD.debug = function(header) {
 
+  /** @type {?Stack} */
+  var stack;
+
+  stack = this._config.debug.stack ? newStack() : null;
+
   logSpaces(this._config.debug.spaceBefore);
 
   if (this._config.debug.header) {
@@ -239,6 +258,7 @@ logOCD.debug = function(header) {
     }
 
     logHeader('debug', header);
+    stack && logStack(stack);
 
     if (arguments.length > 1) {
       logSpaces(1);
@@ -248,6 +268,7 @@ logOCD.debug = function(header) {
   else {
 
     logHeader('debug', 'Debug');
+    stack && logStack(stack);
 
     if (arguments.length) {
       logSpaces(1);
@@ -269,6 +290,11 @@ logOCD.debug = function(header) {
  */
 logOCD.fail = function(msg) {
 
+  /** @type {?Stack} */
+  var stack;
+
+  stack = this._config.fail.stack ? newStack() : null;
+
   if ( !is._str(msg) ) {
     this.error(
       'Invalid `log-ocd fail` Call',
@@ -280,6 +306,7 @@ logOCD.fail = function(msg) {
 
   logSpaces(this._config.fail.spaceBefore);
   logAny('fail', [ msg ]);
+  stack && logStack(stack);
   arguments.length > 1 && logAny(
     'view', slice(arguments, 1), this._config.fail.argMap
   );
@@ -295,17 +322,17 @@ logOCD.fail = function(msg) {
 
 /**
  * All Methods & Their Config Properties
- * -----------------------------------------------------------------
- * | Method | Props                                                |
- * | :----- | :--------------------------------------------------- |
- * | all    | spaceBefore, spaceAfter, argMap, header, style, exit |
- * | log    | spaceBefore, spaceAfter, argMap, style               |
- * | pass   | spaceBefore, spaceAfter, argMap, header              |
- * | error  | spaceBefore, spaceAfter, argMap, header, exit        |
- * | warn   | spaceBefore, spaceAfter, argMap, header              |
- * | debug  | spaceBefore, spaceAfter, argMap, header              |
- * | fail   | spaceBefore, spaceAfter, argMap                      |
- * -----------------------------------------------------------------
+ * ------------------------------------------------------------------------
+ * | Method | Props                                                       |
+ * | :----- | :---------------------------------------------------------- |
+ * | all    | spaceBefore, spaceAfter, argMap, header, style, stack, exit |
+ * | log    | spaceBefore, spaceAfter, argMap, style                      |
+ * | pass   | spaceBefore, spaceAfter, argMap, header                     |
+ * | error  | spaceBefore, spaceAfter, argMap, header, stack, exit        |
+ * | warn   | spaceBefore, spaceAfter, argMap, header, stack              |
+ * | debug  | spaceBefore, spaceAfter, argMap, header, stack              |
+ * | fail   | spaceBefore, spaceAfter, argMap, stack                      |
+ * ------------------------------------------------------------------------
  *
  * @example [logOCDInstance].setConfig("all.argMap", true);
  *
