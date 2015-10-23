@@ -172,7 +172,7 @@ Error.stackTraceLimit = 12;
 
 /**
  * @typedef {!{
- *   pos:    number,
+ *   pos:    string,
  *   event:  string,
  *   dir:    string,
  *   file:   string,
@@ -211,7 +211,7 @@ function newStack() {
     .map(function(/** string */ str, /** number */ i) {
       arr = slice(regex.exec(str), 1);
       props = {
-        pos:    ++i,
+        pos:    ( ++i < 10 ? ' ' : '' ) + i,
         event:  /\)$/.test(str) ? arr.shift().slice(0, -2) : '',
         dir:    arr.length === 4 ? arr.shift() : '';
         file:   arr.shift(),
