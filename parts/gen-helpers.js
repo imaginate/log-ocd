@@ -193,8 +193,6 @@ function newStack() {
 
   /** @type {!Stack} */
   var stack;
-  /** @type {!Object} */
-  var props;
   /** @type {!Trace} */
   var trace;
   /** @type {!RegExp} */
@@ -202,24 +200,24 @@ function newStack() {
   /** @type {!Array<string>} */
   var arr;
 
-  regex = /^([^\(]+\()?([^\)]*\/)?([^\/]+\.[a-z]+):([0-9]+):([0-9]+)\)?$/i;
+  regex = /^([^\(]+\()?(.*\/)?([^\/]+\.[a-z]+):([0-9]+):([0-9]+)\)?$/i;
   stack = new Error().stack
     .replace(/\r\n?/g, '\n') // normalize line breaks
     .replace(/\\/g, '/') // normalize slashes
-    .replace(/^.*\n.*\n.*\n\s+at /, '')
+    .replace(/^.*\n.*\n.*\n\s+at /, '') // remove log-ocd traces
     .split(/\n\s+at /)
     .map(function(/** string */ str, /** number */ i) {
       arr = slice(regex.exec(str), 1);
-      props = {
+      arr[0] = arr[0] && arr[0].slice(0, -2);
+      trace = newMap('Trace');
+      trace = newProps(trace, {
         pos:    ( ++i < 10 ? ' ' : '' ) + i,
-        event:  /\)$/.test(str) ? arr.shift().slice(0, -2) : '',
-        dir:    arr.length === 4 ? arr.shift() : '';
+        event:  arr.shift() || '',
+        dir:    arr.shift() || '',
         file:   arr.shift(),
         line:   arr.shift(),
         column: arr.shift()
-      };
-      trace = newMap('Trace');
-      trace = newProps(trace, props);
+      });
       return freeze(trace);
     });
 
