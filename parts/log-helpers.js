@@ -160,20 +160,35 @@ function logDetails(style, msg) {
  * @param {!Stack} stack
  */
 function logStack(stack) {
-  log( colors.plain('Stacktrace:') );
-  each(stack, function(/** !Trace */ trace) {
-    log(
-      colors.plain(' ' + trace.pos + ') ') +
-      (trace.event && (
-        colors.view('event: ') + colors.plain(trace.event + ' ')
-      )) +
-      (trace.dir && (
-        colors.view('dir: ') + colors.plain(trace.dir + ' ')
-      )) +
-      colors.view('file: ') + colors.plain(trace.file + ' ') +
-      colors.view('line: ') + colors.plain(trace.line + ' ') +
-      colors.view('column: ') + colors.plain(trace.column + ' ')
-    );
+
+  /** @type {function} */
+  var color;
+  /** @type {string} */
+  var str;
+
+  str = fillStr(stack.event - 10, ' ');
+  str += '  file';
+  str += fillStr(stack.file - 4, ' ');
+  str += fillStr(stack.line, ' ');
+  str += 'line';
+  str += fillStr(stack.column, ' ');
+  str += 'column ';
+  log( colors.error(' Stacktrace') + colors.bgRed(str) );
+
+  each(stack, function(/** !Trace */ trace, /** number */ i) {
+    color = i % 2 ? colors.estack : colors.ostack;
+    str = ' ' + trace.event;
+    str += fillStr(stack.event - trace.event.length, ' ');
+    str += '  ' + trace.file;
+    str += fillStr(stack.file - trace.file.length, ' ');
+    str += '    ';
+    str += fillStr(stack.line - trace.line.length, ' ');
+    str += trace.line;
+    str += '      ';
+    str += fillStr(stack.column - trace.column.length, ' ');
+    str += trace.column + ' ';
+    log( color(str) );
+    //trace.dir && log( color(' - ' + trace.dir) );
   });
 }
 
@@ -224,7 +239,7 @@ function logObj(obj, style, indent) {
   );
   indent = indent < 0 ? 0 : indent;
 
-  spaces = indent ? fill(indent, '  ').join('') : '';
+  spaces = fillStr(indent, '  ');
 
   keys = objKeys(obj);
   last = keys.length - 1;

@@ -220,7 +220,7 @@ function newStack() {
       trace = newMap('Trace');
       trace = newProps(trace, {
         pos:    ( ++i < 10 ? ' ' : '' ) + i,
-        event:  arr.shift() || '',
+        event:  arr.shift() || '(none)',
         dir:    arr.shift() || '',
         file:   arr.shift(),
         line:   arr.shift(),
