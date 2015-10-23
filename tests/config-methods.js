@@ -28,17 +28,17 @@ var logOCD = require('../src/log-ocd.js')({
 
 /*
  * All log-ocd Instance Methods & Config Props
- * -----------------------------------------------------------------
- * | Method | Props                                                |
- * | :----- | :--------------------------------------------------- |
- * | all    | spaceBefore, spaceAfter, argMap, header, style, exit |
- * | log    | spaceBefore, spaceAfter, argMap, style               |
- * | pass   | spaceBefore, spaceAfter, argMap, header              |
- * | error  | spaceBefore, spaceAfter, argMap, header, exit        |
- * | warn   | spaceBefore, spaceAfter, argMap, header              |
- * | debug  | spaceBefore, spaceAfter, argMap, header              |
- * | fail   | spaceBefore, spaceAfter, argMap                      |
- * -----------------------------------------------------------------
+ * ------------------------------------------------------------------------
+ * | Method | Props                                                       |
+ * | :----- | :---------------------------------------------------------- |
+ * | all    | spaceBefore, spaceAfter, argMap, header, style, stack, exit |
+ * | log    | spaceBefore, spaceAfter, argMap, style                      |
+ * | pass   | spaceBefore, spaceAfter, argMap, header                     |
+ * | error  | spaceBefore, spaceAfter, argMap, header, stack, exit        |
+ * | warn   | spaceBefore, spaceAfter, argMap, header, stack              |
+ * | debug  | spaceBefore, spaceAfter, argMap, header, stack              |
+ * | fail   | spaceBefore, spaceAfter, argMap, stack                      |
+ * ------------------------------------------------------------------------
  */
 
 /** @type {!Object} */
