@@ -1012,6 +1012,7 @@ logOCD.error = function(header, msg) {
 
     logHeader('error', header);
     logDetails('plain', msg);
+    stack && logSpaces(1);
     stack && logStack(stack);
 
     if (arguments.length > 2) {
@@ -1034,6 +1035,7 @@ logOCD.error = function(header, msg) {
 
     logHeader('error', 'Error');
     logDetails('plain', msg);
+    stack && logSpaces(1);
     stack && logStack(stack);
 
     if (arguments.length > 1) {
@@ -1078,6 +1080,7 @@ logOCD.warn = function(header, msg) {
 
     logHeader('warn', header);
     logDetails('plain', msg);
+    stack && logSpaces(1);
     stack && logStack(stack);
 
     if (arguments.length > 2) {
@@ -1100,6 +1103,7 @@ logOCD.warn = function(header, msg) {
 
     logHeader('warn', 'Warning');
     logDetails('plain', msg);
+    stack && logSpaces(1);
     stack && logStack(stack);
 
     if (arguments.length > 1) {
@@ -1141,6 +1145,7 @@ logOCD.debug = function(header) {
     }
 
     logHeader('debug', header);
+    stack && logSpaces(1);
     stack && logStack(stack);
 
     if (arguments.length > 1) {
@@ -1151,6 +1156,7 @@ logOCD.debug = function(header) {
   else {
 
     logHeader('debug', 'Debug');
+    stack && logSpaces(1);
     stack && logStack(stack);
 
     if (arguments.length) {
@@ -1189,6 +1195,7 @@ logOCD.fail = function(msg) {
 
   logSpaces(this._config.fail.spaceBefore);
   logAny('fail', [ msg ]);
+  stack && logSpaces(1);
   stack && logStack(stack);
   arguments.length > 1 && logAny(
     'view', slice(arguments, 1), this._config.fail.argMap
