@@ -277,7 +277,18 @@ function newProps(map, props, propVal, staticType) {
 Error.stackTraceLimit = 12;
 
 /**
- * @typedef {!Array<string>} Stack
+ * @typedef {!{
+ *   pos:    string,
+ *   event:  string,
+ *   dir:    string,
+ *   file:   string,
+ *   line:   string,
+ *   column: string
+ * }} Trace
+ */
+
+/**
+ * @typedef {!Array<!Trace>} Stack
  */
 
 /**
@@ -286,17 +297,37 @@ Error.stackTraceLimit = 12;
  */
 function newStack() {
 
-  /** @type {!Array<string>} */
+  /** @type {!Stack} */
   var stack;
+  /** @type {!Object} */
+  var props;
+  /** @type {!Trace} */
+  var trace;
+  /** @type {!RegExp} */
+  var regex;
+  /** @type {!Array<string>} */
+  var arr;
 
+  regex = /^([^\(]+\()?([^\)]*\/)?([^\/]+\.[a-z]+):([0-9]+):([0-9]+)\)?$/i;
   stack = new Error().stack
-    .replace(/\r\n?/g, '\n')
-    .replace(/^.*\n.*\n.*\n\s+at/, '')
-    .split(/\n\s+at/);
-
-  stack = mapArr(stack, function(/** string */ line, /** number */ i) {
-    return ( ++i < 10 ? ' ' : '' ) + i + ')' + line;
-  });
+    .replace(/\r\n?/g, '\n') // normalize line breaks
+    .replace(/\\/g, '/') // normalize slashes
+    .replace(/^.*\n.*\n.*\n\s+at /, '')
+    .split(/\n\s+at /)
+    .map(function(/** string */ str, /** number */ i) {
+      arr = slice(regex.exec(str), 1);
+      props = {
+        pos:    ( ++i < 10 ? ' ' : '' ) + i,
+        event:  /\)$/.test(str) ? arr.shift().slice(0, -2) : '',
+        dir:    arr.length === 4 ? arr.shift() : '';
+        file:   arr.shift(),
+        line:   arr.shift(),
+        column: arr.shift()
+      };
+      trace = newMap('Trace');
+      trace = newProps(trace, props);
+      return freeze(trace);
+    });
 
   return freeze(stack);
 }
@@ -824,8 +855,19 @@ function logDetails(style, msg) {
  */
 function logStack(stack) {
   log( colors.plain('Stacktrace:') );
-  each(stack, function(/** string */ line) {
-    log( colors.plain('  ' + line) );
+  each(stack, function(/** !Trace */ trace) {
+    log(
+      colors.plain(' ' + trace.pos + ') ') +
+      (trace.event && (
+        colors.view('event: ') + colors.plain(trace.event + ' ')
+      )) +
+      (trace.dir && (
+        colors.view('dir: ') + colors.plain(trace.dir + ' ')
+      )) +
+      colors.view('file: ') + colors.plain(trace.file + ' ') +
+      colors.view('line: ') + colors.plain(trace.line + ' ') +
+      colors.view('column: ') + colors.plain(trace.column + ' ')
+    );
   });
 }
 

@@ -161,8 +161,19 @@ function logDetails(style, msg) {
  */
 function logStack(stack) {
   log( colors.plain('Stacktrace:') );
-  each(stack, function(/** string */ line) {
-    log( colors.plain('  ' + line) );
+  each(stack, function(/** !Trace */ trace) {
+    log(
+      colors.plain(' ' + trace.pos + ') ') +
+      (trace.event && (
+        colors.view('event: ') + colors.plain(trace.event + ' ')
+      )) +
+      (trace.dir && (
+        colors.view('dir: ') + colors.plain(trace.dir + ' ')
+      )) +
+      colors.view('file: ') + colors.plain(trace.file + ' ') +
+      colors.view('line: ') + colors.plain(trace.line + ' ') +
+      colors.view('column: ') + colors.plain(trace.column + ' ')
+    );
   });
 }
 
