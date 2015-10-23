@@ -46,15 +46,15 @@ var tests = {
   methods: {
     truthy: {
       log:   [ 'spaceBefore', 'spaceAfter', 'argMap', 'style' ],
-      pass:  [ 'spaceBefore', 'spaceAfter', 'argMap', 'header'  ],
-      error: [ 'spaceBefore', 'spaceAfter', 'argMap', 'header', 'exit' ],
-      warn:  [ 'spaceBefore', 'spaceAfter', 'argMap', 'header' ],
-      debug: [ 'spaceBefore', 'spaceAfter', 'argMap', 'header' ],
-      fail:  [ 'spaceBefore', 'spaceAfter', 'argMap' ]
+      pass:  [ 'spaceBefore', 'spaceAfter', 'argMap', 'header' ],
+      error: [ 'spaceBefore', 'spaceAfter', 'argMap', 'header','stack','exit' ],
+      warn:  [ 'spaceBefore', 'spaceAfter', 'argMap', 'header', 'stack' ],
+      debug: [ 'spaceBefore', 'spaceAfter', 'argMap', 'header', 'stack' ],
+      fail:  [ 'spaceBefore', 'spaceAfter', 'argMap', 'stack' ]
     },
     falsy: {
-      log:   [ 'header', 'exit' ],
-      pass:  [ 'style', 'exit' ],
+      log:   [ 'header', 'stack', 'exit' ],
+      pass:  [ 'style', 'stack', 'exit' ],
       error: [ 'style' ],
       warn:  [ 'style', 'exit' ],
       debug: [ 'style', 'exit' ],
@@ -68,6 +68,7 @@ var tests = {
       argMap: true,
       header: false,
       style: 'plain',
+      stack: false,
       exit: false
     },
     falsy: {
@@ -76,6 +77,7 @@ var tests = {
       argMap: null,
       header: null,
       style: 'false',
+      stack: null,
       exit: null
     }
   }
@@ -155,7 +157,7 @@ describe('logOCD.setConfig("<method>.<prop>", val)', function() {
 
   describe('each should change logging behavior', function() {
     beforeEach(function() {
-      logOCD.resetConfig('log', 'pass');
+      logOCD.resetConfig('log', 'pass', 'fail');
     });
 
     it(getSetTitle('log', 'spaceBefore', 2), function() {
@@ -180,6 +182,12 @@ describe('logOCD.setConfig("<method>.<prop>", val)', function() {
       testLog(logOCD.pass, [ 'test' ], [ '', ' test        ', '' ]);
       logOCD.setConfig('pass.header', false);
       testLog(logOCD.pass, [ 'test' ], [ '', ' Pass        ', '', 'test', '' ]);
+    });
+
+    it(getSetTitle('fail', 'stack', true), function() {
+      testLog(logOCD.fail, [ 'test' ], [ '', 'test', '' ]);
+      logOCD.setConfig('fail.stack', true);
+      testLog(logOCD.fail, [ 'test' ], [ '', 'test', 'Stacktrace:' ]);
     });
   });
 });

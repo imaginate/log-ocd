@@ -22,7 +22,10 @@ var logOCD = require('../src/log-ocd.js')({
     spaceBefore: 0,
     spaceAfter: 0
   },
-  error: { exit: false }
+  error: {
+    stack: false,
+    exit: false
+  }
 });
 
 
