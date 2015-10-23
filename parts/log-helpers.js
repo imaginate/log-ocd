@@ -198,13 +198,20 @@ function logStack(stack) {
  */
 function logArgMap(obj) {
 
+  /** @type {!Array<string>} */
+  var keys;
   /** @type {string} */
   var str;
+  /** @type {*} */
+  var val;
 
-  each(obj, function(/** * */ val, /** string */ key) {
+  keys = objKeys(obj).sort( (a, b) => b.length - a.length );
+  each(keys, key => {
     if (key !== 'argMap') {
+      val = obj[key];
+      key = key + ': ';
       str = makeLogStr(val);
-      log( colors.view(key + ': ') + colors.plain(str) );
+      log( colors.view(key) + colors.plain(str) );
       if ( is.func(val) || str === '{' ) {
         logObj(val, 'plain', -1);
       }
@@ -241,9 +248,9 @@ function logObj(obj, style, indent) {
 
   spaces = fillStr(indent, '  ');
 
-  keys = objKeys(obj);
+  keys = objKeys(obj).sort( (a, b) => b.length - a.length );
   last = keys.length - 1;
-  each(keys, function(/** string */ key, /** number */ i) {
+  each(keys, (key, i) => {
     val = obj[key];
     str = makeLogStr(val);
     if ( is.func(val) || str === '{' ) {
