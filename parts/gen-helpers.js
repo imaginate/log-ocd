@@ -81,22 +81,17 @@ function newMap(mapType) {
  */
 function newProp(map, key, val, staticType) {
 
-  staticType = is('func=', staticType) ? staticType : function(/** * */ val) {
-    return is(staticType, val);
-  };
+  if ( is.str(staticType) ) {
+    staticType = val => is(staticType, val);
+  }
 
   return Object.defineProperty(map, key, staticType ? {
       __proto__: null,
-      get: function() { return val; },
-      set: function(value) {
-        if ( staticType(value, val) ) {
-          val = value;
-        }
-      },
+      get() { return val; },
+      set(value) { val = staticType(value, val) ? value : val; },
       enumerable: true,
       configurable: false
-    }
-    : {
+    } : {
       __proto__: null,
       value: val,
       writable: true,
@@ -130,15 +125,12 @@ function newProps(map, props, propVal, staticType) {
   /** @type {!Object} */
   var obj;
 
-  if ( is('!str|arr', props) ) {
-    keys = is.arr(props) ? props : props.split(
-      /, /.test(props) ?
-        ', ' : /,/.test(props) ?
-          ',' : /\|/.test(props) ?
-            '|' : ' '
-    );
+  if ( is('str|arr!', props) ) {
+    keys = is.str(props) ? props.split(
+        [ ', ', ',', '|' ].filter( str => has(props, str) )[0] || ' '
+      ) : props;
     props = {};
-    each(keys, function(/** string */ key) {
+    each(keys, key => {
       props[key] = propVal;
     });
   }
@@ -146,24 +138,19 @@ function newProps(map, props, propVal, staticType) {
     staticType = propVal;
   }
 
-  staticType = is('func=', staticType) ? staticType : function(/** * */ val) {
-    return is(staticType, val);
-  };
+  if ( is.str(staticType) ) {
+    staticType = val => is(staticType, val);
+  }
 
   obj = {};
-  each(props, function(/** * */ val, /** string */ key) {
+  each(props, (val, key) => {
     obj[key] = staticType ? {
         __proto__: null,
-        get: function() { return val; },
-        set: function(value) {
-          if ( staticType(value, val) ) {
-            val = value;
-          }
-        },
+        get() { return val; },
+        set(value) { val = staticType(value, val) ? value : val; },
         enumerable: true,
         configurable: false
-      }
-      : {
+      } : {
         __proto__: null,
         value: val,
         writable: true,
@@ -214,7 +201,7 @@ function newStack() {
     .replace(/\\/g, '/')     // normalize slashes
     .replace(/^.*\n.*\n.*\n\s+at /, '') // remove message and log-ocd traces
     .split(/\n\s+at /)
-    .map(function(/** string */ str, /** number */ i) {
+    .map( (str, i) => {
       arr = slice(regex.exec(str), 1);
       arr[0] = arr[0] && arr[0].slice(0, -2);
       trace = newMap('Trace');
@@ -229,12 +216,10 @@ function newStack() {
       return freeze(trace);
     });
 
-  stack = newProps(stack, 'event, file, line, column', 0,
-    function(/** number */ newVal, /** number */ currentVal) {
-      return newVal > currentVal;
-    }
+  stack = newProps(
+    stack, 'event, file, line, column', 0, (newVal, nowVal) => newVal > nowVal
   );
-  each(stack, function(/** !Trace */ trace) {
+  each(stack, trace => {
     stack.event  = trace.event.length;
     stack.file   = trace.file.length;
     stack.line   = trace.line.length;
@@ -250,16 +235,18 @@ function newStack() {
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
- * A shortcut for Object.prototype.hasOwnProperty that accepts null objects.
+ * A shortcut for Object.prototype.hasOwnProperty that accepts null objects or a
+ *   shortcut for String.prototype.includes and RegExp.prototype.test.
  * @private
- * @param {?(Object|function)} obj
+ * @param {?(Object|function|string)} source
  * @param {*} prop
  * @return {boolean}
  */
-function has(obj, prop) {
-  return is._obj(obj) && ('hasOwnProperty' in obj ?
-    obj.hasOwnProperty(prop) : prop in obj
-  );
+function has(source, prop) {
+  return !source ? false : is.str(source) ?
+    ( is.str(prop) ? source.includes(prop) : prop.test(source) ) : (
+      'hasOwnProperty' in source ? source.hasOwnProperty(prop) : prop in source
+    );
 }
 
 /**
