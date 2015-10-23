@@ -505,21 +505,22 @@ function each(val, iteratee) {
 }
 
 /**
- * Fills an existing or new array with specified values.
+ * Fills a string with specified values.
  * @private
- * @param {(Array|number)} arr
- * @param {*} val
- * @return {Array}
+ * @param {number} count
+ * @param {string} val
+ * @return {string}
  */
-function fill(arr, val) {
+function fillStr(count, val) {
 
+  /** @type {string} */
+  var str;
   /** @type {number} */
   var i;
 
-  arr = is.num(arr) ? new Array(arr) : arr;
-  i = arr.length;
-  while (i--) {
-    arr[i] = val;
+  str = '';
+  while (count--) {
+    str += val;
   }
-  return arr;
+  return str;
 }
