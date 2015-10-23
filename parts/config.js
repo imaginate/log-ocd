@@ -41,13 +41,15 @@
  * @const
  */
 var THEMES = {
-  error: [ 'white', 'bold', 'bgRed'    ],
-  warn:  [ 'white', 'bold', 'bgYellow' ],
-  pass:  [ 'white', 'bold', 'bgGreen'  ],
-  debug: [ 'white', 'bold', 'bgBlue'   ],
-  plain: 'white',
-  view:  'cyan',
-  fail:  'red'
+  error:  [ 'white', 'bold', 'bgRed'    ],
+  warn:   [ 'white', 'bold', 'bgYellow' ],
+  pass:   [ 'white', 'bold', 'bgGreen'  ],
+  debug:  [ 'white', 'bold', 'bgBlue'   ],
+  plain:    'white',
+  view:     'cyan',
+  fail:     'red',
+  ostack:   'white',
+  estack: [ 'white', 'bgBlue' ]
 };
 
 // accent settings for each theme
