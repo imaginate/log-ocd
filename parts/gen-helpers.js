@@ -70,22 +70,26 @@ function newMap(mapType) {
  * @param {!Object} map
  * @param {string} key
  * @param {*} val
- * @param {(string|function(*): boolean)=} staticType - [default= "*"] If
- *   staticType is a string newProps uses an [is method]{@link https://github.com/imaginate/are/blob/master/docs/is-methods.md}
- *   or the [is main function]{@link https://github.com/imaginate/are/blob/master/docs/is-main-func.md}
- *   to check all new values.
+ * @param {(string|function(*, *): boolean)=} staticType - [default= "*"] If
+ *   staticType is a string newProps uses the [is main function]{@link https://github.com/imaginate/are/blob/master/docs/is-main-func.md}
+ *   from the [are library]{@link https://github.com/imaginate/are} to check all
+ *   new values (e.g. is(staticType, newVal)). If staticType is a function it
+ *   will be given two params, newValue and currentValue, and expected to return
+ *   true if the currentValue should be set to the newValue (note: an error is
+ *   not thrown if it returns false).
  * @return {!Object}
  */
 function newProp(map, key, val, staticType) {
 
-  staticType = is('func=', staticType) ? staticType : has(is, staticType) ?
-    is[staticType] : function(val) { return is(staticType, val); };
+  staticType = is('func=', staticType) ? staticType : function(/** * */ val) {
+    return is(staticType, val);
+  };
 
   return Object.defineProperty(map, key, staticType ? {
       __proto__: null,
       get: function() { return val; },
       set: function(value) {
-        if ( staticType(value) ) {
+        if ( staticType(value, val) ) {
           val = value;
         }
       },
@@ -110,10 +114,13 @@ function newProp(map, key, val, staticType) {
  *   separator (chars listed in order of use):  ", "  ","  "|"  " "
  * @param {*=} propVal - [default= null] The value for all props if an array or
  *   string is used for the props param.
- * @param {(string|function(*): boolean)=} staticType - [default= "*"] If
- *   staticType is a string newProps uses an [is method]{@link https://github.com/imaginate/are/blob/master/docs/is-methods.md}
- *   or the [is main function]{@link https://github.com/imaginate/are/blob/master/docs/is-main-func.md}
- *   to check all new values.
+ * @param {(string|function(*, *): boolean)=} staticType - [default= "*"] If
+ *   staticType is a string newProps uses the [is main function]{@link https://github.com/imaginate/are/blob/master/docs/is-main-func.md}
+ *   from the [are library]{@link https://github.com/imaginate/are} to check all
+ *   new values (e.g. is(staticType, newVal)). If staticType is a function it
+ *   will be given two params, newValue and currentValue, and expected to return
+ *   true if the currentValue should be set to the newValue (note: an error is
+ *   not thrown if it returns false).
  * @return {!Object}
  */
 function newProps(map, props, propVal, staticType) {
@@ -139,8 +146,9 @@ function newProps(map, props, propVal, staticType) {
     staticType = propVal;
   }
 
-  staticType = is('func=', staticType) ? staticType : has(is, staticType) ?
-    is[staticType] : function(val) { return is(staticType, val); };
+  staticType = is('func=', staticType) ? staticType : function(/** * */ val) {
+    return is(staticType, val);
+  };
 
   obj = {};
   each(props, function(/** * */ val, /** string */ key) {
@@ -148,7 +156,7 @@ function newProps(map, props, propVal, staticType) {
         __proto__: null,
         get: function() { return val; },
         set: function(value) {
-          if ( staticType(value) ) {
+          if ( staticType(value, val) ) {
             val = value;
           }
         },
@@ -203,8 +211,8 @@ function newStack() {
   regex = /^([^\(]+\()?(.*\/)?([^\/]+\.[a-z]+):([0-9]+):([0-9]+)\)?$/i;
   stack = new Error().stack
     .replace(/\r\n?/g, '\n') // normalize line breaks
-    .replace(/\\/g, '/') // normalize slashes
-    .replace(/^.*\n.*\n.*\n\s+at /, '') // remove log-ocd traces
+    .replace(/\\/g, '/')     // normalize slashes
+    .replace(/^.*\n.*\n.*\n\s+at /, '') // remove message and log-ocd traces
     .split(/\n\s+at /)
     .map(function(/** string */ str, /** number */ i) {
       arr = slice(regex.exec(str), 1);
@@ -220,6 +228,18 @@ function newStack() {
       });
       return freeze(trace);
     });
+
+  stack = newProps(stack, 'event, file, line, column', 0,
+    function(/** number */ newVal, /** number */ currentVal) {
+      return newVal > currentVal;
+    }
+  );
+  each(stack, function(/** !Trace */ trace) {
+    stack.event  = trace.event.length;
+    stack.file   = trace.file.length;
+    stack.line   = trace.line.length;
+    stack.column = trace.column.length;
+  });
 
   return freeze(stack);
 }
