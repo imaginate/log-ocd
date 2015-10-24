@@ -208,7 +208,7 @@ function logArgMap(obj) {
   /** @type {*} */
   var val;
 
-  has(obj, 'argMap') && removeProp('argMap');
+  obj = removeProp(obj, 'argMap');
   keys = objKeys(obj).sort( (a, b) => b.length - a.length );
   each(keys, key => {
 

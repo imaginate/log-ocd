@@ -520,6 +520,21 @@ function fillStr(count, val) {
  * @return {!Object}
  */
 function removeProp(obj, prop) {
-  delete obj[prop];
-  return obj;
+
+  /** @type {!Object} */
+  var newObj;
+  /** @type {string} */
+  var key;
+
+  if ( !is.obj(obj) ) {
+    return null;
+  }
+
+  newObj = {};
+  for (key in obj) {
+    if ( has(obj, key) && key !== prop ) {
+      newObj[key] = obj[key];
+    }
+  }
+  return newObj;
 }
