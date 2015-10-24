@@ -149,8 +149,16 @@ function mapArr(obj, iteratee) {
   /** @type {number} */
   var i;
 
-  if ( !is.obj(obj) || !has(obj, 'length') ) {
+  if ( !is.func(iteratee) ) {
+    throw new TypeError('Invalid "iteratee" for mapArr() in log-ocd module.');
+  }
+
+  if ( !is.null(obj) ) {
     return null;
+  }
+
+  if ( !is.obj(obj) || !has(obj, 'length') ) {
+    throw new TypeError('Invalid "obj" for mapArr() in log-ocd module.');
   }
 
   i = obj.length;
@@ -174,8 +182,12 @@ function objKeys(obj) {
   /** @type {!Array<string>} */
   var arr;
 
-  if (!obj) {
+  if ( is.null(obj) ) {
     return null;
+  }
+
+  if ( !is._obj(obj) ) {
+    throw new TypeError('Invalid "obj" param for objKeys() in log-ocd module.');
   }
 
   arr = [];
@@ -201,11 +213,15 @@ function clone(obj, deep) {
   /** @type {string} */
   var prop;
 
-  if ( !is.obj(obj) ) {
+  if ( is.null(obj) ) {
     return null;
   }
 
-  newObj = {};
+  if ( !is.obj(obj) ) {
+    throw new TypeError('Invalid "obj" param for clone() in log-ocd module.');
+  }
+
+  newObj = is.arr(obj) ? [] : {};
   for (prop in obj) {
     if ( has(obj, prop) ) {
       newObj[prop] = deep && is.obj( obj[prop] ) ?
@@ -219,21 +235,32 @@ function clone(obj, deep) {
  * Appends an object's properties to an existing object.
  * @private
  * @param {!(Object|function)} dest
- * @param {?(Object|function)} source
- * @return {?(Object|function)}
+ * @param {...?(Object|function)} source
+ * @return {!(Object|function)}
  */
 function merge(dest, source) {
 
   /** @type {string} */
   var prop;
+  /** @type {number} */
+  var len;
+  /** @type {number} */
+  var i;
 
-  if (!source) {
-    return dest;
+  if ( !are('?obj|func', arguments) || is.null(dest) ) {
+    throw new TypeError('Invalid param(s) for slice() in log-ocd module.');
   }
 
-  for (prop in source) {
-    if ( has(source, prop) ) {
-      dest[prop] = source[prop];
+  len = arguments.length;
+  i = 0;
+  while(++i < len) {
+    source = arguments[i];
+    if (source) {
+      for (prop in source) {
+        if ( has(source, prop) ) {
+          dest[prop] = source[prop];
+        }
+      }
     }
   }
   return dest;
