@@ -895,6 +895,16 @@ function logDetails(msg, theme) {
 
 /**
  * @private
+ * @param {string} msg
+ * @param {string} theme
+ */
+function logMsg(msg, theme) {
+  msg = getAccentStr(msg, theme);
+  log(msg);
+}
+
+/**
+ * @private
  * @param {!Stack} stack
  */
 function logStack(stack) {
@@ -1297,7 +1307,7 @@ logOCD.fail = function(msg) {
   }
 
   logSpaces(this._config.fail.spaceBefore);
-  logAny([ msg ], 'fail');
+  logMsg(msg, 'fail');
   stack && logSpaces(1);
   stack && logStack(stack);
 

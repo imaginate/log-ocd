@@ -166,6 +166,16 @@ function logDetails(msg, theme) {
 
 /**
  * @private
+ * @param {string} msg
+ * @param {string} theme
+ */
+function logMsg(msg, theme) {
+  msg = getAccentStr(msg, theme);
+  log(msg);
+}
+
+/**
+ * @private
  * @param {!Stack} stack
  */
 function logStack(stack) {

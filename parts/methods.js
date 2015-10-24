@@ -311,7 +311,7 @@ logOCD.fail = function(msg) {
   }
 
   logSpaces(this._config.fail.spaceBefore);
-  logAny([ msg ], 'fail');
+  logMsg(msg, 'fail');
   stack && logSpaces(1);
   stack && logStack(stack);
 
