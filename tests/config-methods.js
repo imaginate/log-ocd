@@ -157,37 +157,31 @@ describe('logOCD.setConfig("<method>.<prop>", val)', function() {
 
   describe('each should change logging behavior', function() {
     beforeEach(function() {
-      logOCD.resetConfig('log', 'pass', 'fail');
+      logOCD.resetConfig('log', 'pass');
     });
 
     it(getSetTitle('log', 'spaceBefore', 2), function() {
-      testLog(logOCD, [ 'test' ], [ '', 'test', '' ]);
+      testLog(logOCD, [ 'test' ], [ '', '"test"', '' ]);
       logOCD.setConfig('log.spaceBefore', 2);
-      testLog(logOCD, [ 'test' ], [ '', '', 'test', '' ]);
+      testLog(logOCD, [ 'test' ], [ '', '', '"test"', '' ]);
     });
 
     it(getSetTitle('log', 'spaceAfter', 0), function() {
-      testLog(logOCD, [ 'test' ], [ '', 'test', '' ]);
+      testLog(logOCD, [ 'test' ], [ '', '"test"', '' ]);
       logOCD.setConfig('log.spaceAfter', 0);
-      testLog(logOCD, [ 'test' ], [ '', 'test', undefined ]);
+      testLog(logOCD, [ 'test' ], [ '', '"test"', undefined ]);
     });
 
     it(getSetTitle('log', 'argMap', true), function() {
-      testLog(logOCD, [ { a: 'test' } ], [ '', '{', '  a: test', '}', '' ]);
+      testLog(logOCD, [ { a: 'test' } ], [ '', '{', '  a: "test"', '}', '' ]);
       logOCD.setConfig('log.argMap', true);
-      testLog(logOCD, [ { a: 'test' } ], [ '', 'a: test', '' ]);
+      testLog(logOCD, [ { a: 'test' } ], [ '', 'a: "test"', '' ]);
     });
 
     it(getSetTitle('pass', 'header', false), function() {
       testLog(logOCD.pass, [ 'test' ], [ '', ' test        ', '' ]);
       logOCD.setConfig('pass.header', false);
-      testLog(logOCD.pass, [ 'test' ], [ '', ' Pass        ', '', 'test', '' ]);
-    });
-
-    it(getSetTitle('fail', 'stack', true), function() {
-      testLog(logOCD.fail, [ 'test' ], [ '', 'test', '' ]);
-      logOCD.setConfig('fail.stack', true);
-      testLog(logOCD.fail, [ 'test' ], [ '', 'test', 'Stacktrace:' ]);
+      testLog(logOCD.pass, [ 'test' ], [ '', ' Pass        ', '', '"test"', '' ]);
     });
   });
 });
