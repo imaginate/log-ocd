@@ -220,7 +220,7 @@ global.clone = function clone(obj, deep) {
 /**
  * Appends the properties of source objects to an existing object.
  * @param {(!Object|function)} dest
- * @param {(!Object|function)...} sources
+ * @param {...(!Object|function)} sources
  * @return {(!Object|function)}
  */
 global.merge = function merge(dest) {
