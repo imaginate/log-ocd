@@ -32,15 +32,15 @@
  * @type {!Object<string, function(*): boolean>}
  * @const
  */
-var CONFIG_PROPS = {
+var CONFIG_PROPS = freeze({
   spaceBefore: is.num,
   spaceAfter: is.num,
   argMap: is.bool,
   header: is.bool,
-  style: function(val) { return is._str(val) && has(THEMES, val); },
+  style(val) { return is._str(val) && has(THEMES, val); },
   stack: is.bool,
   exit: is.bool
-};
+});
 
 /**
  * @private
@@ -60,24 +60,13 @@ function isConfigProp(prop, val) {
 /**
  * @private
  * @param {string} str
- * @return {boolean}
- */
-function hasAccent(str) {
-  return /`.+`/.test(str);
-}
-
-/**
- * @private
- * @param {string} style
- * @param {string} str
+ * @param {string} theme
  * @return {string}
  */
-function getAccentStr(style, str) {
-  return hasAccent(str) ? mapArr(str.split('`'),
-    function(/** string */ part, /** number */ i) {
-      return colors[ (i % 2 ? 'a' : '') + style ](part);
-    }
-  ).join('') : colors[style](str);
+function getAccentStr(str, theme) {
+  return has(str, /`[^`]+`/) ? mapArr(str.split(/`+/), (section, i) => {
+      return color(section, ( i % 2 ? 'a' : '' ) + theme);
+    }).join('') : color(str, theme);
 }
 
 /**
@@ -87,10 +76,10 @@ function getAccentStr(style, str) {
  */
 function makeLogStr(val) {
   return is.str(val) ?
-    val || '""' : is.func(val) ?
+    `"${val}"` : is.func(val) ?
       '[Function] {' : is.arr(val) ?
-        '[ '+ val.join(', ') +' ]' : is.args(val) ?
-          '[ '+ slice(val).join(', ') +' ]' : is.regex(val) ?
+        `[ ${val.join(', ')} ]` : is.args(val) ?
+          `[ ${slice(val).join(', ')} ]` : is.regex(val) ?
             val.toString() : is.obj(val) ?
               '{' : String(val);
 }
@@ -108,20 +97,28 @@ var log = has(global, 'logOCDLogger') ? logOCDLogger : console.log;
 
 /**
  * @private
- * @param {string} style
  * @param {!Array} args
+ * @param {string} theme
  * @param {boolean=} argMap
  */
-function logAny(style, args, argMap) {
-  each(args, function(/** * */ val) {
-    if ( is.func(val) || ( is.obj(val) && !is('regex|arr', val) ) ) {
-      val.argMap || argMap ? logArgMap(val) : logObj(val, style);
+function logAny(args, theme, argMap) {
+
+  each(args, val => {
+
+    if ( is._obj(val) && !is('regex|arr', val) ) {
+
+      if (argMap || val.argMap) {
+        logArgMap(val)
+        return;
+      }
+
+      logObj(val, theme);
+      return;
     }
-    else {
-      log(is._str(val) ?
-        getAccentStr(style, val) : colors[style]( makeLogStr(val) )
-      );
-    }
+
+    val = makeLogStr(val);
+    val = color(val, theme);
+    log(val);
   });
 }
 
@@ -137,22 +134,24 @@ function logSpaces(spaces) {
 
 /**
  * @private
- * @param {string} style
  * @param {string} msg
+ * @param {string} theme
  */
-function logHeader(style, msg) {
-  log(
-    colors[style](' ') + getAccentStr(style, msg) + colors[style]('        ')
-  );
+function logHeader(msg, theme) {
+  msg = getAccentStr(msg, theme);
+  msg = color(' ', theme) + msg + color('        ', theme);
+  log(msg);
 }
 
 /**
  * @private
- * @param {string} style
  * @param {string} msg
+ * @param {string} theme
  */
-function logDetails(style, msg) {
-  log( colors[style]('  - ') + getAccentStr(style, msg) );
+function logDetails(msg, theme) {
+  msg = getAccentStr(msg, theme);
+  msg = color('  - ', theme) + msg;
+  log(msg);
 }
 
 /**
@@ -162,33 +161,27 @@ function logDetails(style, msg) {
 function logStack(stack) {
 
   /** @type {function} */
-  var color;
+  var getSpace;
+  /** @type {string} */
+  var theme;
   /** @type {string} */
   var str;
 
-  str = fillStr(stack.event - 10, ' ');
-  str += '  file';
-  str += fillStr(stack.file - 4, ' ');
-  str += fillStr(stack.line, ' ');
-  str += 'line';
-  str += fillStr(stack.column, ' ');
-  str += 'column ';
-  log( colors.error(' Stacktrace') + colors.bgRed(str) );
+  getSpace = (prop, minus) => fillStr(stack[prop] - (minus || 0), ' ');
+  str = `${getSpace('event', 10)}  file${getSpace('file', 4)}` +
+        `${getSpace('line')}line${getSpace('column')}column `;
+  str = color(' Stacktrace', 'error') + color(str, 'bgRed');
+  log(str);
 
-  each(stack, function(/** !Trace */ trace, /** number */ i) {
-    color = i % 2 ? colors.estack : colors.ostack;
-    str = ' ' + trace.event;
-    str += fillStr(stack.event - trace.event.length, ' ');
-    str += '  ' + trace.file;
-    str += fillStr(stack.file - trace.file.length, ' ');
-    str += '    ';
-    str += fillStr(stack.line - trace.line.length, ' ');
-    str += trace.line;
-    str += '      ';
-    str += fillStr(stack.column - trace.column.length, ' ');
-    str += trace.column + ' ';
-    log( color(str) );
-    //trace.dir && log( color(' - ' + trace.dir) );
+  each(stack, (trace, i) => {
+    getSpace = prop => fillStr(stack[prop] - trace[prop].length, ' ');
+    str = ` ${trace.event}${getSpace('event')} `   +
+          ` ${trace.file}${getSpace('file')}   `   +
+          ` ${getSpace('line')}${trace.line}     ` +
+          ` ${getSpace('column')}${trace.column} `;
+    theme = i % 2 ? 'estack' : 'ostack';
+    str = color(str, theme);
+    log(str);
   });
 }
 
@@ -205,16 +198,17 @@ function logArgMap(obj) {
   /** @type {*} */
   var val;
 
+  has(obj, 'argMap') && removeProp('argMap');
   keys = objKeys(obj).sort( (a, b) => b.length - a.length );
   each(keys, key => {
-    if (key !== 'argMap') {
-      val = obj[key];
-      key = key + ': ';
-      str = makeLogStr(val);
-      log( colors.view(key) + colors.plain(str) );
-      if ( is.func(val) || str === '{' ) {
-        logObj(val, 'plain', -1);
-      }
+
+    val = obj[key];
+    str = makeLogStr(val);
+    key = color(`${key}: `, 'view') + color(str, 'plain');
+    log(key);
+
+    if ( is.func(val) || str === '{' ) {
+      logObj(val, 'plain', -1);
     }
   });
 }
@@ -222,10 +216,10 @@ function logArgMap(obj) {
 /**
  * @private
  * @param {!Object} obj
- * @param {string=} style
+ * @param {string=} theme
  * @param {number=} indent
  */
-function logObj(obj, style, indent) {
+function logObj(obj, theme, indent) {
 
   /** @type {string} */
   var spaces;
@@ -238,34 +232,34 @@ function logObj(obj, style, indent) {
   /** * */
   var val;
 
-  style = style || 'plain';
+  theme = theme || 'plain';
   indent = indent || 0;
 
-  indent || log(
-    colors[style]( is.func(obj) ? '[Function] {' : '{' )
-  );
+  str = indent ? '' : color(is.func(obj) ? '[Function] {' : '{', theme);
+  str && log(str);
+
   indent = indent < 0 ? 0 : indent;
-
   spaces = fillStr(indent, '  ');
-
   keys = objKeys(obj).sort( (a, b) => b.length - a.length );
   last = keys.length - 1;
+
   each(keys, (key, i) => {
     val = obj[key];
     str = makeLogStr(val);
     if ( is.func(val) || str === '{' ) {
-      log( colors[style]('  ' + spaces + key + ': ' + str) );
-      logObj(val, style, (indent + 1));
+      str = `  ${spaces}${key}: ${str}`;
+      str = color(str, theme);
+      log(str);
+      logObj(val, theme, (indent + 1));
     }
     else {
-      log(
-        colors[style](
-          '  ' + spaces + key + ': ' + str + ( i !== last ? ',' : '' )
-        )
-      );
+      str = `  ${spaces}${key}: ${str}` + ( i !== last ? ',' : '' );
+      str = color(str, theme);
+      log(str);
     }
   });
-  log(
-    colors[style]( spaces + '}' + (indent ? ',' : '') )
-  );
+
+  str = spaces + '}' + ( indent ? ',' : '' );
+  str = color(str, theme);
+  log(str);
 }
