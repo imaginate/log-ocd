@@ -18,7 +18,7 @@ log.error('A `Failure`', 'with some `guidance`', { andAnArgMap: 'with', easy: 't
 log.warn('A Word of `Caution`', 'with a tale of `adventure`');
 log.debug('A Beacon of `Hope`', [ 'with', 'all', 'the', 'juicy', 'details' ], /you want to know/g);
 ```
-<img src="http://www.algorithmiv.com/images/log-ocd/example-8d3aad09c366c65dc7a0.png" alt="log-ocd Example" />
+<img src="http://www.algorithmiv.com/images/log-ocd/example-c9783b9285f4f7f1abfd.png" alt="log-ocd Example" />
 
 
 ## Getting Started
