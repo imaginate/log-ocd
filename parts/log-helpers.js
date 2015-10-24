@@ -187,8 +187,10 @@ function logStack(stack) {
   /** @type {string} */
   var str;
 
+  stack.base && log(`cwd: ${stack.base}`);
+
   getSpace = (prop, minus) => fillStr(stack[prop] - (minus || 0), ' ');
-  str = `${getSpace('event', 10)}  file${getSpace('file', 4)}` +
+  str = `${getSpace('event', 10)}  module${getSpace('module', 6)}` +
         `${getSpace('line')}line${getSpace('column')}column `;
   str = color(' Stacktrace', 'error') + color(str, 'bgRed');
   log(str);
@@ -196,7 +198,7 @@ function logStack(stack) {
   each(stack, (trace, i) => {
     getSpace = prop => fillStr(stack[prop] - trace[prop].length, ' ');
     str = ` ${trace.event}${getSpace('event')} `   +
-          ` ${trace.file}${getSpace('file')}   `   +
+          ` ${trace.module}${getSpace('module')}   `   +
           ` ${getSpace('line')}${trace.line}     ` +
           ` ${getSpace('column')}${trace.column} `;
     theme = i % 2 ? 'estack' : 'ostack';
