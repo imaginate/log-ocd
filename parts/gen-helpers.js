@@ -247,7 +247,8 @@ function merge(dest, source) {
   /** @type {number} */
   var i;
 
-  if ( !are('?obj|func', arguments) || is.null(dest) ) {
+  if ( !is._obj(dest) || arguments.length > 2 ?
+         !are('?obj|func', slice(arguments, 1)) : !is('?obj|func', source) ) {
     throw new TypeError('Invalid param(s) for slice() in log-ocd module.');
   }
 

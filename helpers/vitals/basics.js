@@ -240,7 +240,8 @@ global.merge = function merge(dest, source) {
   /** @type {number} */
   var i;
 
-  if ( !are('?obj|func', arguments) || is.null(dest) ) {
+  if ( !is._obj(dest) || arguments.length > 2 ?
+         !are('?obj|func', slice(arguments, 1)) : !is('?obj|func', source) ) {
     log.error(
       'Invalid `Vitals.merge` Call',
       'invalid type for a param or params',
