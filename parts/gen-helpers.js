@@ -165,6 +165,11 @@ function newProps(map, props, propVal, staticType) {
 /** @type {number} */
 Error.stackTraceLimit = 12;
 
+/** @type {!RegExp} */
+var traceRegex = /^([^\(]+\()?(.*\/)?([^\/]+\.[a-z]+):([0-9]+):([0-9]+)\)?$/i;
+/** @type {!RegExp} */
+var nodeModRegex = /\/node_modules\/([^\/]+)\//;
+
 /**
  * @typedef {!{
  *   pos:    string,
@@ -172,9 +177,58 @@ Error.stackTraceLimit = 12;
  *   dir:    string,
  *   file:   string,
  *   line:   string,
- *   column: string
+ *   column: string,
+ *   module: string
  * }} Trace
  */
+
+/**
+ * @private
+ * @param {string} str
+ * @param {number} i
+ * @param {!Array<string>=} base
+ * @return {!Trace}
+ */
+function newTrace(str, i, base) {
+
+  /** @type {!Trace} */
+  var trace;
+  /** @type {!Array<string>} */
+  var arr;
+  /** @type {number} */
+  var len;
+
+  arr = traceRegex.exec(str);
+  arr = slice(arr, 1);
+  arr[0] = arr[0] && arr[0].slice(0, -2);
+
+  trace = newMap('Trace');
+  trace = newProps(trace, {
+    pos:    ( ++i < 10 ? ' ' : '' ) + i,
+    event:  arr.shift() || '(none)',
+    dir:    arr.shift() || '',
+    file:   arr.shift(),
+    line:   arr.shift(),
+    column: arr.shift(),
+    module: ''
+  });
+
+  arr = base && trace.dir && !has(trace.dir, nodeModRegex);
+  arr = arr && trace.dir.split('/');
+
+  if (arr) {
+    len = base.length - arr.length;
+    trace.module = fillStr(len, '../') || './' + (
+      len ? slice(arr, len).join('/') : ''
+    );
+    trace.module += trace.file;
+  }
+  else {
+    trace.module = trace.dir ? nodeModRegex.exec(trace.dir)[1] : '(core)';
+  }
+
+  return freeze(trace);
+}
 
 /**
  * @typedef {!Array<!Trace>} Stack
@@ -182,45 +236,39 @@ Error.stackTraceLimit = 12;
 
 /**
  * @private
+ * @param {string=} stack
  * @return {!Stack}
  */
-function newStack() {
+function newStack(stack) {
 
-  /** @type {!Stack} */
-  var stack;
-  /** @type {!Trace} */
-  var trace;
-  /** @type {!RegExp} */
-  var regex;
   /** @type {!Array<string>} */
-  var arr;
+  var base;
+  /** @type {string} */
+  var dir;
 
-  regex = /^([^\(]+\()?(.*\/)?([^\/]+\.[a-z]+):([0-9]+):([0-9]+)\)?$/i;
-  stack = new Error().stack
-    .replace(/\r\n?/g, '\n') // normalize line breaks
-    .replace(/\\/g, '/')     // normalize slashes
+  stack = stack || new Error().stack;
+  stack = stack.replace(/\r\n?/g, '\n') // normalize line breaks
+    .replace(/\\/g, '/')                // normalize slashes
     .replace(/^.*\n.*\n.*\n\s+at /, '') // remove message and log-ocd traces
-    .split(/\n\s+at /)
-    .map( (str, i) => {
-      arr = slice(regex.exec(str), 1);
-      arr[0] = arr[0] && arr[0].slice(0, -2);
-      trace = newMap('Trace');
-      trace = newProps(trace, {
-        pos:    ( ++i < 10 ? ' ' : '' ) + i,
-        event:  arr.shift() || '(none)',
-        dir:    arr.shift() || '',
-        file:   arr.shift(),
-        line:   arr.shift(),
-        column: arr.shift()
-      });
-      return freeze(trace);
-    });
+    .split(/\n\s+at /);
 
-  stack = newProps(
-    stack, 'event, file, line, column', 0, (newVal, nowVal) => newVal > nowVal
+  stack.some( str => {
+    dir = traceRegex.exec(str)[2];
+    if ( !dir || has(dir, nodeModRegex) ) {
+      return false;
+    }
+    base = dir.split('/');
+    return true;
+  });
+
+  stack = mapArr( stack, (str, i) => newTrace(str, i, base) );
+  stack.base = base.join('/');
+  stack = newProps(stack, 'event, module, file, line, column', 0,
+    (newVal, nowVal) => newVal > nowVal
   );
   each(stack, trace => {
     stack.event  = trace.event.length;
+    stack.module = trace.module.length;
     stack.file   = trace.file.length;
     stack.line   = trace.line.length;
     stack.column = trace.column.length;
@@ -253,7 +301,7 @@ function has(source, prop) {
  * A shortcut for Array.prototype.slice.call(obj, start).
  * @private
  * @param {Object} obj
- * @param {number=} start - negative numbers not allowed [default= 0]
+ * @param {number=} start - [default= 0]
  * @return {Array}
  */
 function slice(obj, start) {
@@ -272,6 +320,7 @@ function slice(obj, start) {
   }
 
   start = start || 0;
+  start = start < 0 ? start + obj.length : start;
   len = obj.length - start;
 
   arr = len ? new Array(len) : [];
@@ -505,6 +554,7 @@ function fillStr(count, val) {
   /** @type {number} */
   var i;
 
+  count = count < 0 ? 0 : count;
   str = '';
   while (count--) {
     str += val;
