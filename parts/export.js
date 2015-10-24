@@ -126,6 +126,8 @@ function setOptions(options, instance) {
 
 // INSERT gen-helpers.js
 
+// INSERT gen-constructors.js
+
 // INSERT config.js
 
 // INSERT log-helpers.js
