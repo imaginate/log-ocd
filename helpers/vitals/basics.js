@@ -203,15 +203,23 @@ global.clone = function clone(obj, deep) {
   /** @type {string} */
   var prop;
 
-  if ( !is.obj(obj) ) {
+  if ( is.null(obj) ) {
     return null;
   }
 
-  newObj = {};
+  if ( !is.obj(obj) ) {
+    log.error(
+      'Invalid `Vitals.clone` Call',
+      'invalid type for `obj` param',
+      mapArgs({ obj: obj, deep: deep })
+    );
+  }
+
+  newObj = is.arr(obj) ? [] : {};
   for (prop in obj) {
     if ( has(obj, prop) ) {
       newObj[prop] = deep && is.obj( obj[prop] ) ?
-        copy(obj[prop], true) : obj[prop];
+        clone(obj[prop], true) : obj[prop];
     }
   }
   return newObj;
@@ -219,11 +227,11 @@ global.clone = function clone(obj, deep) {
 
 /**
  * Appends the properties of source objects to an existing object.
- * @param {(!Object|function)} dest
- * @param {...(!Object|function)} sources
- * @return {(!Object|function)}
+ * @param {!(Object|function)} dest
+ * @param {...?(Object|function)} source
+ * @return {!(Object|function)}
  */
-global.merge = function merge(dest) {
+global.merge = function merge(dest, source) {
 
   /** @type {string} */
   var prop;
@@ -232,20 +240,102 @@ global.merge = function merge(dest) {
   /** @type {number} */
   var i;
 
-  if ( !are._obj(arguments) ) {
-    return null;
+  if ( !are('?obj|func', arguments) || is.null(dest) ) {
+    log.error(
+      'Invalid `Vitals.merge` Call',
+      'invalid type for a param or params',
+      mapArgs({ dest: dest, sources: slice(arguments, 1) })
+    );
   }
 
   len = arguments.length;
-  i = -1;
+  i = 0;
   while(++i < len) {
-    for (prop in source) {
-      if ( has(source, prop) ) {
-        dest[prop] = source[prop];
+    source = arguments[i];
+    if (source) {
+      for (prop in source) {
+        if ( has(source, prop) ) {
+          dest[prop] = source[prop];
+        }
       }
     }
   }
   return dest;
+};
+
+/**
+ * A shortcut for Array.prototype.map(obj, iteratee).
+ * @param {Object} obj
+ * @param {function(*, number): *} iteratee
+ * @return {Array}
+ */
+global.map = function map(obj, iteratee) {
+
+  /** @type {!Array} */
+  var arr;
+  /** @type {number} */
+  var i;
+
+  if ( !is.func(iteratee) ) {
+    log.error(
+      'Invalid `Vitals.map` Call',
+      'invalid type for `iteratee` param',
+      mapArgs({ obj: obj, iteratee: iteratee })
+    );
+  }
+
+  if ( !is.null(obj) ) {
+    return null;
+  }
+
+  if ( !is.obj(obj) || !has(obj, 'length') ) {
+    log.error(
+      'Invalid `Vitals.map` Call',
+      'invalid type for `obj` param',
+      mapArgs({ obj: obj, iteratee: iteratee })
+    );
+  }
+
+  i = obj.length;
+  arr = i ? new Array(i) : [];
+  while (i--) {
+    arr[i] = iteratee(obj[i], i);
+  }
+  return arr;
+};
+
+/**
+ * Gets an object's property keys.
+ * @private
+ * @param {?(Object|function)} obj
+ * @return {Array<string>}
+ */
+global.objKeys = function objKeys(obj) {
+
+  /** @type {string} */
+  var prop;
+  /** @type {!Array<string>} */
+  var arr;
+
+  if ( is.null(obj) ) {
+    return null;
+  }
+
+  if ( !is._obj(obj) ) {
+    log.error(
+      'Invalid `Vitals.objKeys` Call',
+      'invalid type for `obj` param',
+      mapArgs({ obj: obj })
+    );
+  }
+
+  arr = [];
+  for (prop in obj) {
+    if ( has(obj, prop) ) {
+      arr.push(prop);
+    }
+  }
+  return arr;
 };
 
 /**

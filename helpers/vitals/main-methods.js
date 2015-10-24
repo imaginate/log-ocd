@@ -23,31 +23,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
- * A shortcut for Array.prototype.map(obj, iteratee).
- * @param {Object} obj
- * @param {function(*, number): *} iteratee
- * @return {Array}
- */
-global.map = function map(obj, iteratee) {
-
-  /** @type {!Array} */
-  var arr;
-  /** @type {number} */
-  var i;
-
-  if ( !is.obj(obj) || !has(obj, 'length') ) {
-    return null;
-  }
-
-  i = obj.length;
-  arr = i ? new Array(i) : [];
-  while (i--) {
-    arr[i] = iteratee(obj[i], i);
-  }
-  return arr;
-};
-
-/**
  * Fills an existing or new array with specified values.
  * @param {(Array|number)} arr
  * @param {*} val
