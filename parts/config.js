@@ -115,5 +115,10 @@ var CONFIG = {
     spaceAfter: 1,
     argMap: false,
     stack: false
+  },
+  trace: {
+    spaceBefore: 1,
+    spaceAfter: 1,
+    exit: false
   }
 };
