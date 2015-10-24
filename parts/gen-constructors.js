@@ -161,10 +161,22 @@ function StackTrace(stack) {
   ) : stack;
 }
 
-/** @type {!RegExp} */
-var traceRegex = /^([^\(]+\()?(.*\/)?([^\/]+\.[a-z]+):([0-9]+):([0-9]+)\)?$/i;
-/** @type {!RegExp} */
-var nodeModRegex = /\/node_modules\/([^\/]+)\//;
+/**
+ * For newTrace & newStack use only.
+ * @private
+ * @type {!RegExp}
+ * @const
+ */
+const TRACE = /^([^\(]+\()?(.*\/)?([^\/]+\.[a-z]+):([0-9]+):([0-9]+)\)?$/i;
+freeze(TRACE);
+
+/**
+ * For newTrace & newStack use only.
+ * @private
+ * @type {!RegExp}
+ * @const
+ */
+const NODE_MODULE = freeze( /\/node_modules\/([^\/]+)\// );
 
 /**
  * @typedef {!{
@@ -194,7 +206,7 @@ function newTrace(str, i, base) {
   /** @type {number} */
   var len;
 
-  arr = traceRegex.exec(str);
+  arr = TRACE.exec(str);
   arr = slice(arr, 1);
   arr[0] = arr[0] && arr[0].slice(0, -2);
 
@@ -209,7 +221,7 @@ function newTrace(str, i, base) {
     module: ''
   });
 
-  arr = base && trace.dir && !has(trace.dir, nodeModRegex);
+  arr = base && trace.dir && !has(trace.dir, NODE_MODULE);
   arr = arr && trace.dir.split('/');
 
   if (arr) {
@@ -220,7 +232,7 @@ function newTrace(str, i, base) {
     trace.module += trace.file;
   }
   else {
-    trace.module = trace.dir ? nodeModRegex.exec(trace.dir)[1] : '(core)';
+    trace.module = trace.dir ? NODE_MODULE.exec(trace.dir)[1] : '(core)';
   }
 
   return freeze(trace);
@@ -247,8 +259,8 @@ function newStack(stack) {
 
   // set the base path
   stack.some( str => {
-    dir = traceRegex.exec(str)[2];
-    if ( !dir || has(dir, nodeModRegex) ) {
+    dir = TRACE.exec(str)[2];
+    if ( !dir || has(dir, NODE_MODULE) ) {
       return false;
     }
     base = dir.split('/');
