@@ -89,16 +89,16 @@ var tests = {
   results: {
     log: [
       [ 
-        'str',
-        '[Function] {', '  a: func', '}',
+        '"str"',
+        '[Function] {', '  a: "func"', '}',
         '[ arr ]',
         '/regex/i',
-        '{', '  a: obj', '}'
+        '{', '  a: "obj"', '}'
       ],
-      [ 'a: arg1', 'b: arg2' ]
+      [ 'a: "arg1"', 'b: "arg2"' ]
     ],
     pass: [
-      [ ' header        ', '', 'str' ],
+      [ ' header        ', '', '"str"' ],
       [ ' header        ', undefined, undefined ]
     ],
     error: [
@@ -110,11 +110,11 @@ var tests = {
       [ ' header        ', '  - msg', undefined, undefined ]
     ],
     debug: [
-      [ ' header        ', '', 'str' ],
+      [ ' header        ', '', '"str"' ],
       [ ' header        ', undefined, undefined ]
     ],
     fail: [
-      [ 'msg', 'str' ],
+      [ 'msg', '"str"' ],
       [ 'msg', undefined ]
     ]
   }
