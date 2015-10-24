@@ -10,10 +10,6 @@
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
  * @see [Colors]{@link https://www.npmjs.com/package/colors}
- *
- * Annotations:
- * @see [JSDoc3]{@link http://usejsdoc.org/}
- * @see [Closure Compiler specific JSDoc]{@link https://developers.google.com/closure/compiler/docs/js-for-compiler}
  */
 
 'use strict';
@@ -28,9 +24,11 @@ log.setConfig('fail.spaceBefore', 0);
 log.setConfig('pass.spaceAfter', 0);
 log.resetConfig('pass');
 
+// note: log-ocd uses two traces so add two to any limit change you make
+Error.stackTraceLimit = 6;
+
 log('a quick message');
-log.fail('a quick slip');
-log.pass('A `Success` Story', { argMap: true, and: 'an', object: 'with' }, { some: 'superfluous', extra: 'details' });
-log.error('A `Failure`', 'with some `guidance`', { and: 'an', arg: 'Map', with: 'all', the: 'meaty', states: 'shown' });
-log.warn('A Word of `Caution`', 'with a story of `danger`');
+log.pass('A `Success` Story', { argMap: true, easily: 'view', given: 'values' }, 'plus', { endless: 'superfluous', extra: 'details' });
+log.error('A `Failure`', 'with some `guidance`', { andAnArgMap: 'with', easy: 'titling', of: 'any value' });
+log.warn('A Word of `Caution`', 'with a tale of `adventure`');
 log.debug('A Beacon of `Hope`', [ 'with', 'all', 'the', 'juicy', 'details' ], /you want to know/g);

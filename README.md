@@ -13,10 +13,9 @@ log.setConfig('pass.spaceAfter', 0);
 log.resetConfig('pass');
 
 log('a quick message');
-log.fail('a quick slip');
-log.pass('A `Success` Story', { argMap: true, and: 'an', object: 'with' }, { some: 'superfluous', extra: 'details' });
-log.error('A `Failure`', 'with some `guidance`', { and: 'an', arg: 'Map', with: 'all', the: 'meaty', states: 'shown' });
-log.warn('A Word of `Caution`', 'with a story of `danger`');
+log.pass('A `Success` Story', { argMap: true, easily: 'view', given: 'values' }, 'plus', { endless: 'superfluous', extra: 'details' });
+log.error('A `Failure`', 'with some `guidance`', { andAnArgMap: 'with', easy: 'titling', of: 'any value' });
+log.warn('A Word of `Caution`', 'with a tale of `adventure`');
 log.debug('A Beacon of `Hope`', [ 'with', 'all', 'the', 'juicy', 'details' ], /you want to know/g);
 ```
 <img src="http://www.algorithmiv.com/images/log-ocd/example-8d3aad09c366c65dc7a0.png" alt="log-ocd Example" />
