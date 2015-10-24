@@ -187,22 +187,17 @@ function newMap(mapType) {
  */
 function newProp(map, key, val, staticType) {
 
-  staticType = is('func=', staticType) ? staticType : function(/** * */ val) {
-    return is(staticType, val);
-  };
+  if ( is.str(staticType) ) {
+    staticType = val => is(staticType, val);
+  }
 
   return Object.defineProperty(map, key, staticType ? {
       __proto__: null,
-      get: function() { return val; },
-      set: function(value) {
-        if ( staticType(value, val) ) {
-          val = value;
-        }
-      },
+      get() { return val; },
+      set(value) { val = staticType(value, val) ? value : val; },
       enumerable: true,
       configurable: false
-    }
-    : {
+    } : {
       __proto__: null,
       value: val,
       writable: true,
@@ -236,15 +231,12 @@ function newProps(map, props, propVal, staticType) {
   /** @type {!Object} */
   var obj;
 
-  if ( is('!str|arr', props) ) {
-    keys = is.arr(props) ? props : props.split(
-      /, /.test(props) ?
-        ', ' : /,/.test(props) ?
-          ',' : /\|/.test(props) ?
-            '|' : ' '
-    );
+  if ( is('str|arr!', props) ) {
+    keys = is.str(props) ? props.split(
+        [ ', ', ',', '|' ].filter( str => has(props, str) )[0] || ' '
+      ) : props;
     props = {};
-    each(keys, function(/** string */ key) {
+    each(keys, key => {
       props[key] = propVal;
     });
   }
@@ -252,24 +244,19 @@ function newProps(map, props, propVal, staticType) {
     staticType = propVal;
   }
 
-  staticType = is('func=', staticType) ? staticType : function(/** * */ val) {
-    return is(staticType, val);
-  };
+  if ( is.str(staticType) ) {
+    staticType = val => is(staticType, val);
+  }
 
   obj = {};
-  each(props, function(/** * */ val, /** string */ key) {
+  each(props, (val, key) => {
     obj[key] = staticType ? {
         __proto__: null,
-        get: function() { return val; },
-        set: function(value) {
-          if ( staticType(value, val) ) {
-            val = value;
-          }
-        },
+        get() { return val; },
+        set(value) { val = staticType(value, val) ? value : val; },
         enumerable: true,
         configurable: false
-      }
-      : {
+      } : {
         __proto__: null,
         value: val,
         writable: true,
@@ -320,7 +307,7 @@ function newStack() {
     .replace(/\\/g, '/')     // normalize slashes
     .replace(/^.*\n.*\n.*\n\s+at /, '') // remove message and log-ocd traces
     .split(/\n\s+at /)
-    .map(function(/** string */ str, /** number */ i) {
+    .map( (str, i) => {
       arr = slice(regex.exec(str), 1);
       arr[0] = arr[0] && arr[0].slice(0, -2);
       trace = newMap('Trace');
@@ -335,12 +322,10 @@ function newStack() {
       return freeze(trace);
     });
 
-  stack = newProps(stack, 'event, file, line, column', 0,
-    function(/** number */ newVal, /** number */ currentVal) {
-      return newVal > currentVal;
-    }
+  stack = newProps(
+    stack, 'event, file, line, column', 0, (newVal, nowVal) => newVal > nowVal
   );
-  each(stack, function(/** !Trace */ trace) {
+  each(stack, trace => {
     stack.event  = trace.event.length;
     stack.file   = trace.file.length;
     stack.line   = trace.line.length;
@@ -356,16 +341,18 @@ function newStack() {
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
- * A shortcut for Object.prototype.hasOwnProperty that accepts null objects.
+ * A shortcut for Object.prototype.hasOwnProperty that accepts null objects or a
+ *   shortcut for String.prototype.includes and RegExp.prototype.test.
  * @private
- * @param {?(Object|function)} obj
+ * @param {?(Object|function|string)} source
  * @param {*} prop
  * @return {boolean}
  */
-function has(obj, prop) {
-  return is._obj(obj) && ('hasOwnProperty' in obj ?
-    obj.hasOwnProperty(prop) : prop in obj
-  );
+function has(source, prop) {
+  return !source ? false : is.str(source) ?
+    ( is.str(prop) ? source.includes(prop) : prop.test(source) ) : (
+      'hasOwnProperty' in source ? source.hasOwnProperty(prop) : prop in source
+    );
 }
 
 /**
@@ -631,6 +618,33 @@ function fillStr(count, val) {
   return str;
 }
 
+/**
+ * Deletes a property from an object.
+ * @private
+ * @param {!Object} obj
+ * @param {string} prop
+ * @return {!Object}
+ */
+function removeProp(obj, prop) {
+
+  /** @type {!Object} */
+  var newObj;
+  /** @type {string} */
+  var key;
+
+  if ( !is.obj(obj) ) {
+    return null;
+  }
+
+  newObj = {};
+  for (key in obj) {
+    if ( has(obj, key) && key !== prop ) {
+      newObj[key] = obj[key];
+    }
+  }
+  return newObj;
+}
+
 
 // *****************************************************************************
 // SECTION: CONFIG
@@ -747,15 +761,15 @@ var CONFIG = {
  * @type {!Object<string, function(*): boolean>}
  * @const
  */
-var CONFIG_PROPS = {
+var CONFIG_PROPS = freeze({
   spaceBefore: is.num,
   spaceAfter: is.num,
   argMap: is.bool,
   header: is.bool,
-  style: function(val) { return is._str(val) && has(THEMES, val); },
+  style(val) { return is._str(val) && has(THEMES, val); },
   stack: is.bool,
   exit: is.bool
-};
+});
 
 /**
  * @private
@@ -775,24 +789,23 @@ function isConfigProp(prop, val) {
 /**
  * @private
  * @param {string} str
- * @return {boolean}
+ * @param {string} theme
+ * @return {string}
  */
-function hasAccent(str) {
-  return /`.+`/.test(str);
+function color(str, theme) {
+  return colors[theme](str);
 }
 
 /**
  * @private
- * @param {string} style
  * @param {string} str
+ * @param {string} theme
  * @return {string}
  */
-function getAccentStr(style, str) {
-  return hasAccent(str) ? mapArr(str.split('`'),
-    function(/** string */ part, /** number */ i) {
-      return colors[ (i % 2 ? 'a' : '') + style ](part);
-    }
-  ).join('') : colors[style](str);
+function getAccentStr(str, theme) {
+  return has(str, /`[^`]+`/) ? mapArr(str.split(/`+/), (section, i) => {
+      return color(section, ( i % 2 ? 'a' : '' ) + theme);
+    }).join('') : color(str, theme);
 }
 
 /**
@@ -802,10 +815,10 @@ function getAccentStr(style, str) {
  */
 function makeLogStr(val) {
   return is.str(val) ?
-    val || '""' : is.func(val) ?
+    `"${val}"` : is.func(val) ?
       '[Function] {' : is.arr(val) ?
-        '[ '+ val.join(', ') +' ]' : is.args(val) ?
-          '[ '+ slice(val).join(', ') +' ]' : is.regex(val) ?
+        `[ ${val.join(', ')} ]` : is.args(val) ?
+          `[ ${slice(val).join(', ')} ]` : is.regex(val) ?
             val.toString() : is.obj(val) ?
               '{' : String(val);
 }
@@ -823,20 +836,28 @@ var log = has(global, 'logOCDLogger') ? logOCDLogger : console.log;
 
 /**
  * @private
- * @param {string} style
  * @param {!Array} args
+ * @param {string} theme
  * @param {boolean=} argMap
  */
-function logAny(style, args, argMap) {
-  each(args, function(/** * */ val) {
-    if ( is.func(val) || ( is.obj(val) && !is('regex|arr', val) ) ) {
-      val.argMap || argMap ? logArgMap(val) : logObj(val, style);
+function logAny(args, theme, argMap) {
+
+  each(args, val => {
+
+    if ( is._obj(val) && !is('regex|arr', val) ) {
+
+      if (argMap || val.argMap) {
+        logArgMap(val)
+        return;
+      }
+
+      logObj(val, theme);
+      return;
     }
-    else {
-      log(is._str(val) ?
-        getAccentStr(style, val) : colors[style]( makeLogStr(val) )
-      );
-    }
+
+    val = makeLogStr(val);
+    val = color(val, theme);
+    log(val);
   });
 }
 
@@ -852,22 +873,24 @@ function logSpaces(spaces) {
 
 /**
  * @private
- * @param {string} style
  * @param {string} msg
+ * @param {string} theme
  */
-function logHeader(style, msg) {
-  log(
-    colors[style](' ') + getAccentStr(style, msg) + colors[style]('        ')
-  );
+function logHeader(msg, theme) {
+  msg = getAccentStr(msg, theme);
+  msg = color(' ', theme) + msg + color('        ', theme);
+  log(msg);
 }
 
 /**
  * @private
- * @param {string} style
  * @param {string} msg
+ * @param {string} theme
  */
-function logDetails(style, msg) {
-  log( colors[style]('  - ') + getAccentStr(style, msg) );
+function logDetails(msg, theme) {
+  msg = getAccentStr(msg, theme);
+  msg = color('  - ', theme) + msg;
+  log(msg);
 }
 
 /**
@@ -877,33 +900,27 @@ function logDetails(style, msg) {
 function logStack(stack) {
 
   /** @type {function} */
-  var color;
+  var getSpace;
+  /** @type {string} */
+  var theme;
   /** @type {string} */
   var str;
 
-  str = fillStr(stack.event - 10, ' ');
-  str += '  file';
-  str += fillStr(stack.file - 4, ' ');
-  str += fillStr(stack.line, ' ');
-  str += 'line';
-  str += fillStr(stack.column, ' ');
-  str += 'column ';
-  log( colors.error(' Stacktrace') + colors.bgRed(str) );
+  getSpace = (prop, minus) => fillStr(stack[prop] - (minus || 0), ' ');
+  str = `${getSpace('event', 10)}  file${getSpace('file', 4)}` +
+        `${getSpace('line')}line${getSpace('column')}column `;
+  str = color(' Stacktrace', 'error') + color(str, 'bgRed');
+  log(str);
 
-  each(stack, function(/** !Trace */ trace, /** number */ i) {
-    color = i % 2 ? colors.estack : colors.ostack;
-    str = ' ' + trace.event;
-    str += fillStr(stack.event - trace.event.length, ' ');
-    str += '  ' + trace.file;
-    str += fillStr(stack.file - trace.file.length, ' ');
-    str += '    ';
-    str += fillStr(stack.line - trace.line.length, ' ');
-    str += trace.line;
-    str += '      ';
-    str += fillStr(stack.column - trace.column.length, ' ');
-    str += trace.column + ' ';
-    log( color(str) );
-    //trace.dir && log( color(' - ' + trace.dir) );
+  each(stack, (trace, i) => {
+    getSpace = prop => fillStr(stack[prop] - trace[prop].length, ' ');
+    str = ` ${trace.event}${getSpace('event')} `   +
+          ` ${trace.file}${getSpace('file')}   `   +
+          ` ${getSpace('line')}${trace.line}     ` +
+          ` ${getSpace('column')}${trace.column} `;
+    theme = i % 2 ? 'estack' : 'ostack';
+    str = color(str, theme);
+    log(str);
   });
 }
 
@@ -913,16 +930,24 @@ function logStack(stack) {
  */
 function logArgMap(obj) {
 
+  /** @type {!Array<string>} */
+  var keys;
   /** @type {string} */
   var str;
+  /** @type {*} */
+  var val;
 
-  each(obj, function(/** * */ val, /** string */ key) {
-    if (key !== 'argMap') {
-      str = makeLogStr(val);
-      log( colors.view(key + ': ') + colors.plain(str) );
-      if ( is.func(val) || str === '{' ) {
-        logObj(val, 'plain', -1);
-      }
+  obj = removeProp(obj, 'argMap');
+  keys = objKeys(obj).sort( (a, b) => b.length - a.length );
+  each(keys, key => {
+
+    val = obj[key];
+    str = makeLogStr(val);
+    key = color(`${key}: `, 'view') + color(str, 'plain');
+    log(key);
+
+    if ( is.func(val) || str === '{' ) {
+      logObj(val, 'plain', -1);
     }
   });
 }
@@ -930,10 +955,10 @@ function logArgMap(obj) {
 /**
  * @private
  * @param {!Object} obj
- * @param {string=} style
+ * @param {string=} theme
  * @param {number=} indent
  */
-function logObj(obj, style, indent) {
+function logObj(obj, theme, indent) {
 
   /** @type {string} */
   var spaces;
@@ -946,36 +971,36 @@ function logObj(obj, style, indent) {
   /** * */
   var val;
 
-  style = style || 'plain';
+  theme = theme || 'plain';
   indent = indent || 0;
 
-  indent || log(
-    colors[style]( is.func(obj) ? '[Function] {' : '{' )
-  );
+  str = indent ? '' : color(is.func(obj) ? '[Function] {' : '{', theme);
+  str && log(str);
+
   indent = indent < 0 ? 0 : indent;
-
   spaces = fillStr(indent, '  ');
-
-  keys = objKeys(obj);
+  keys = objKeys(obj).sort( (a, b) => b.length - a.length );
   last = keys.length - 1;
-  each(keys, function(/** string */ key, /** number */ i) {
+
+  each(keys, (key, i) => {
     val = obj[key];
     str = makeLogStr(val);
     if ( is.func(val) || str === '{' ) {
-      log( colors[style]('  ' + spaces + key + ': ' + str) );
-      logObj(val, style, (indent + 1));
+      str = `  ${spaces}${key}: ${str}`;
+      str = color(str, theme);
+      log(str);
+      logObj(val, theme, (indent + 1));
     }
     else {
-      log(
-        colors[style](
-          '  ' + spaces + key + ': ' + str + ( i !== last ? ',' : '' )
-        )
-      );
+      str = `  ${spaces}${key}: ${str}` + ( i !== last ? ',' : '' );
+      str = color(str, theme);
+      log(str);
     }
   });
-  log(
-    colors[style]( spaces + '}' + (indent ? ',' : '') )
-  );
+
+  str = spaces + '}' + ( indent ? ',' : '' );
+  str = color(str, theme);
+  log(str);
 }
 
 
@@ -1002,7 +1027,7 @@ function logOCD() {
   }
 
   logSpaces(this._config.log.spaceBefore);
-  logAny(this._config.log.style, arguments, this._config.log.argMap);
+  logAny(arguments, this._config.log.style, this._config.log.argMap);
   logSpaces(this._config.log.spaceAfter);
 
   return true;
@@ -1038,11 +1063,11 @@ logOCD.pass = function(header) {
       return false;
     }
 
-    logHeader('pass', header);
+    logHeader(header, 'pass');
 
     if (arguments.length > 1) {
       logSpaces(1);
-      logAny('plain', slice(arguments, 1), this._config.pass.argMap);
+      logAny(slice(arguments, 1), 'plain', this._config.pass.argMap);
     }
   }
   else {
@@ -1051,7 +1076,7 @@ logOCD.pass = function(header) {
 
     if (arguments.length) {
       logSpaces(1);
-      logAny('plain', arguments, this._config.pass.argMap);
+      logAny(arguments, 'plain', this._config.pass.argMap);
     }
   }
 
@@ -1088,14 +1113,14 @@ logOCD.error = function(header, msg) {
       return false;
     }
 
-    logHeader('error', header);
-    logDetails('plain', msg);
+    logHeader(header, 'error');
+    logDetails(msg, 'plain');
     stack && logSpaces(1);
     stack && logStack(stack);
 
     if (arguments.length > 2) {
       logSpaces(1);
-      logAny('view', slice(arguments, 2), this._config.error.argMap);
+      logAny(slice(arguments, 2), 'view', this._config.error.argMap);
     }
   }
   else {
@@ -1112,13 +1137,13 @@ logOCD.error = function(header, msg) {
     }
 
     logHeader('error', 'Error');
-    logDetails('plain', msg);
+    logDetails(msg, 'plain');
     stack && logSpaces(1);
     stack && logStack(stack);
 
     if (arguments.length > 1) {
       logSpaces(1);
-      logAny('view', slice(arguments, 1), this._config.error.argMap);
+      logAny(slice(arguments, 1), 'view', this._config.error.argMap);
     }
   }
 
@@ -1156,14 +1181,14 @@ logOCD.warn = function(header, msg) {
       return false;
     }
 
-    logHeader('warn', header);
-    logDetails('plain', msg);
+    logHeader(header, 'warn');
+    logDetails(msg, 'plain');
     stack && logSpaces(1);
     stack && logStack(stack);
 
     if (arguments.length > 2) {
       logSpaces(1);
-      logAny('view', slice(arguments, 2), this._config.warn.argMap);
+      logAny(slice(arguments, 2), 'view', this._config.warn.argMap);
     }
   }
   else {
@@ -1180,13 +1205,13 @@ logOCD.warn = function(header, msg) {
     }
 
     logHeader('warn', 'Warning');
-    logDetails('plain', msg);
+    logDetails(msg, 'plain');
     stack && logSpaces(1);
     stack && logStack(stack);
 
     if (arguments.length > 1) {
       logSpaces(1);
-      logAny('view', slice(arguments, 1), this._config.warn.argMap);
+      logAny(slice(arguments, 1), 'view', this._config.warn.argMap);
     }
   }
 
@@ -1222,13 +1247,13 @@ logOCD.debug = function(header) {
       return false;
     }
 
-    logHeader('debug', header);
+    logHeader(header, 'debug');
     stack && logSpaces(1);
     stack && logStack(stack);
 
     if (arguments.length > 1) {
       logSpaces(1);
-      logAny('plain', slice(arguments, 1), this._config.debug.argMap);
+      logAny(slice(arguments, 1), 'plain', this._config.debug.argMap);
     }
   }
   else {
@@ -1239,7 +1264,7 @@ logOCD.debug = function(header) {
 
     if (arguments.length) {
       logSpaces(1);
-      logAny('plain', arguments, this._config.debug.argMap);
+      logAny(arguments, 'plain', this._config.debug.argMap);
     }
   }
 
@@ -1272,12 +1297,14 @@ logOCD.fail = function(msg) {
   }
 
   logSpaces(this._config.fail.spaceBefore);
-  logAny('fail', [ msg ]);
+  logAny([ msg ], 'fail');
   stack && logSpaces(1);
   stack && logStack(stack);
-  arguments.length > 1 && logAny(
-    'view', slice(arguments, 1), this._config.fail.argMap
-  );
+
+  if (arguments.length > 1) {
+    logAny(slice(arguments, 1), 'view', this._config.fail.argMap);
+  }
+
   logSpaces(this._config.fail.spaceAfter);
 
   return true;
