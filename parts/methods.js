@@ -324,6 +324,26 @@ logOCD.fail = function(msg) {
   return true;
 };
 
+/**
+ * @public
+ * @this {!LogOCD}
+ * @param {(!Error|string)=} stack
+ * @return {boolean}
+ */
+logOCD.trace = function(stack) {
+
+  stack = is.obj ? stack.stack : stack;
+  stack = is.str(stack) ? stack : null;
+  stack = newStack(stack);
+
+  logSpaces(this._config.trace.spaceBefore);
+  logStack(stack);
+  logSpaces(this._config.trace.spaceAfter);
+  this._config.trace.exit && process.exit(1);
+
+  return true;
+};
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // CONFIG METHODS
@@ -341,6 +361,7 @@ logOCD.fail = function(msg) {
  * | warn   | spaceBefore, spaceAfter, argMap, header, stack              |
  * | debug  | spaceBefore, spaceAfter, argMap, header, stack              |
  * | fail   | spaceBefore, spaceAfter, argMap, stack                      |
+ * | trace  | spaceBefore, spaceAfter, exit                               |
  * ------------------------------------------------------------------------
  *
  * @example [logOCDInstance].setConfig("all.argMap", true);
