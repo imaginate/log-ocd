@@ -57,20 +57,45 @@ var colors = require('colors/safe');
  * @return {boolean}
  */
 function has(source, prop) {
-  return !source ? false : is.str(source) ?
-    ( is.str(prop) ? source.includes(prop) : prop.test(source) ) : (
-      'hasOwnProperty' in source ? source.hasOwnProperty(prop) : prop in source
-    );
+
+  if (!source) {
+    if ( !is('?str', source) ) {
+      throw new TypeError('Invalid "source" for has() in log-ocd module.');
+    }
+    return false;
+  }
+
+  if ( is.str(source) ) {
+    if ( is.str(prop) ) {
+      return source.includes(prop);
+    }
+    else if ( is.regex(prop) ) {
+      return prop.test(source);
+    }
+    else {
+      throw new TypeError('Invalid "prop" for has() in log-ocd module.');
+    }
+  }
+
+  if ( is._obj(source) ) {
+    source = String(source);
+    return 'hasOwnProperty' in source ?
+      source.hasOwnProperty(prop) : prop in source;
+  }
+
+  throw new TypeError('Invalid "source" for has() in log-ocd module.');
 }
 
 /**
- * A shortcut for Array.prototype.slice.call(obj, start).
+ * A shortcut for Array.prototype.slice.call(obj, start, end) and
+ *   String.prototype.slice(start, end).
  * @private
- * @param {Object} obj
- * @param {number=} start - [default= 0]
- * @return {Array}
+ * @param {?(Object|string)} val
+ * @param {number=} start [default= 0]
+ * @param {number=} end [default= arr.length]
+ * @return {?(Array|string)}
  */
-function slice(obj, start) {
+function slice(val, start, end) {
 
   /** @type {!Array} */
   var arr;
@@ -81,21 +106,32 @@ function slice(obj, start) {
   /** @type {number} */
   var i;
 
-  if ( !is.obj(obj) || !has(obj, 'length') ) {
+  if ( is.str(val) ) {
+    return val.slice(start, end);
+  }
+
+  if ( is.null(val) ) {
     return null;
   }
 
-  start = start || 0;
-  start = start < 0 ? start + obj.length : start;
-  len = obj.length - start;
-
-  arr = len ? new Array(len) : [];
-  ii = start;
-  i = -1;
-  while (++i < len) {
-    arr[i] = obj[ii++];
+  if ( !is._obj(val) || !has(val, 'length') ) {
+    throw new TypeError('Invalid "val" for slice() in log-ocd module.');
   }
 
+  len = val.length;
+  start = start || 0;
+  start = start < 0 ? len + start : start;
+  end = end || len;
+  end = end > len ?
+    len : end < 0 ?
+      len + end : end;
+
+  arr = start < end ? new Array(end - start) : [];
+  ii = start - 1;
+  i = 0;
+  while (++ii < end) {
+    arr[i++] = val[ii];
+  }
   return arr;
 }
 
