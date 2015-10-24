@@ -23,37 +23,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Appends the properties of source objects to an existing object.
- * @param {(!Object|function)} dest
- * @param {(!Object|function)...} sources
- * @return {(!Object|function)}
- */
-global.merge = function merge(dest) {
-
-  /** @type {string} */
-  var prop;
-  /** @type {number} */
-  var len;
-  /** @type {number} */
-  var i;
-
-  if ( !are._obj(arguments) ) {
-    return null;
-  }
-
-  len = arguments.length;
-  i = -1;
-  while(++i < len) {
-    for (prop in source) {
-      if ( has(source, prop) ) {
-        dest[prop] = source[prop];
-      }
-    }
-  }
-  return dest;
-};
-
-/**
  * A shortcut for Array.prototype.map(obj, iteratee).
  * @param {Object} obj
  * @param {function(*, number): *} iteratee
