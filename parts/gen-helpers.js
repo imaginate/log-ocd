@@ -513,17 +513,6 @@ function fillStr(count, val) {
 }
 
 /**
- * Colors a string.
- * @private
- * @param {string} str
- * @param {string} theme
- * @return {string}
- */
-function color(str, theme) {
-  return colors[theme](str);
-}
-
-/**
  * Deletes a property from an object.
  * @private
  * @param {!Object} obj

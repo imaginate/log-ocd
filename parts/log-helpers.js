@@ -63,6 +63,16 @@ function isConfigProp(prop, val) {
  * @param {string} theme
  * @return {string}
  */
+function color(str, theme) {
+  return colors[theme](str);
+}
+
+/**
+ * @private
+ * @param {string} str
+ * @param {string} theme
+ * @return {string}
+ */
 function getAccentStr(str, theme) {
   return has(str, /`[^`]+`/) ? mapArr(str.split(/`+/), (section, i) => {
       return color(section, ( i % 2 ? 'a' : '' ) + theme);
