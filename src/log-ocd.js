@@ -271,6 +271,23 @@ function newProps(map, props, propVal, staticType) {
 /** @type {number} */
 Error.stackTraceLimit = 12;
 
+/**
+ * @private
+ * @param {(!Error|string)=} stack
+ * @constructor
+ */
+function StackTrace(stack) {
+  this.stack = is._str(stack) ? stack : is.obj(stack) ? stack.stack : undefined;
+  is._str(this.stack) || Error.captureStackTrace(this, StackTrace);
+  stack = this.stack.replace(/\r\n?/g, '\n') // normalize line breaks
+    .replace(/\\/g, '/')        // normalize slashes
+    .replace(/^.*\n\s+at /, '') // remove message
+    .split(/\n\s+at /);
+  this.stack = has(stack[0], 'log-ocd.js') ? slice(stack,
+    has(stack[1], 'log-ocd.js') ? 2 : 1
+  ) : stack;
+}
+
 /** @type {!RegExp} */
 var traceRegex = /^([^\(]+\()?(.*\/)?([^\/]+\.[a-z]+):([0-9]+):([0-9]+)\)?$/i;
 /** @type {!RegExp} */
@@ -342,7 +359,7 @@ function newTrace(str, i, base) {
 
 /**
  * @private
- * @param {string=} stack
+ * @param {(!Error|string)=} stack
  * @return {!Stack}
  */
 function newStack(stack) {
@@ -352,12 +369,10 @@ function newStack(stack) {
   /** @type {string} */
   var dir;
 
-  stack = stack || new Error().stack;
-  stack = stack.replace(/\r\n?/g, '\n') // normalize line breaks
-    .replace(/\\/g, '/')                // normalize slashes
-    .replace(/^.*\n.*\n.*\n\s+at /, '') // remove message and log-ocd traces
-    .split(/\n\s+at /);
+  // get the stack array
+  stack = new StackTrace(stack).stack;
 
+  // set the base path
   stack.some( str => {
     dir = traceRegex.exec(str)[2];
     if ( !dir || has(dir, nodeModRegex) ) {
@@ -367,7 +382,10 @@ function newStack(stack) {
     return true;
   });
 
-  stack = mapArr( stack, (str, i) => newTrace(str, i, base) );
+  // setup the stack object
+  stack = mapArr(stack, (str, i) => {
+    return newTrace(str, i, base);
+  });
   stack.base = base.join('/');
   stack = newProps(stack, 'event, module, file, line, column', 0,
     (newVal, nowVal) => newVal > nowVal
@@ -793,6 +811,11 @@ var CONFIG = {
     spaceAfter: 1,
     argMap: false,
     stack: false
+  },
+  trace: {
+    spaceBefore: 1,
+    spaceAfter: 1,
+    exit: false
   }
 };
 
@@ -1380,8 +1403,6 @@ logOCD.fail = function(msg) {
  */
 logOCD.trace = function(stack) {
 
-  stack = is.obj ? stack.stack : stack;
-  stack = is.str(stack) ? stack : null;
   stack = newStack(stack);
 
   logSpaces(this._config.trace.spaceBefore);

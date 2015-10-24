@@ -332,8 +332,6 @@ logOCD.fail = function(msg) {
  */
 logOCD.trace = function(stack) {
 
-  stack = is.obj ? stack.stack : stack;
-  stack = is.str(stack) ? stack : null;
   stack = newStack(stack);
 
   logSpaces(this._config.trace.spaceBefore);
