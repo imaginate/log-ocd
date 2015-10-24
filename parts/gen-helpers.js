@@ -269,7 +269,7 @@ function merge(dest, source) {
 /**
  * Seals an object.
  * @private
- * @param {Object} obj
+ * @param {!(Object|function)} obj
  * @param {boolean=} deep
  * @return {!Object}
  */
@@ -278,13 +278,17 @@ function seal(obj, deep) {
   /** @type {string} */
   var prop;
 
+  if ( is.null(obj) ) {
+    return null;
+  }
+
   if ( !is._obj(obj) ) {
-    return obj;
+    throw new TypeError('Invalid "obj" param for seal() in log-ocd module.');
   }
 
   if (deep) {
     for (prop in obj) {
-      if ( has(obj, prop) ) {
+      if ( has(obj, prop) && is._obj( obj[prop] ) ) {
         obj[prop] = seal(obj[prop], true);
       }
     }
@@ -296,7 +300,7 @@ function seal(obj, deep) {
 /**
  * Freezes an object.
  * @private
- * @param {!Object} obj
+ * @param {!(Object|function)} obj
  * @param {boolean=} deep
  * @return {!Object}
  */
@@ -305,13 +309,17 @@ function freeze(obj, deep) {
   /** @type {string} */
   var prop;
 
+  if ( is.null(obj) ) {
+    return null;
+  }
+
   if ( !is._obj(obj) ) {
-    return obj;
+    throw new TypeError('Invalid "obj" param for freeze() in log-ocd module.');
   }
 
   if (deep) {
     for (prop in obj) {
-      if ( has(obj, prop) ) {
+      if ( has(obj, prop) && is._obj( obj[prop] ) ) {
         obj[prop] = freeze(obj[prop], true);
       }
     }
