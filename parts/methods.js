@@ -86,7 +86,7 @@ logOCD.pass = function(header) {
   }
   else {
 
-    logHeader('pass', 'Pass');
+    logHeader('Pass', 'pass');
 
     if (arguments.length) {
       logSpaces(1);
@@ -150,7 +150,7 @@ logOCD.error = function(header, msg) {
       return false;
     }
 
-    logHeader('error', 'Error');
+    logHeader('Error', 'error');
     logDetails(msg, 'plain');
     stack && logSpaces(1);
     stack && logStack(stack);
@@ -218,7 +218,7 @@ logOCD.warn = function(header, msg) {
       return false;
     }
 
-    logHeader('warn', 'Warning');
+    logHeader('Warning', 'warn');
     logDetails(msg, 'plain');
     stack && logSpaces(1);
     stack && logStack(stack);
@@ -272,7 +272,7 @@ logOCD.debug = function(header) {
   }
   else {
 
-    logHeader('debug', 'Debug');
+    logHeader('Debug', 'debug');
     stack && logSpaces(1);
     stack && logStack(stack);
 
