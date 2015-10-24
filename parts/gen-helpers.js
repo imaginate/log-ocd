@@ -78,7 +78,7 @@ function has(source, prop) {
   }
 
   if ( is._obj(source) ) {
-    source = String(source);
+    prop = String(prop);
     return 'hasOwnProperty' in source ?
       source.hasOwnProperty(prop) : prop in source;
   }
