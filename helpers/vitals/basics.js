@@ -339,6 +339,40 @@ global.objKeys = function objKeys(obj) {
 };
 
 /**
+ * Seals an object.
+ * @private
+ * @param {!(Object|function)} obj
+ * @param {boolean=} deep
+ * @return {!Object}
+ */
+global.seal = function seal(obj, deep) {
+
+  /** @type {string} */
+  var prop;
+
+  if ( !is._obj(obj) ) {
+    if ( !is.null(obj) ) {
+      log.error(
+        'Invalid `Vitals.seal` Call',
+        'invalid type for `obj` param',
+        mapArgs({ obj: obj, deep: deep })
+      );
+    }
+    return null;
+  }
+
+  if (deep) {
+    for (prop in obj) {
+      if ( has(obj, prop) && is._obj( obj[prop] ) ) {
+        obj[prop] = seal(obj[prop], true);
+      }
+    }
+  }
+
+  return Object.seal(obj);
+};
+
+/**
  * Freezes an object.
  * @private
  * @param {!Object} obj
@@ -355,7 +389,7 @@ global.freeze = function freeze(obj, deep) {
       log.error(
         'Invalid `Vitals.freeze` Call',
         'invalid type for `obj` param',
-        mapArgs({ iteratee: iteratee })
+        mapArgs({ obj: obj, deep: deep })
       );
     }
     return null;
@@ -363,7 +397,7 @@ global.freeze = function freeze(obj, deep) {
 
   if (deep) {
     for (prop in obj) {
-      if ( has(obj, prop) ) {
+      if ( has(obj, prop) && is._obj( obj[prop] ) ) {
         obj[prop] = freeze(obj[prop], true);
       }
     }
