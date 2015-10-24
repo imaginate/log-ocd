@@ -41,7 +41,7 @@ function logOCD() {
   }
 
   logSpaces(this._config.log.spaceBefore);
-  logAny(this._config.log.style, arguments, this._config.log.argMap);
+  logAny(arguments, this._config.log.style, this._config.log.argMap);
   logSpaces(this._config.log.spaceAfter);
 
   return true;
@@ -77,11 +77,11 @@ logOCD.pass = function(header) {
       return false;
     }
 
-    logHeader('pass', header);
+    logHeader(header, 'pass');
 
     if (arguments.length > 1) {
       logSpaces(1);
-      logAny('plain', slice(arguments, 1), this._config.pass.argMap);
+      logAny(slice(arguments, 1), 'plain', this._config.pass.argMap);
     }
   }
   else {
@@ -90,7 +90,7 @@ logOCD.pass = function(header) {
 
     if (arguments.length) {
       logSpaces(1);
-      logAny('plain', arguments, this._config.pass.argMap);
+      logAny(arguments, 'plain', this._config.pass.argMap);
     }
   }
 
@@ -127,14 +127,14 @@ logOCD.error = function(header, msg) {
       return false;
     }
 
-    logHeader('error', header);
-    logDetails('plain', msg);
+    logHeader(header, 'error');
+    logDetails(msg, 'plain');
     stack && logSpaces(1);
     stack && logStack(stack);
 
     if (arguments.length > 2) {
       logSpaces(1);
-      logAny('view', slice(arguments, 2), this._config.error.argMap);
+      logAny(slice(arguments, 2), 'view', this._config.error.argMap);
     }
   }
   else {
@@ -151,13 +151,13 @@ logOCD.error = function(header, msg) {
     }
 
     logHeader('error', 'Error');
-    logDetails('plain', msg);
+    logDetails(msg, 'plain');
     stack && logSpaces(1);
     stack && logStack(stack);
 
     if (arguments.length > 1) {
       logSpaces(1);
-      logAny('view', slice(arguments, 1), this._config.error.argMap);
+      logAny(slice(arguments, 1), 'view', this._config.error.argMap);
     }
   }
 
@@ -195,14 +195,14 @@ logOCD.warn = function(header, msg) {
       return false;
     }
 
-    logHeader('warn', header);
-    logDetails('plain', msg);
+    logHeader(header, 'warn');
+    logDetails(msg, 'plain');
     stack && logSpaces(1);
     stack && logStack(stack);
 
     if (arguments.length > 2) {
       logSpaces(1);
-      logAny('view', slice(arguments, 2), this._config.warn.argMap);
+      logAny(slice(arguments, 2), 'view', this._config.warn.argMap);
     }
   }
   else {
@@ -219,13 +219,13 @@ logOCD.warn = function(header, msg) {
     }
 
     logHeader('warn', 'Warning');
-    logDetails('plain', msg);
+    logDetails(msg, 'plain');
     stack && logSpaces(1);
     stack && logStack(stack);
 
     if (arguments.length > 1) {
       logSpaces(1);
-      logAny('view', slice(arguments, 1), this._config.warn.argMap);
+      logAny(slice(arguments, 1), 'view', this._config.warn.argMap);
     }
   }
 
@@ -261,13 +261,13 @@ logOCD.debug = function(header) {
       return false;
     }
 
-    logHeader('debug', header);
+    logHeader(header, 'debug');
     stack && logSpaces(1);
     stack && logStack(stack);
 
     if (arguments.length > 1) {
       logSpaces(1);
-      logAny('plain', slice(arguments, 1), this._config.debug.argMap);
+      logAny(slice(arguments, 1), 'plain', this._config.debug.argMap);
     }
   }
   else {
@@ -278,7 +278,7 @@ logOCD.debug = function(header) {
 
     if (arguments.length) {
       logSpaces(1);
-      logAny('plain', arguments, this._config.debug.argMap);
+      logAny(arguments, 'plain', this._config.debug.argMap);
     }
   }
 
@@ -311,12 +311,14 @@ logOCD.fail = function(msg) {
   }
 
   logSpaces(this._config.fail.spaceBefore);
-  logAny('fail', [ msg ]);
+  logAny([ msg ], 'fail');
   stack && logSpaces(1);
   stack && logStack(stack);
-  arguments.length > 1 && logAny(
-    'view', slice(arguments, 1), this._config.fail.argMap
-  );
+
+  if (arguments.length > 1) {
+    logAny(slice(arguments, 1), 'view', this._config.fail.argMap);
+  }
+
   logSpaces(this._config.fail.spaceAfter);
 
   return true;
