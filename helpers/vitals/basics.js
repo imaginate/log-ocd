@@ -98,44 +98,51 @@ global.each = function(val, iteratee) {
   /** @type {number} */
   var len;
 
-  is.func(iteratee) || log.error(
-    'Invalid `Vitals.each` Call',
-    'invalid type for `iteratee` param',
-    { argMap: true, iteratee: iteratee }
-  );
+  if ( !is.func(iteratee) ) {
+    log.error(
+      'Invalid `Vitals.each` Call',
+      'invalid type for `iteratee` param',
+      mapArgs({ val: val, iteratee: iteratee })
+    );
+  }
 
   if ( is._obj(val) ) {
-    if ( is._arr(val) ) {
 
-      // iterate over an array or arguments obj
+    // iterate over an array or arguments obj
+    if ( is._arr(val) ) {
       val = slice(val);
       len = val.length;
       prop = -1;
       while (++prop < len) {
         iteratee(val[prop], prop, val);
       }
-      return val;
     }
-    else {
 
-      // iterate over an object's own props
-      val = clone(val) || val;
+    // iterate over an object's own props
+    else {
+      val = is.func(val) ? val : clone(val);
       for (prop in val) {
         if ( has(val, prop) ) {
           iteratee(val[prop], prop, val);
         }
       }
-      return val;
     }
+    return val;
   }
-  else if ( is.num(val) ) {
 
-    // iterate specified number of times
-    while(val--) {
+  // iterate specified number of times
+  else if ( is.num(val) ) {
+    while(cycles--) {
       iteratee();
     }
+    return null;
   }
-  return null;
+
+  log.error(
+    'Invalid `Vitals.each` Call',
+    'invalid type for `val` param',
+    mapArgs({ val: val, iteratee: iteratee })
+  );
 };
 
 /**
