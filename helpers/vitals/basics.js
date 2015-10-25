@@ -277,7 +277,7 @@ global.merge = function merge(dest, source) {
  * @param {function(*, number): *} iteratee
  * @return {Array}
  */
-global.map = function map(obj, iteratee) {
+global.mapArr = function mapArr(obj, iteratee) {
 
   /** @type {!Array} */
   var arr;
@@ -292,7 +292,7 @@ global.map = function map(obj, iteratee) {
     );
   }
 
-  if ( !is.null(obj) ) {
+  if ( is.null(obj) ) {
     return null;
   }
 

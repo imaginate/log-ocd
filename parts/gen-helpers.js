@@ -153,7 +153,7 @@ function mapArr(obj, iteratee) {
     throw new TypeError('Invalid "iteratee" for mapArr() in log-ocd module.');
   }
 
-  if ( !is.null(obj) ) {
+  if ( is.null(obj) ) {
     return null;
   }
 
