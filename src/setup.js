@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------------------------------
- * LOG-OCD SETUP
+ * LOG-OCD: SETUP
  * -----------------------------------------------------------------------------
  * @version 1.0.0
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
@@ -46,14 +46,3 @@ var remap  = vitals.remap;
 var seal   = vitals.seal;
 var slice  = vitals.slice;
 var until  = vitals.until;
-
-
-////////////////////////////////////////////////////////////////////////////////
-// EXPORT LOG-OCD FACTORY
-////////////////////////////////////////////////////////////////////////////////
-
-/**
- * @public
- * @return {!LogOCD}
- */
-module.exports = function newLogOCD() {};

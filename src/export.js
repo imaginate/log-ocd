@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------------------------------
- * LOG-OCD
+ * LOG-OCD: EXPORT
  * -----------------------------------------------------------------------------
  * @version 1.0.0
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
@@ -18,13 +18,13 @@
  * @see [Closure Compiler specific JSDoc]{@link https://developers.google.com/closure/compiler/docs/js-for-compiler}
  */
 
-'use strict';
 
+////////////////////////////////////////////////////////////////////////////////
+// EXPORT LOG-OCD FACTORY
+////////////////////////////////////////////////////////////////////////////////
 
-// INSERT setup.js
-// INSERT .js
-// INSERT .js
-// INSERT .js
-// INSERT .js
-// INSERT .js
-// INSERT export.js
+/**
+ * @public
+ * @return {!LogOCD}
+ */
+module.exports = function newLogOCD() {};
