@@ -21,7 +21,7 @@
 'use strict';
 
 
-// INSERT .js
+// INSERT setup.js
 // INSERT .js
 // INSERT .js
 // INSERT .js
