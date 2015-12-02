@@ -1,8 +1,8 @@
 {
   "name": "log-ocd",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Clean, Detailed, & Efficient Node.js Logging",
-  "main": "src/log-ocd.js",
+  "main": "log-ocd.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/imaginate/log-ocd.git"
@@ -14,15 +14,15 @@
   },
   "homepage": "https://github.com/imaginate/log-ocd",
   "dependencies": {
-    "colors": "^1.1.2",
-    "node-are": "^0.1.0"
+    "colors": "1.x",
+    "node-are": "0.x",
+    "node-vitals": "2.x"
   },
   "devDependencies": {
-    "mocha": "^2.3.3",
-    "shelljs": "^0.5.1"
+    "mocha": "2.x"
   },
   "scripts": {
-    "test": "node make test"
+    "test": "node ./test/init.js"
   },
   "keywords": [
     "imaginate",
