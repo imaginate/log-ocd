@@ -151,8 +151,402 @@ var colors = require('colors/safe');
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// METHODS
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * A shortcut for Object.prototype.hasOwnProperty that accepts null objects or a
+ *   shortcut for String.prototype.includes and RegExp.prototype.test.
+ * @private
+ * @param {?(Object|function|string)} source
+ * @param {*} prop
+ * @return {boolean}
+ */
+function has(source, prop) {
+
+  if (!source) {
+    if ( !is('?str', source) ) {
+      throw new TypeError('Invalid "source" for has() in log-ocd module.');
+    }
+    return false;
+  }
+
+  if ( is.str(source) ) {
+    if ( is.str(prop) ) {
+      return source.includes(prop);
+    }
+    else if ( is.regex(prop) ) {
+      return prop.test(source);
+    }
+    else {
+      throw new TypeError('Invalid "prop" for has() in log-ocd module.');
+    }
+  }
+
+  if ( is._obj(source) ) {
+    prop = String(prop);
+    return 'hasOwnProperty' in source ?
+      source.hasOwnProperty(prop) : prop in source;
+  }
+
+  throw new TypeError('Invalid "source" for has() in log-ocd module.');
+}
+
+/**
+ * A shortcut for Array.prototype.slice.call(obj, start, end) and
+ *   String.prototype.slice(start, end).
+ * @private
+ * @param {?(Object|string)} val
+ * @param {number=} start [default= 0]
+ * @param {number=} end [default= arr.length]
+ * @return {?(Array|string)}
+ */
+function slice(val, start, end) {
+
+  /** @type {!Array} */
+  var arr;
+  /** @type {number} */
+  var len;
+  /** @type {number} */
+  var ii;
+  /** @type {number} */
+  var i;
+
+  if ( is.str(val) ) {
+    return val.slice(start, end);
+  }
+
+  if ( is.null(val) ) {
+    return null;
+  }
+
+  if ( !is._obj(val) || !has(val, 'length') ) {
+    throw new TypeError('Invalid "val" for slice() in log-ocd module.');
+  }
+
+  len = val.length;
+  start = start || 0;
+  start = start < 0 ? len + start : start;
+  end = end || len;
+  end = end > len ?
+    len : end < 0 ?
+      len + end : end;
+
+  arr = start < end ? new Array(end - start) : [];
+  ii = start - 1;
+  i = 0;
+  while (++ii < end) {
+    arr[i++] = val[ii];
+  }
+  return arr;
+}
+
+/**
+ * A shortcut for Array.prototype.map(obj, iteratee).
+ * @private
+ * @param {Object} obj
+ * @param {function(*, number): *} iteratee
+ * @return {Array}
+ */
+function mapArr(obj, iteratee) {
+
+  /** @type {!Array} */
+  var arr;
+  /** @type {number} */
+  var i;
+
+  if ( !is.func(iteratee) ) {
+    throw new TypeError('Invalid "iteratee" for mapArr() in log-ocd module.');
+  }
+
+  if ( is.null(obj) ) {
+    return null;
+  }
+
+  if ( !is.obj(obj) || !has(obj, 'length') ) {
+    throw new TypeError('Invalid "obj" for mapArr() in log-ocd module.');
+  }
+
+  i = obj.length;
+  arr = i ? new Array(i) : [];
+  while (i--) {
+    arr[i] = iteratee(obj[i], i);
+  }
+  return arr;
+}
+
+/**
+ * Gets an object's property keys.
+ * @private
+ * @param {?(Object|function)} obj
+ * @return {Array<string>}
+ */
+function objKeys(obj) {
+
+  /** @type {string} */
+  var prop;
+  /** @type {!Array<string>} */
+  var arr;
+
+  if ( is.null(obj) ) {
+    return null;
+  }
+
+  if ( !is._obj(obj) ) {
+    throw new TypeError('Invalid "obj" param for objKeys() in log-ocd module.');
+  }
+
+  arr = [];
+  for (prop in obj) {
+    if ( has(obj, prop) ) {
+      arr.push(prop);
+    }
+  }
+  return arr;
+}
+
+/**
+ * Creates a new object with the properties of the given object.
+ * @private
+ * @param {Object} obj
+ * @param {boolean=} deep
+ * @return {!Object}
+ */
+function clone(obj, deep) {
+
+  /** @type {!Object} */
+  var newObj;
+  /** @type {string} */
+  var prop;
+
+  if ( is.null(obj) ) {
+    return null;
+  }
+
+  if ( !is.obj(obj) ) {
+    throw new TypeError('Invalid "obj" param for clone() in log-ocd module.');
+  }
+
+  newObj = is.arr(obj) ? [] : {};
+  for (prop in obj) {
+    if ( has(obj, prop) ) {
+      newObj[prop] = deep && is.obj( obj[prop] ) ?
+        clone(obj[prop], true) : obj[prop];
+    }
+  }
+  return newObj;
+}
+
+/**
+ * Appends an object's properties to an existing object.
+ * @private
+ * @param {!(Object|function)} dest
+ * @param {...?(Object|function)} source
+ * @return {!(Object|function)}
+ */
+function merge(dest, source) {
+
+  /** @type {string} */
+  var prop;
+  /** @type {number} */
+  var len;
+  /** @type {number} */
+  var i;
+
+  if ( !is._obj(dest) || arguments.length > 2 ?
+         !are('?obj|func', slice(arguments, 1)) : !is('?obj|func', source) ) {
+    throw new TypeError('Invalid param(s) for slice() in log-ocd module.');
+  }
+
+  len = arguments.length;
+  i = 0;
+  while(++i < len) {
+    source = arguments[i];
+    if (source) {
+      for (prop in source) {
+        if ( has(source, prop) ) {
+          dest[prop] = source[prop];
+        }
+      }
+    }
+  }
+  return dest;
+}
+
+/**
+ * Seals an object.
+ * @private
+ * @param {!(Object|function)} obj
+ * @param {boolean=} deep
+ * @return {!Object}
+ */
+function seal(obj, deep) {
+
+  /** @type {string} */
+  var prop;
+
+  if ( is.null(obj) ) {
+    return null;
+  }
+
+  if ( !is._obj(obj) ) {
+    throw new TypeError('Invalid "obj" param for seal() in log-ocd module.');
+  }
+
+  if (deep) {
+    for (prop in obj) {
+      if ( has(obj, prop) && is._obj( obj[prop] ) ) {
+        obj[prop] = seal(obj[prop], true);
+      }
+    }
+  }
+
+  return Object.seal(obj);
+}
+
+/**
+ * Freezes an object.
+ * @private
+ * @param {!(Object|function)} obj
+ * @param {boolean=} deep
+ * @return {!Object}
+ */
+function freeze(obj, deep) {
+
+  /** @type {string} */
+  var prop;
+
+  if ( is.null(obj) ) {
+    return null;
+  }
+
+  if ( !is._obj(obj) ) {
+    throw new TypeError('Invalid "obj" param for freeze() in log-ocd module.');
+  }
+
+  if (deep) {
+    for (prop in obj) {
+      if ( has(obj, prop) && is._obj( obj[prop] ) ) {
+        obj[prop] = freeze(obj[prop], true);
+      }
+    }
+  }
+
+  return Object.freeze(obj);
+}
+
+/**
+ * A shortcut for iterating over object maps and arrays or invoking an action a
+ *   set number of times.
+ * @private
+ * @param {!(Object|function|Array|number)} val
+ * @param {function(*, (string|number)=, (Object|function|Array)=)} iteratee
+ * @return {(Object|function|Array)}
+ */
+function each(val, iteratee) {
+
+  /** @type {(string|number)} */
+  var prop;
+  /** @type {number} */
+  var len;
+
+  if ( !is.func(iteratee) ) {
+    throw new TypeError('Invalid iteratee param for each() in log-ocd module.');
+  }
+
+  if ( is._obj(val) ) {
+
+    // iterate over an array or arguments obj
+    if ( is._arr(val) ) {
+      val = slice(val);
+      len = val.length;
+      prop = -1;
+      while (++prop < len) {
+        iteratee(val[prop], prop, val);
+      }
+    }
+
+    // iterate over an object's own props
+    else {
+      val = is.func(val) ? val : clone(val);
+      for (prop in val) {
+        if ( has(val, prop) ) {
+          iteratee(val[prop], prop, val);
+        }
+      }
+    }
+    return val;
+  }
+
+  // iterate specified number of times
+  else if ( is.num(val) ) {
+    while(cycles--) {
+      iteratee();
+    }
+    return null;
+  }
+
+  throw new TypeError('Invalid "val" param for each() in log-ocd module.');
+}
+
+/**
+ * Fills a string with specified values.
+ * @private
+ * @param {number} count
+ * @param {string} val
+ * @return {string}
+ */
+function fillStr(count, val) {
+
+  /** @type {string} */
+  var str;
+  /** @type {number} */
+  var i;
+
+  count = count < 0 ? 0 : count;
+  str = '';
+  while (count--) {
+    str += val;
+  }
+  return str;
+}
+
+/**
+ * Deletes a property from an object.
+ * @private
+ * @param {!Object} obj
+ * @param {string} prop
+ * @return {!Object}
+ */
+function removeProp(obj, prop) {
+
+  /** @type {!Object} */
+  var newObj;
+  /** @type {string} */
+  var key;
+
+  if ( !is.obj(obj) ) {
+    return null;
+  }
+
+  newObj = {};
+  for (key in obj) {
+    if ( has(obj, key) && key !== prop ) {
+      newObj[key] = obj[key];
+    }
+  }
+  return newObj;
+}
+
+
+// *****************************************************************************
+// SECTION: GENERAL CONSTRUCTORS
+// *****************************************************************************
+
+
+////////////////////////////////////////////////////////////////////////////////
 // CONSTRUCTORS
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 /**
  * @private
@@ -288,10 +682,22 @@ function StackTrace(stack) {
   ) : stack;
 }
 
-/** @type {!RegExp} */
-var traceRegex = /^([^\(]+\()?(.*\/)?([^\/]+\.[a-z]+):([0-9]+):([0-9]+)\)?$/i;
-/** @type {!RegExp} */
-var nodeModRegex = /\/node_modules\/([^\/]+)\//;
+/**
+ * For newTrace & newStack use only.
+ * @private
+ * @type {!RegExp}
+ * @const
+ */
+const TRACE = /^([^\(]+\()?(.*\/)?([^\/]+\.[a-z]+):([0-9]+):([0-9]+)\)?$/i;
+freeze(TRACE);
+
+/**
+ * For newTrace & newStack use only.
+ * @private
+ * @type {!RegExp}
+ * @const
+ */
+const NODE_MODULE = freeze( /\/node_modules\/([^\/]+)\// );
 
 /**
  * @typedef {!{
@@ -321,7 +727,7 @@ function newTrace(str, i, base) {
   /** @type {number} */
   var len;
 
-  arr = traceRegex.exec(str);
+  arr = TRACE.exec(str);
   arr = slice(arr, 1);
   arr[0] = arr[0] && arr[0].slice(0, -2);
 
@@ -336,7 +742,7 @@ function newTrace(str, i, base) {
     module: ''
   });
 
-  arr = base && trace.dir && !has(trace.dir, nodeModRegex);
+  arr = base && trace.dir && !has(trace.dir, NODE_MODULE);
   arr = arr && trace.dir.split('/');
 
   if (arr) {
@@ -347,7 +753,7 @@ function newTrace(str, i, base) {
     trace.module += trace.file;
   }
   else {
-    trace.module = trace.dir ? nodeModRegex.exec(trace.dir)[1] : '(core)';
+    trace.module = trace.dir ? NODE_MODULE.exec(trace.dir)[1] : '(core)';
   }
 
   return freeze(trace);
@@ -374,8 +780,8 @@ function newStack(stack) {
 
   // set the base path
   stack.some( str => {
-    dir = traceRegex.exec(str)[2];
-    if ( !dir || has(dir, nodeModRegex) ) {
+    dir = TRACE.exec(str)[2];
+    if ( !dir || has(dir, NODE_MODULE) ) {
       return false;
     }
     base = dir.split('/');
@@ -399,318 +805,6 @@ function newStack(stack) {
   });
 
   return freeze(stack);
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// METHODS
-////////////////////////////////////////////////////////////////////////////////
-
-/**
- * A shortcut for Object.prototype.hasOwnProperty that accepts null objects or a
- *   shortcut for String.prototype.includes and RegExp.prototype.test.
- * @private
- * @param {?(Object|function|string)} source
- * @param {*} prop
- * @return {boolean}
- */
-function has(source, prop) {
-  return !source ? false : is.str(source) ?
-    ( is.str(prop) ? source.includes(prop) : prop.test(source) ) : (
-      'hasOwnProperty' in source ? source.hasOwnProperty(prop) : prop in source
-    );
-}
-
-/**
- * A shortcut for Array.prototype.slice.call(obj, start).
- * @private
- * @param {Object} obj
- * @param {number=} start - [default= 0]
- * @return {Array}
- */
-function slice(obj, start) {
-
-  /** @type {!Array} */
-  var arr;
-  /** @type {number} */
-  var len;
-  /** @type {number} */
-  var ii;
-  /** @type {number} */
-  var i;
-
-  if ( !is.obj(obj) || !has(obj, 'length') ) {
-    return null;
-  }
-
-  start = start || 0;
-  start = start < 0 ? start + obj.length : start;
-  len = obj.length - start;
-
-  arr = len ? new Array(len) : [];
-  ii = start;
-  i = -1;
-  while (++i < len) {
-    arr[i] = obj[ii++];
-  }
-
-  return arr;
-}
-
-/**
- * A shortcut for Array.prototype.map(obj, iteratee).
- * @private
- * @param {Object} obj
- * @param {function(*, number): *} iteratee
- * @return {Array}
- */
-function mapArr(obj, iteratee) {
-
-  /** @type {!Array} */
-  var arr;
-  /** @type {number} */
-  var i;
-
-  if ( !is.obj(obj) || !has(obj, 'length') ) {
-    return null;
-  }
-
-  i = obj.length;
-  arr = i ? new Array(i) : [];
-  while (i--) {
-    arr[i] = iteratee(obj[i], i);
-  }
-  return arr;
-}
-
-/**
- * Gets an object's property keys.
- * @private
- * @param {?(Object|function)} obj
- * @return {Array<string>}
- */
-function objKeys(obj) {
-
-  /** @type {string} */
-  var prop;
-  /** @type {!Array<string>} */
-  var arr;
-
-  if (!obj) {
-    return null;
-  }
-
-  arr = [];
-  for (prop in obj) {
-    if ( has(obj, prop) ) {
-      arr.push(prop);
-    }
-  }
-  return arr;
-}
-
-/**
- * Creates a new object with the properties of the given object.
- * @private
- * @param {Object} obj
- * @param {boolean=} deep
- * @return {!Object}
- */
-function clone(obj, deep) {
-
-  /** @type {!Object} */
-  var newObj;
-  /** @type {string} */
-  var prop;
-
-  if ( !is.obj(obj) ) {
-    return null;
-  }
-
-  newObj = {};
-  for (prop in obj) {
-    if ( has(obj, prop) ) {
-      newObj[prop] = deep && is.obj( obj[prop] ) ?
-        clone(obj[prop], true) : obj[prop];
-    }
-  }
-  return newObj;
-}
-
-/**
- * Appends an object's properties to an existing object.
- * @private
- * @param {!(Object|function)} dest
- * @param {?(Object|function)} source
- * @return {?(Object|function)}
- */
-function merge(dest, source) {
-
-  /** @type {string} */
-  var prop;
-
-  if (!source) {
-    return dest;
-  }
-
-  for (prop in source) {
-    if ( has(source, prop) ) {
-      dest[prop] = source[prop];
-    }
-  }
-  return dest;
-}
-
-/**
- * Seals an object.
- * @private
- * @param {Object} obj
- * @param {boolean=} deep
- * @return {!Object}
- */
-function seal(obj, deep) {
-
-  /** @type {string} */
-  var prop;
-
-  if ( !is._obj(obj) ) {
-    return obj;
-  }
-
-  if (deep) {
-    for (prop in obj) {
-      if ( has(obj, prop) ) {
-        obj[prop] = seal(obj[prop], true);
-      }
-    }
-  }
-
-  return Object.seal(obj);
-}
-
-/**
- * Freezes an object.
- * @private
- * @param {!Object} obj
- * @param {boolean=} deep
- * @return {!Object}
- */
-function freeze(obj, deep) {
-
-  /** @type {string} */
-  var prop;
-
-  if ( !is._obj(obj) ) {
-    return obj;
-  }
-
-  if (deep) {
-    for (prop in obj) {
-      if ( has(obj, prop) ) {
-        obj[prop] = freeze(obj[prop], true);
-      }
-    }
-  }
-
-  return Object.freeze(obj);
-}
-
-/**
- * A shortcut for iterating over object maps and arrays or invoking an action a
- *   set number of times.
- * @private
- * @param {!(Object|function|Array|number)} val
- * @param {function(*, (string|number)=, (Object|function|Array)=)} iteratee
- * @return {(Object|function|Array)}
- */
-function each(val, iteratee) {
-
-  /** @type {(string|number)} */
-  var prop;
-  /** @type {number} */
-  var len;
-
-  if ( is._obj(val) ) {
-    if ( is._arr(val) ) {
-
-      // iterate over an array or arguments obj
-      val = slice(val);
-      len = val.length;
-      prop = -1;
-      while (++prop < len) {
-        iteratee(val[prop], prop, val);
-      }
-      return val;
-    }
-    else {
-
-      // iterate over an object's own props
-      val = clone(val) || val;
-      for (prop in val) {
-        if ( has(val, prop) ) {
-          iteratee(val[prop], prop, val);
-        }
-      }
-      return val;
-    }
-  }
-  else if ( is.num(val) ) {
-
-    // iterate specified number of times
-    while(cycles--) {
-      iteratee();
-    }
-  }
-  return null;
-}
-
-/**
- * Fills a string with specified values.
- * @private
- * @param {number} count
- * @param {string} val
- * @return {string}
- */
-function fillStr(count, val) {
-
-  /** @type {string} */
-  var str;
-  /** @type {number} */
-  var i;
-
-  count = count < 0 ? 0 : count;
-  str = '';
-  while (count--) {
-    str += val;
-  }
-  return str;
-}
-
-/**
- * Deletes a property from an object.
- * @private
- * @param {!Object} obj
- * @param {string} prop
- * @return {!Object}
- */
-function removeProp(obj, prop) {
-
-  /** @type {!Object} */
-  var newObj;
-  /** @type {string} */
-  var key;
-
-  if ( !is.obj(obj) ) {
-    return null;
-  }
-
-  newObj = {};
-  for (key in obj) {
-    if ( has(obj, key) && key !== prop ) {
-      newObj[key] = obj[key];
-    }
-  }
-  return newObj;
 }
 
 
@@ -858,6 +952,22 @@ function isConfigProp(prop, val) {
 ////////////////////////////////////////////////////////////////////////////////
 // FORMATTING METHODS
 ////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @private
+ * @param {!Object} obj
+ * @return {!Object}
+ */
+function mapArgs(obj) {
+
+  /** @type {!Object} */
+  var map;
+
+  map = newMap('ArgMap');
+  map = newProp(map, 'argMap', true);
+  map = merge(map, obj);
+  return freeze(map);
+}
 
 /**
  * @private
@@ -1361,7 +1471,7 @@ logOCD.debug = function(header) {
 /**
  * @public
  * @this {!LogOCD}
- * @param {string} msg
+ * @param {(!Error|string)} msg
  * @param {*...=} args
  * @return {boolean}
  */
@@ -1370,11 +1480,11 @@ logOCD.fail = function(msg) {
   /** @type {?Stack} */
   var stack;
 
-  stack = this._config.fail.stack ? newStack() : null;
+  stack = this._config.fail.stack ? newStack(msg) : null;
+  msg = is.obj(msg) ? msg.toString && msg.toString() : msg;
 
   if ( !is._str(msg) ) {
-    this.error(
-      'Invalid `log-ocd fail` Call',
+    this.error('Invalid `logOCD.fail` Call',
       'invalid type for `msg` param (a failure message is required)',
       { argMap: true, msg: msg }
     );
