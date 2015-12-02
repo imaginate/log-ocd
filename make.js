@@ -46,9 +46,9 @@ shortcuts = {
   dev: 'compile'
 };
 
-tasks = process.argv.length > 2 ?
-  process.argv.slice(2) : shortcuts.dev.split(' ');
-tasks = tasks.map(function(/** string */ task) {
+tasks = process.argv;
+tasks = tasks.length > 2 ? slice(tasks, 2) : shortcuts.dev.split(' ');
+tasks = tasks.map(task => {
   task = task.replace(/^--/, '');
   return has(shortcuts, task) ? shortcuts[task] : task;
 });
@@ -71,8 +71,10 @@ is.dir(taskDir) || log.error(
 // RUN THE TASKS
 ////////////////////////////////////////////////////////////////////////////////
 
-each(tasks, function(/** string */ taskStr) {
+each(tasks, taskStr => {
 
+  /** @type {string} */
+  var val;
   /** @type {!Task} */
   var task;
   /** @type {string} */
@@ -86,29 +88,25 @@ each(tasks, function(/** string */ taskStr) {
   methods = taskStr.split('-');
   defaultVal = getVal( methods.shift() );
 
-  is.file(taskDir + name + '.js') || log.error(
-    'Invalid `make` Command',
-    'a task\'s file does not exist',
-    { argMap: true, invalidTask: taskDir + name + '.js' }
-  );
+  if ( !is.file(`${taskDir}${name}.js`) ) {
+    log.error('Invalid `make` Command', 'a task\'s file does not exist', {
+      argMap: true,
+      invalidTask: `${taskDir}${name}.js`
+    });
+  }
 
   task = require(taskDir + name);
   task.name = name;
 
   methods = methods.length ? methods : task.defaultMethods;
-  methods = defaultVal ? methods.map(function(/** string */ method) {
-    return /=/.test(method) ? method : method + defaultVal;
+  methods = defaultVal ? mapArr(methods, method => {
+    return has(method, '=') ? method : method + defaultVal;
   }) : methods;
 
-  each(methods, function(/** string */ method) {
-
-    /** @type {string} */
-    var val;
-
+  each(methods, method => {
     val = getVal(method);
-    val = val && val.slice(1);
+    val = val && slice(val, 1); // trim "=" from string start
     method = getName(method);
-
     task.run(method, val);
   });
 });
