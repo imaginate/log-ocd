@@ -21,7 +21,9 @@
 
 'use strict';
 
-require('node-vitals')(2, 'all'); // appends global helpers for tasks
+// append global helpers for tasks
+require('node-vitals')(2, 'all');
+global.newTask = require('./_tasks/_helpers/new-task.js');
 
 
 ////////////////////////////////////////////////////////////////////////////////
