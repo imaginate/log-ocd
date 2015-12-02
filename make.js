@@ -13,6 +13,7 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
+ * @see [vitals]{@link https://github.com/imaginate/vitals}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
