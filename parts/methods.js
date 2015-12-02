@@ -290,7 +290,7 @@ logOCD.debug = function(header) {
 /**
  * @public
  * @this {!LogOCD}
- * @param {string} msg
+ * @param {(!Error|string)} msg
  * @param {*...=} args
  * @return {boolean}
  */
@@ -299,11 +299,11 @@ logOCD.fail = function(msg) {
   /** @type {?Stack} */
   var stack;
 
-  stack = this._config.fail.stack ? newStack() : null;
+  stack = this._config.fail.stack ? newStack(msg) : null;
+  msg = is.obj(msg) ? msg.toString && msg.toString() : msg;
 
   if ( !is._str(msg) ) {
-    this.error(
-      'Invalid `log-ocd fail` Call',
+    this.error('Invalid `logOCD.fail` Call',
       'invalid type for `msg` param (a failure message is required)',
       { argMap: true, msg: msg }
     );
