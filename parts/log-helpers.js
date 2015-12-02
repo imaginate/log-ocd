@@ -59,6 +59,22 @@ function isConfigProp(prop, val) {
 
 /**
  * @private
+ * @param {!Object} obj
+ * @return {!Object}
+ */
+function mapArgs(obj) {
+
+  /** @type {!Object} */
+  var map;
+
+  map = newMap('ArgMap');
+  map = newProp(map, 'argMap', true);
+  map = merge(map, obj);
+  return freeze(map);
+}
+
+/**
+ * @private
  * @param {string} str
  * @param {string} theme
  * @return {string}
