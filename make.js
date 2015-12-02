@@ -6,14 +6,13 @@
  *   Tasks are executed in the order given. Tasks may be repeated. You may view
  *   each task's source code in the "tasks" directory as "taskname.js".
  *
- * @see [makefile docs](https://github.com/imaginate/log-ocd/blob/master/docs/makefile.md)
+ * @see [makefile docs](https://github.com/imaginate/log-ocd/blob/master/_tasks/README.md)
  *
  * @author Adam Smith <adam@imaginate.life> (https://github.com/imaginate)
  * @copyright 2015 Adam A Smith <adam@imaginate.life> (https://github.com/imaginate)
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
- * @see [ShellJS]{@link https://github.com/shelljs/shelljs}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
@@ -22,7 +21,7 @@
 
 'use strict';
 
-require('./helpers/vitals')('all'); // appends global helpers for all tasks
+require('node-vitals')(2, 'all'); // appends global helpers for tasks
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -30,7 +29,7 @@ require('./helpers/vitals')('all'); // appends global helpers for all tasks
 ////////////////////////////////////////////////////////////////////////////////
 
 /** @type {string} */
-var taskDir = './tasks';
+var taskDir = './_tasks';
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -48,7 +47,7 @@ shortcuts = {
 
 tasks = process.argv;
 tasks = tasks.length > 2 ? slice(tasks, 2) : shortcuts.dev.split(' ');
-tasks = tasks.map(task => {
+tasks = remap(tasks, function(task){
   task = task.replace(/^--/, '');
   return has(shortcuts, task) ? shortcuts[task] : task;
 });
@@ -58,52 +57,50 @@ tasks = tasks.map(task => {
 // PREP THE TASK DIRECTORY
 ////////////////////////////////////////////////////////////////////////////////
 
-taskDir = taskDir ? taskDir.replace(/([^\/])$/, '$1/') : './tasks/';
+taskDir = taskDir ? taskDir.replace(/([^\/])$/, '$1/') : './_tasks/';
 
-is.dir(taskDir) || log.error(
-  'Invalid `makefile` Config',
-  'the tasks directory does not exist',
-  { argMap: true, taskDir: taskDir }
-);
+if ( !is.dir(taskDir) ) {
+  throw new RangeError('The makefile tasks directory does not exist.');
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // RUN THE TASKS
 ////////////////////////////////////////////////////////////////////////////////
 
-each(tasks, taskStr => {
+each(tasks, function(taskStr) {
 
   /** @type {string} */
-  var val;
+  var defaultVal;
+  /** @type {!Array} */
+  var methods;
+  /** @type {string} */
+  var name;
+  /** @type {string} */
+  var file;
   /** @type {!Task} */
   var task;
   /** @type {string} */
-  var name;
-  /** @type {!Array<string>} */
-  var methods;
-  /** @type {string} */
-  var defaultVal;
+  var val;
 
   name = getName(taskStr);
+  file = taskDir + name + '.js';
   methods = taskStr.split('-');
   defaultVal = getVal( methods.shift() );
 
-  if ( !is.file(`${taskDir}${name}.js`) ) {
-    log.error('Invalid `make` Command', 'a task\'s file does not exist', {
-      argMap: true,
-      invalidTask: `${taskDir}${name}.js`
-    });
+  if ( !is.file(file) ) {
+    throw new RangeError('The makefile task, ' + name + ' , does not exist.');
   }
 
-  task = require(taskDir + name);
+  task = require(file);
   task.name = name;
 
   methods = methods.length ? methods : task.defaultMethods;
-  methods = defaultVal ? mapArr(methods, method => {
+  methods = defaultVal ? remap(methods, function(method) {
     return has(method, '=') ? method : method + defaultVal;
   }) : methods;
 
-  each(methods, method => {
+  each(methods, function(method) {
     val = getVal(method);
     val = val && slice(val, 1); // trim "=" from string start
     method = getName(method);
