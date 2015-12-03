@@ -72,9 +72,37 @@ function newEmptyObj(type) {
 
 /**
  * @private
- * @param {*} val
+ * @type {boolean}
+ * @const
+ */
+var HAS_SYMBOL = typeof Symbol === 'function';
+
+/**
+ * @private
+ * @param {string} descrip
  * @return {(!Symbol|string)}
  */
-var newSymbol = typeof Symbol === 'function'
-  ? Symbol
-  : function(val) { return '__' + val + Math.random(); };
+var newSymbol = HAS_SYMBOL ? Symbol : function SymbolShim(descrip) {
+  return '__' + descrip + Math.random();
+};
+
+/**
+ * @private
+ * @type {!Object}
+ * @const
+ */
+var SYMBOLS = (function() {
+  
+  /** @type {!Object} */
+  var symbols;
+
+  symbols = {
+    config: newSymbol('config'),
+    format: newSymbol('format'),
+    style:  newSymbol('style')
+  };
+  symbols = HAS_SYMBOL
+    ? symbols
+    : amend.config(symbols, 'config,format,style', { enumerable: false });
+  return freeze(symbols);
+})();
