@@ -57,42 +57,55 @@ function newTheme(props) {
   keys  = 'bold,dim,hidden,inverse,italic,reset,strikethrough,underline';
   theme = amend(theme, keys, false, 'boolean');
   theme = seal(theme);
-  props = props || null;
-  return fuse(theme, props);
+  return props ? fuse(theme, props) : theme;
 }
 
 /**
  * @typedef {!{
  *   __TYPE:     string,
- *   separators: ?Theme,
+ *   identifier: ?Theme,
+ *   separator:  ?Theme,
  *   brackets:   ?Theme,
- *   default:    ?Theme,
- *   ending:     ?Theme,
- *   indent:     ?Theme,
- *   intro:      ?Theme,
- *   flags:      ?Theme
- * }} Themes
+ *   flags:      ?Theme,
+ *   color:      string,
+ *   bg:         string,
+ *   bold:       boolean,
+ *   dim:        boolean,
+ *   hidden:     boolean,
+ *   inverse:    boolean,
+ *   italic:     boolean,
+ *   reset:      boolean,
+ *   strikethrough: boolean,
+ *   underline:     boolean
+ * }} TypeTheme
  */
 
 /**
- * A factory method for Themes objects.
+ * A factory method for TypeTheme objects.
  * @private
- * @param {Object<string, ?Theme>=} props
- * @return {!Themes}
+ * @param {string} validKeys
+ * @param {Object<string, (string|boolean|Theme)>=} props
+ * @return {!TypeTheme}
  */
-function newThemes(props) {
+function newTypeTheme(validKeys, props) {
 
-  /** @type {!Themes} */
-  var themes;
+  /** @type {!TypeTheme} */
+  var theme;
   /** @type {string} */
   var keys;
 
-  themes = newEmptyObj('Themes');
-  keys   = 'separators,brackets,default,ending,indent,intro,flags';
-  themes = amend(themes, keys, null, 'object');
-  themes = seal(themes);
-  props  = props || null;
-  return fuse(themes, props);
+  theme = newEmptyObj('TypeTheme');
+  theme = amend(theme, 'color,bg', '', 'string');
+  keys  = 'bold,dim,hidden,inverse,italic,reset,strikethrough,underline';
+  theme = amend(theme, keys, false, 'boolean');
+  keys  = 'identifier,separator,brackets,flags';
+  each(keys.split(','), function(key) {
+    theme = has(validKeys, key)
+      ? amend(theme, key, newTheme(), '!object')
+      : amend(theme, key, null, 'null');
+  });
+  theme = seal(theme);
+  return props ? fuse(theme, props) : theme;
 }
 
 /**
@@ -131,8 +144,7 @@ function newAccentTheme(props) {
   theme = amend(theme, keys, false, 'boolean');
   theme = amend(theme, 'accent', newTheme(), '!object');
   theme = seal(theme);
-  props = props || null;
-  return fuse(theme, props);
+  return props ? fuse(theme, props) : theme;
 }
 
 /**
@@ -140,20 +152,20 @@ function newAccentTheme(props) {
  *   __TYPE:    string,
  *   header:    ?AccentTheme,
  *   msg:       ?AccentTheme,
- *   argMap:    !Themes,
- *   null:      !Themes,
- *   undefined: !Themes,
- *   boolean:   !Themes,
- *   string:    !Themes,
- *   number:    !Themes,
- *   nan:       !Themes,
- *   object:    !Themes,
- *   function:  !Themes,
- *   regexp:    !Themes,
- *   array:     !Themes,
- *   args:      !Themes,
- *   element:   !Themes,
- *   document:  !Themes
+ *   argMap:    !Theme,
+ *   null:      !Theme,
+ *   undefined: !Theme,
+ *   boolean:   !Theme,
+ *   string:    !TypeTheme,
+ *   number:    !TypeTheme,
+ *   nan:       !Theme,
+ *   object:    !TypeTheme,
+ *   function:  !TypeTheme,
+ *   regexp:    !TypeTheme,
+ *   array:     !TypeTheme,
+ *   args:      !TypeTheme,
+ *   element:   !TypeTheme,
+ *   document:  !TypeTheme
  * }} Style
  */
 
@@ -167,6 +179,8 @@ function newAccentTheme(props) {
  */
 function newStyle(header, msg, props) {
 
+  /** @type {!Object} */
+  var validKeys;
   /** @type {!Style} */
   var style;
   /** @type {string} */
@@ -179,12 +193,24 @@ function newStyle(header, msg, props) {
   style = msg
     ? amend(style, 'msg', newAccentTheme(), '!object')
     : amend(style, 'msg', null, 'null');
-  keys = 'argMap,null,undefined,boolean,string,number,nan,object,' +
-          'function,regexp,array,args,element,document';
-  style = amend(style, keys, newThemes(), '!object');
+  keys  = 'argMap,null,undefined,boolean,nan';
+  style = amend(style, keys, newTheme(), '!object');
+  validKeys = {
+    'string':   'brackets',
+    'number':   'identifier,separator',
+    'object':   'identifier,separator,brackets',
+    'function': 'identifier,separator,brackets',
+    'regexp':   'identifier,separator,brackets,flags',
+    'array':    'identifier,separator,brackets',
+    'args':     'identifier,separator,brackets',
+    'element':  'identifier,separator,brackets',
+    'document': 'identifier,separator,brackets'
+  };
+  each(validKeys, function(val, key) {
+    style = amend(style, key, newTypeTheme(val), '!object');
+  });
   style = seal(style);
-  props = props || null;
-  return fuse(style, props);
+  return props ? fuse(style, props) : style;
 }
 
 
