@@ -99,7 +99,7 @@ function newTypeTheme(validKeys, props) {
   keys  = 'bold,dim,hidden,inverse,italic,reset,strikethrough,underline';
   theme = amend(theme, keys, false, 'boolean');
   keys  = 'identifier,separator,brackets,flags';
-  each(keys.split(','), function(key) {
+  each(keys, function(key) {
     theme = has(validKeys, key)
       ? amend(theme, key, newTheme(), '!object')
       : amend(theme, key, null, 'null');
@@ -389,11 +389,11 @@ function makeColorsTheme(theme) {
   var keys;
 
   result = [];
-  each([ 'color', 'bg' ], function(key) {
+  each('color, bg', function(key) {
     if ( theme[key] ) result.push( theme[key] );
   });
   keys = 'bold, dim, hidden, inverse, italic, reset, strikethrough, underline';
-  each(keys.split(', '), function(key) {
+  each(keys, function(key) {
     if ( theme[key] ) result.push(key);
   });
   return result;
