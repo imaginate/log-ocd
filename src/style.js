@@ -196,11 +196,11 @@ function newStyle(header, msg, props) {
   keys  = 'argMap,null,undefined,boolean,nan';
   style = amend(style, keys, newTheme(), '!object');
   validKeys = {
-    'string':   'brackets',
+    'string':   'separator,brackets',
     'number':   'identifier,separator',
     'object':   'identifier,separator,brackets',
     'function': 'identifier,separator,brackets',
-    'regexp':   'identifier,separator,brackets,flags',
+    'regexp':   'identifier,brackets,flags',
     'array':    'identifier,separator,brackets',
     'args':     'identifier,separator,brackets',
     'element':  'identifier,separator,brackets',
@@ -215,10 +215,232 @@ function newStyle(header, msg, props) {
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// STYLE SETUP
+// STYLE SETUP METHODS
 ////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @private
+ * @param {Object=} props
+ * @return {!Object}
+ */
+function setupStyleProps(props) {
+  return fuse({
+    'argMap':    newTheme({ color: 'cyan'    }),
+    'null':      newTheme({ color: 'magenta' }),
+    'undefined': newTheme({ color: 'magenta' }),
+    'boolean':   newTheme({ color: 'magenta' }),
+    'nan':       newTheme({ color: 'magenta' }),
+    'string': newTypeTheme({
+      color: 'yellow',
+      separator: newTheme({ color: 'red'    }),
+      brackets:  newTheme({ color: 'yellow' })
+    }),
+    'number': newTypeTheme({
+      color: 'magenta',
+      identifier: newTheme({ color: 'magenta' }),
+      separator:  newTheme({ color: 'magenta' })
+    }),
+    'object': newTypeTheme({
+      color: 'white',
+      identifier: newTheme({ color: 'white' }),
+      separator:  newTheme({ color: 'white' }),
+      brackets:   newTheme({ color: 'white' })
+    }),
+    'function': newTypeTheme({
+      color: 'white',
+      identifier: newTheme({ color: 'white' }),
+      separator:  newTheme({ color: 'white' }),
+      brackets:   newTheme({ color: 'white' })
+    }),
+    'regexp': newTypeTheme({
+      color: 'white',
+      identifier: newTheme({ color: 'yellow' }),
+      brackets:   newTheme({ color: 'yellow' }),
+      flags:      newTheme({ color: 'yellow' })
+    }),
+    'array': newTypeTheme({
+      color: 'white',
+      identifier: newTheme({ color: 'white' }),
+      separator:  newTheme({ color: 'white' }),
+      brackets:   newTheme({ color: 'white' })
+    }),
+    'args': newTypeTheme({
+      color: 'white',
+      identifier: newTheme({ color: 'white' }),
+      separator:  newTheme({ color: 'white' }),
+      brackets:   newTheme({ color: 'white' })
+    }),
+    'element': newTypeTheme({
+      color: 'white',
+      identifier: newTheme({ color: 'white' }),
+      separator:  newTheme({ color: 'white' }),
+      brackets:   newTheme({ color: 'white' })
+    }),
+    'document': newTypeTheme({
+      color: 'white',
+      identifier: newTheme({ color: 'white' }),
+      separator:  newTheme({ color: 'white' }),
+      brackets:   newTheme({ color: 'white' })
+    })
+  }, props || null);
+}
 
+/**
+ * @private
+ * @return {!Object}
+ */
+function getDefaultStyles() {
+  return seal({
+    'log':  newStyle(false, false, setupStyleProps());
+    'pass': newStyle(true,  false, setupStyleProps({
+      header: newAccentTheme({
+        color: 'white',
+        bg:    'green',
+        bold:  true,
+        accent: newTheme({
+          color: 'yellow',
+          bg:    'green',
+          bold:  true
+        })
+      })
+    }),
+    'error': newStyle(true, true, setupStyleProps({
+      header: newAccentTheme({
+        color: 'white',
+        bg:    'red',
+        bold:  true,
+        accent: newTheme({
+          color: 'yellow',
+          bg:    'red',
+          bold:  true
+        })
+      }),
+      msg: newAccentTheme({
+        color: 'white',
+        accent: newTheme({ color: 'magenta' })
+      })
+    }),
+    'warn': newStyle(true, true, setupStyleProps({
+      header: newAccentTheme({
+        color: 'white',
+        bg:    'yellow',
+        bold:  true,
+        accent: newTheme({
+          color: 'blue',
+          bg:    'yellow',
+          bold:  true
+        })
+      }),
+      msg: newAccentTheme({
+        color: 'white',
+        accent: newTheme({ color: 'magenta' })
+      })
+    }),
+    'debug': newStyle(true, false, setupStyleProps({
+      header: newAccentTheme({
+        color: 'white',
+        bg:    'blue',
+        bold:  true,
+        accent: newTheme({
+          color: 'magenta',
+          bg:    'blue',
+          bold:  true
+        })
+      })
+    }),
+    'fail': newStyle(false, true, setupStyleProps({
+      msg: newAccentTheme({
+        color: 'red',
+        accent: newTheme({ color: 'yellow' })
+      })
+    })
+  });
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// STYLE CHECK METHODS
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @private
+ * @param {*} val
+ * @return {boolean}
+ */
+function isTheme(val) {
+  return is.obj(val) && val.__TYPE === 'Theme';
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// COLORS SETUP METHODS
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @private
+ * @param {!Theme} theme
+ * @return {!Array}
+ */
+function makeColorsTheme(theme) {
+
+  /** @type {!Array} */
+  var result;
+  /** @type {string} */
+  var keys;
+
+  result = [];
+  each([ 'color', 'bg' ], function(key) {
+    if ( theme[key] ) result.push( theme[key] );
+  });
+  keys = 'bold, dim, hidden, inverse, italic, reset, strikethrough, underline';
+  each(keys.split(', '), function(key) {
+    if ( theme[key] ) result.push(key);
+  });
+  return result;
+}
+
+/**
+ * @private
+ * @param {string} name
+ * @param {!Object} obj
+ */
+function setColorsThemes(name, obj) {
+
+  /** @type {!Object} */
+  var themes;
+
+  each(obj, function(val, key) {
+    if ( isTheme(val) ) {
+      themes = themes || {};
+      themes[name + key] = makeColorsTheme(val);
+      return;
+    }
+    if ( is.obj(val) ) setColorsThemes(name + key, val);
+  });
+
+  if (themes) colors.setTheme(themes);
+}
+
+/**
+ * @private
+ * @param {!Object} styles
+ */
+function setAllColorsThemes(styles) {
+  each(styles, function(val, key) {
+    setColorsThemes(key, val);
+  });
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// SET ADDITIONAL THEMES FOR COLORS
+////////////////////////////////////////////////////////////////////////////////
+
+// stacktrace themes
+colors.setTheme({
+  ostack:   'white',
+  estack: [ 'white', 'bgBlue' ]
+};
 
 
 ////////////////////////////////////////////////////////////////////////////////
