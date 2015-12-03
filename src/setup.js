@@ -64,3 +64,17 @@ function newEmptyObj(type) {
     writable: false
   });
 }
+
+
+////////////////////////////////////////////////////////////////////////////////
+// DEFINE SYMBOLS
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @private
+ * @param {*} val
+ * @return {(!Symbol|string)}
+ */
+var newSymbol = typeof Symbol === 'function'
+  ? Symbol
+  : function(val) { return '__' + val + Math.random(); };
