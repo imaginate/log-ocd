@@ -46,3 +46,21 @@ var remap  = vitals.remap;
 var seal   = vitals.seal;
 var slice  = vitals.slice;
 var until  = vitals.until;
+
+
+////////////////////////////////////////////////////////////////////////////////
+// DEFINE GENERAL HELPERS
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @private
+ * @param {string} type
+ * @return {!Object}
+ */
+function newEmptyObj(type) {
+  return create(null, '__TYPE', type, {
+    configurable: false,
+    enumerable: false,
+    writable: false
+  });
+}
