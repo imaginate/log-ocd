@@ -72,7 +72,7 @@ function newConfig(validKeys, trueKeys) {
 /**
  * @private
  * @param {string} method
- * @return {!Object}
+ * @return {!Config}
  */
 function getDefaultConfig(method) {
   switch (method) {
@@ -84,25 +84,6 @@ function getDefaultConfig(method) {
     case 'fail':  return newConfig('argMap,header,stack');
     case 'trace': return newConfig();
   }
-}
-
-/**
- * @private
- * @return {!Object}
- */
-function getDefaultConfigs() {
-
-  /** @type {!Object} */
-  var configs;
-  /** @type {string} */
-  var methods;
-
-  methods = 'log, pass, error, warn, debug, fail, trace';
-  configs = {};
-  each(methods, function(method) {
-    configs[method] = getDefaultConfig(method);
-  });
-  return seal(configs);
 }
 
 
