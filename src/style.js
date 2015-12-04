@@ -65,7 +65,7 @@ function newTheme(props) {
  * @typedef {!{
  *   __TYPE:     string,
  *   identifier: ?Theme,
- *   separator:  ?Theme,
+ *   delimiter:  ?Theme,
  *   brackets:   ?Theme,
  *   flags:      ?Theme,
  *   color:      string,
@@ -100,9 +100,9 @@ function newTypeTheme(validKeys, props) {
   theme = amend(theme, keys, '', 'string');
   keys  = 'bold, dim, hidden, inverse, italic, reset, strikethrough, underline';
   theme = amend(theme, keys, false, 'boolean');
-  keys  = 'identifier, separator, brackets, flags';
+  keys  = 'identifier, delimiter, brackets, flags';
   each(keys, function(key) {
-    theme = has(validKeys, key)
+    theme = validKeys && has(validKeys, key)
       ? amend(theme, key, newTheme(), '!object')
       : amend(theme, key, null, 'null');
   });
@@ -151,6 +151,10 @@ function newAccentTheme(props) {
 }
 
 /**
+ * @typedef {!(Theme|TypeTheme|AccentTheme)} AnyTheme
+ */
+
+/**
  * @typedef {!{
  *   __TYPE:    string,
  *   header:    ?AccentTheme,
@@ -169,49 +173,79 @@ function newAccentTheme(props) {
  *   args:      !TypeTheme,
  *   element:   !TypeTheme,
  *   document:  !TypeTheme
- * }} Style
+ * }} TypeStyle
  */
 
 /**
- * A factory method for Style objects.
  * @private
- * @param {boolean} header
- * @param {boolean} msg
- * @param {Object<string, (AccentTheme|Themes)>=} props
- * @return {!Style}
+ * @type {!Object<string, string>}
+ * @const
  */
-function newStyle(header, msg, props) {
+var TYPE_THEME_VALID_KEYS = freeze({
+  'string':   '            delimiter, brackets       ',
+  'number':   'identifier, delimiter                 ',
+  'object':   'identifier, delimiter, brackets       ',
+  'function': 'identifier, delimiter, brackets       ',
+  'regexp':   'identifier,            brackets, flags',
+  'array':    'identifier, delimiter, brackets       ',
+  'args':     'identifier, delimiter, brackets       ',
+  'element':  'identifier, delimiter, brackets       ',
+  'document': 'identifier, delimiter, brackets       '
+});
 
-  /** @type {!Object} */
-  var validKeys;
-  /** @type {!Style} */
+/**
+ * A factory method for TypeStyle objects.
+ * @private
+ * @param {string=} validKeys
+ * @param {Object<string, AnyTheme>=} props
+ * @return {!TypeStyle}
+ */
+function newTypeStyle(validKeys, props) {
+
+  /** @type {!TypeStyle} */
   var style;
   /** @type {string} */
   var keys;
 
   style = newEmptyObj('Style');
-  style = header
-    ? amend(style, 'header', newAccentTheme(), '!object')
-    : amend(style, 'header', null, 'null');
-  style = msg
-    ? amend(style, 'msg', newAccentTheme(), '!object')
-    : amend(style, 'msg', null, 'null');
-  keys  = 'argMap,null,undefined,boolean,nan';
-  style = amend(style, keys, newTheme(), '!object');
-  validKeys = {
-    'string':   'separator,  brackets',
-    'number':   'identifier, separator',
-    'object':   'identifier, separator, brackets',
-    'function': 'identifier, separator, brackets',
-    'regexp':   'identifier, brackets,  flags',
-    'array':    'identifier, separator, brackets',
-    'args':     'identifier, separator, brackets',
-    'element':  'identifier, separator, brackets',
-    'document': 'identifier, separator, brackets'
-  };
-  each(validKeys, function(val, key) {
-    style = amend(style, key, newTypeTheme(val), '!object');
+  keys = 'header, msg';
+  each(keys, function(key) {
+    style = validKeys && has(validKeys, key)
+      ? amend(style, key, newAccentTheme(), '!object')
+      : amend(style, key, null, 'null');
   });
+  keys = 'argMap, null, undefined, boolean, nan';
+  each(keys, function(key) {
+    style = amend(style, key, newTheme(), '!object');
+  });
+  each(TYPE_THEME_VALID_KEYS, function(validKeys, key) {
+    style = amend(style, key, newTypeTheme(validKeys), '!object');
+  });
+  style = seal(style);
+  return props ? fuse(style, props) : style;
+}
+
+/**
+ * @typedef {!{
+ *   __TYPE: string
+ * }} TraceStyle
+ */
+
+/**
+ * A factory method for TraceStyle objects.
+ * @private
+ * @param {string=} validKeys
+ * @param {Object<string, AnyTheme>=} props
+ * @return {!TraceStyle}
+ */
+function newTraceStyle(validKeys, props) {
+
+  /** @type {!TraceStyle} */
+  var style;
+  /** @type {string} */
+  var keys;
+
+  style = newEmptyObj('Style');
   style = seal(style);
   return props ? fuse(style, props) : style;
 }
@@ -223,82 +257,46 @@ function newStyle(header, msg, props) {
 
 /**
  * @private
- * @param {Object=} props
- * @return {!Object}
+ * @type {!Object<string, function>}
+ * @const
  */
-function setupStyleProps(props) {
-  return fuse({
-    'argMap':    newTheme({ color: 'cyan'    }),
-    'null':      newTheme({ color: 'magenta' }),
-    'undefined': newTheme({ color: 'magenta' }),
-    'boolean':   newTheme({ color: 'magenta' }),
-    'nan':       newTheme({ color: 'magenta' }),
-    'string': newTypeTheme({
-      color: 'yellow',
-      separator: newTheme({ color: 'red'    }),
-      brackets:  newTheme({ color: 'yellow' })
-    }),
-    'number': newTypeTheme({
-      color: 'magenta',
-      identifier: newTheme({ color: 'magenta' }),
-      separator:  newTheme({ color: 'magenta' })
-    }),
-    'object': newTypeTheme({
-      color: 'white',
-      identifier: newTheme({ color: 'white' }),
-      separator:  newTheme({ color: 'white' }),
-      brackets:   newTheme({ color: 'white' })
-    }),
-    'function': newTypeTheme({
-      color: 'white',
-      identifier: newTheme({ color: 'white' }),
-      separator:  newTheme({ color: 'white' }),
-      brackets:   newTheme({ color: 'white' })
-    }),
-    'regexp': newTypeTheme({
-      color: 'white',
-      identifier: newTheme({ color: 'yellow' }),
-      brackets:   newTheme({ color: 'yellow' }),
-      flags:      newTheme({ color: 'yellow' })
-    }),
-    'array': newTypeTheme({
-      color: 'white',
-      identifier: newTheme({ color: 'white' }),
-      separator:  newTheme({ color: 'white' }),
-      brackets:   newTheme({ color: 'white' })
-    }),
-    'args': newTypeTheme({
-      color: 'white',
-      identifier: newTheme({ color: 'white' }),
-      separator:  newTheme({ color: 'white' }),
-      brackets:   newTheme({ color: 'white' })
-    }),
-    'element': newTypeTheme({
-      color: 'white',
-      identifier: newTheme({ color: 'white' }),
-      separator:  newTheme({ color: 'white' }),
-      brackets:   newTheme({ color: 'white' })
-    }),
-    'document': newTypeTheme({
-      color: 'white',
-      identifier: newTheme({ color: 'white' }),
-      separator:  newTheme({ color: 'white' }),
-      brackets:   newTheme({ color: 'white' })
-    })
-  }, props || null);
-}
+var STYLE_FACTORY = freeze({
+  'toString': newTypeStyle,
+  'log':      newTypeStyle,
+  'pass':     newTypeStyle,
+  'error':    newTypeStyle,
+  'warn':     newTypeStyle,
+  'debug':    newTypeStyle,
+  'fail':     newTypeStyle,
+  'trace':    newTraceStyle
+});
 
 /**
  * @private
- * @param {string} method
- * @return {!Style}
+ * @type {!Object<string, string>}
+ * @const
  */
-function getDefaultStyle(method) {
-  switch (method) {
-    case 'log':
-    return newStyle(false, false, setupStyleProps());
-    case 'pass':
-    return newStyle(true,  false, setupStyleProps({
+var STYLE_VALID_KEYS = freeze({
+  'toString': '',
+  'log':      '',
+  'pass':     'header, msg',
+  'error':    'header, msg',
+  'warn':     'header, msg',
+  'debug':    'header',
+  'fail':     'msg',
+  'trace':    ''
+});
+
+/**
+ * @private
+ * @type {!Object<string, function>}
+ * @const
+ */
+var STYLE_PROPS = freeze({
+  'toString': makeDefaultTypeStyleProps,
+  'log':  makeDefaultTypeStyleProps,
+  'pass': function() {
+    return makeDefaultTypeStyleProps({
       header: newAccentTheme({
         color: 'white',
         bg:    'green',
@@ -309,9 +307,10 @@ function getDefaultStyle(method) {
           bold:  true
         })
       })
-    }));
-    case 'error':
-    return newStyle(true, true, setupStyleProps({
+    });
+  },
+  'error': function() {
+    return makeDefaultTypeStyleProps({
       header: newAccentTheme({
         color: 'white',
         bg:    'red',
@@ -326,9 +325,10 @@ function getDefaultStyle(method) {
         color: 'white',
         accent: newTheme({ color: 'magenta' })
       })
-    }));
-    case 'warn':
-    return newStyle(true, true, setupStyleProps({
+    });
+  },
+  'warn': function() {
+    return makeDefaultTypeStyleProps({
       header: newAccentTheme({
         color: 'white',
         bg:    'yellow',
@@ -343,9 +343,10 @@ function getDefaultStyle(method) {
         color: 'white',
         accent: newTheme({ color: 'magenta' })
       })
-    }));
-    case 'debug':
-    return newStyle(true, false, setupStyleProps({
+    });
+  },
+  'debug': function() {
+    return makeDefaultTypeStyleProps({
       header: newAccentTheme({
         color: 'white',
         bg:    'blue',
@@ -356,15 +357,100 @@ function getDefaultStyle(method) {
           bold:  true
         })
       })
-    }));
-    case 'fail':
-    return newStyle(false, true, setupStyleProps({
+    });
+  },
+  'fail': function() {
+    return makeDefaultTypeStyleProps({
       msg: newAccentTheme({
         color: 'red',
         accent: newTheme({ color: 'yellow' })
       })
-    }));
-  }
+    });
+  },
+  'trace': function(){}
+});
+
+/**
+ * @typedef {!(TypeStyle|TraceStyle)} Style
+ */
+
+/**
+ * @private
+ * @param {string} method
+ * @return {!Style}
+ */
+function getDefaultStyle(method) {
+  return STYLE_FACTORY[method](
+    STYLE_VALID_KEYS[method],
+    STYLE_PROPS[method]()
+  );
+}
+
+/**
+ * @private
+ * @param {Object=} props
+ * @return {!Object}
+ */
+function makeDefaultTypeStyleProps(props) {
+  return fuse({
+    'argMap':    newTheme({ color: 'cyan'    }),
+    'null':      newTheme({ color: 'magenta' }),
+    'undefined': newTheme({ color: 'magenta' }),
+    'boolean':   newTheme({ color: 'magenta' }),
+    'nan':       newTheme({ color: 'magenta' }),
+    'string': newTypeTheme({
+      color: 'yellow',
+      delimiter: newTheme({ color: 'red'    }),
+      brackets:  newTheme({ color: 'yellow' })
+    }),
+    'number': newTypeTheme({
+      color: 'magenta',
+      identifier: newTheme({ color: 'magenta' }),
+      delimiter:  newTheme({ color: 'magenta' })
+    }),
+    'object': newTypeTheme({
+      color: 'white',
+      identifier: newTheme({ color: 'white' }),
+      delimiter:  newTheme({ color: 'white' }),
+      brackets:   newTheme({ color: 'white' })
+    }),
+    'function': newTypeTheme({
+      color: 'white',
+      identifier: newTheme({ color: 'white' }),
+      delimiter:  newTheme({ color: 'white' }),
+      brackets:   newTheme({ color: 'white' })
+    }),
+    'regexp': newTypeTheme({
+      color: 'white',
+      identifier: newTheme({ color: 'yellow' }),
+      brackets:   newTheme({ color: 'yellow' }),
+      flags:      newTheme({ color: 'yellow' })
+    }),
+    'array': newTypeTheme({
+      color: 'white',
+      identifier: newTheme({ color: 'white' }),
+      delimiter:  newTheme({ color: 'white' }),
+      brackets:   newTheme({ color: 'white' })
+    }),
+    'args': newTypeTheme({
+      color: 'white',
+      identifier: newTheme({ color: 'white' }),
+      delimiter:  newTheme({ color: 'white' }),
+      brackets:   newTheme({ color: 'white' })
+    }),
+    'element': newTypeTheme({
+      color: 'white',
+      identifier: newTheme({ color: 'white' }),
+      delimiter:  newTheme({ color: 'white' }),
+      brackets:   newTheme({ color: 'white' })
+    }),
+    'document': newTypeTheme({
+      color: 'white',
+      identifier: newTheme({ color: 'white' }),
+      delimiter:  newTheme({ color: 'white' }),
+      brackets:   newTheme({ color: 'white' })
+    })
+  }, props || null);
 }
 
 
@@ -425,16 +511,6 @@ function setColorsTheme(name, obj) {
   });
 
   if (themes) colors.setTheme(themes);
-}
-
-/**
- * @private
- * @param {!Object} styles
- */
-function setColorsThemes(styles) {
-  each(styles, function(val, key) {
-    setColorsTheme(key, val);
-  });
 }
 
 
