@@ -22,7 +22,7 @@
 
 
 // INSERT setup.js
-// INSERT .js
+// INSERT config.js
 // INSERT .js
 // INSERT style.js
 // INSERT .js
