@@ -291,7 +291,7 @@ function setupStyleProps(props) {
 /**
  * @private
  * @param {string} method
- * @return {!Object}
+ * @return {!Style}
  */
 function getDefaultStyle(method) {
   switch (method) {
@@ -365,25 +365,6 @@ function getDefaultStyle(method) {
       })
     }));
   }
-}
-
-/**
- * @private
- * @return {!Object}
- */
-function getDefaultStyles() {
-
-  /** @type {!Object} */
-  var styles;
-  /** @type {string} */
-  var methods;
-
-  methods = 'log, pass, error, warn, debug, fail';
-  styles  = {};
-  each(methods, function(method) {
-    styles[method] = getDefaultStyle(method);
-  });
-  return seal(styles);
 }
 
 
