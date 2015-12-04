@@ -22,6 +22,7 @@
 
 
 // INSERT setup.js
+// INSERT settings.js
 // INSERT config.js
 // INSERT format.js
 // INSERT style.js
