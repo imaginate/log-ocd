@@ -287,12 +287,15 @@ function setupStyleProps(props) {
 
 /**
  * @private
+ * @param {string} method
  * @return {!Object}
  */
-function getDefaultStyles() {
-  return seal({
-    'log':  newStyle(false, false, setupStyleProps());
-    'pass': newStyle(true,  false, setupStyleProps({
+function getDefaultStyle(method) {
+  switch (method) {
+    case 'log':
+    return newStyle(false, false, setupStyleProps());
+    case 'pass':
+    return newStyle(true,  false, setupStyleProps({
       header: newAccentTheme({
         color: 'white',
         bg:    'green',
@@ -303,8 +306,9 @@ function getDefaultStyles() {
           bold:  true
         })
       })
-    }),
-    'error': newStyle(true, true, setupStyleProps({
+    }));
+    case 'error':
+    return newStyle(true, true, setupStyleProps({
       header: newAccentTheme({
         color: 'white',
         bg:    'red',
@@ -319,8 +323,9 @@ function getDefaultStyles() {
         color: 'white',
         accent: newTheme({ color: 'magenta' })
       })
-    }),
-    'warn': newStyle(true, true, setupStyleProps({
+    }));
+    case 'warn':
+    return newStyle(true, true, setupStyleProps({
       header: newAccentTheme({
         color: 'white',
         bg:    'yellow',
@@ -335,8 +340,9 @@ function getDefaultStyles() {
         color: 'white',
         accent: newTheme({ color: 'magenta' })
       })
-    }),
-    'debug': newStyle(true, false, setupStyleProps({
+    }));
+    case 'debug':
+    return newStyle(true, false, setupStyleProps({
       header: newAccentTheme({
         color: 'white',
         bg:    'blue',
@@ -347,14 +353,31 @@ function getDefaultStyles() {
           bold:  true
         })
       })
-    }),
-    'fail': newStyle(false, true, setupStyleProps({
+    }));
+    case 'fail':
+    return newStyle(false, true, setupStyleProps({
       msg: newAccentTheme({
         color: 'red',
         accent: newTheme({ color: 'yellow' })
       })
-    })
+    }));
+  }
+}
+
+/**
+ * @private
+ * @return {!Object}
+ */
+function getDefaultStyles() {
+
+  /** @type {!Object} */
+  var styles;
+
+  styles = {};
+  each('log,pass,error,warn,debug,fail', function(method) {
+    styles[method] = getDefaultStyle(method);
   });
+  return seal(styles);
 }
 
 
