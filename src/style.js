@@ -53,8 +53,9 @@ function newTheme(props) {
   var keys;
 
   theme = newEmptyObj('Theme');
-  theme = amend(theme, 'color,bg', '', 'string');
-  keys  = 'bold,dim,hidden,inverse,italic,reset,strikethrough,underline';
+  keys  = 'color, bg';
+  theme = amend(theme, keys, '', 'string');
+  keys  = 'bold, dim, hidden, inverse, italic, reset, strikethrough, underline';
   theme = amend(theme, keys, false, 'boolean');
   theme = seal(theme);
   return props ? fuse(theme, props) : theme;
@@ -95,10 +96,11 @@ function newTypeTheme(validKeys, props) {
   var keys;
 
   theme = newEmptyObj('TypeTheme');
-  theme = amend(theme, 'color,bg', '', 'string');
-  keys  = 'bold,dim,hidden,inverse,italic,reset,strikethrough,underline';
+  keys  = 'color, bg';
+  theme = amend(theme, keys, '', 'string');
+  keys  = 'bold, dim, hidden, inverse, italic, reset, strikethrough, underline';
   theme = amend(theme, keys, false, 'boolean');
-  keys  = 'identifier,separator,brackets,flags';
+  keys  = 'identifier, separator, brackets, flags';
   each(keys, function(key) {
     theme = has(validKeys, key)
       ? amend(theme, key, newTheme(), '!object')
@@ -139,8 +141,9 @@ function newAccentTheme(props) {
   var keys;
 
   theme = newEmptyObj('AccentTheme');
-  theme = amend(theme, 'color,bg', '', 'string');
-  keys  = 'bold,dim,hidden,inverse,italic,reset,strikethrough,underline';
+  keys  = 'color, bg';
+  theme = amend(theme, keys, '', 'string');
+  keys  = 'bold, dim, hidden, inverse, italic, reset, strikethrough, underline';
   theme = amend(theme, keys, false, 'boolean');
   theme = amend(theme, 'accent', newTheme(), '!object');
   theme = seal(theme);
@@ -196,15 +199,15 @@ function newStyle(header, msg, props) {
   keys  = 'argMap,null,undefined,boolean,nan';
   style = amend(style, keys, newTheme(), '!object');
   validKeys = {
-    'string':   'separator,brackets',
-    'number':   'identifier,separator',
-    'object':   'identifier,separator,brackets',
-    'function': 'identifier,separator,brackets',
-    'regexp':   'identifier,brackets,flags',
-    'array':    'identifier,separator,brackets',
-    'args':     'identifier,separator,brackets',
-    'element':  'identifier,separator,brackets',
-    'document': 'identifier,separator,brackets'
+    'string':   'separator,  brackets',
+    'number':   'identifier, separator',
+    'object':   'identifier, separator, brackets',
+    'function': 'identifier, separator, brackets',
+    'regexp':   'identifier, brackets,  flags',
+    'array':    'identifier, separator, brackets',
+    'args':     'identifier, separator, brackets',
+    'element':  'identifier, separator, brackets',
+    'document': 'identifier, separator, brackets'
   };
   each(validKeys, function(val, key) {
     style = amend(style, key, newTypeTheme(val), '!object');
@@ -372,9 +375,12 @@ function getDefaultStyles() {
 
   /** @type {!Object} */
   var styles;
+  /** @type {string} */
+  var methods;
 
-  styles = {};
-  each('log,pass,error,warn,debug,fail', function(method) {
+  methods = 'log, pass, error, warn, debug, fail';
+  styles  = {};
+  each(methods, function(method) {
     styles[method] = getDefaultStyle(method);
   });
   return seal(styles);
@@ -412,13 +418,10 @@ function makeColorsTheme(theme) {
   var keys;
 
   result = [];
-  each('color, bg', function(key) {
-    if ( theme[key] ) result.push( theme[key] );
-  });
+  keys = 'color, bg';
+  each(keys, function(key) { theme[key] && result.push( theme[key] ); });
   keys = 'bold, dim, hidden, inverse, italic, reset, strikethrough, underline';
-  each(keys, function(key) {
-    if ( theme[key] ) result.push(key);
-  });
+  each(keys, function(key) { theme[key] && result.push(key); });
   return result;
 }
 
@@ -427,7 +430,7 @@ function makeColorsTheme(theme) {
  * @param {string} name
  * @param {!Object} obj
  */
-function setColorsThemes(name, obj) {
+function setColorsTheme(name, obj) {
 
   /** @type {!Object} */
   var themes;
@@ -436,9 +439,8 @@ function setColorsThemes(name, obj) {
     if ( isTheme(val) ) {
       themes = themes || {};
       themes[name + key] = makeColorsTheme(val);
-      return;
     }
-    if ( is.obj(val) ) setColorsThemes(name + key, val);
+    else if ( is.obj(val) ) setColorsTheme(name + key, val);
   });
 
   if (themes) colors.setTheme(themes);
@@ -448,9 +450,9 @@ function setColorsThemes(name, obj) {
  * @private
  * @param {!Object} styles
  */
-function setAllColorsThemes(styles) {
+function setColorsThemes(styles) {
   each(styles, function(val, key) {
-    setColorsThemes(key, val);
+    setColorsTheme(key, val);
   });
 }
 
