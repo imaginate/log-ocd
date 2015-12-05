@@ -222,6 +222,66 @@ function newRegExpFormat(props) {
  * }} TypeFormat
  */
 
+/**
+ * @private
+ * @type {!Object<string, function>}
+ * @const
+ */
+var TYPE_FORMAT_OPT_NEW_PROP = freeze({
+  'header': newHeaderFormat,
+  'msg':    newMsgFormat
+  ''
+});
+
+/**
+ * @private
+ * @type {!Object<string, function>}
+ * @const
+ */
+var TYPE_FORMAT_NEW_PROP = freeze({
+  'argMap': newArgMapFormat,
+  'string': newStringFormat,
+  'regexp': newRegExpFormat
+});
+
+/**
+ * @private
+ * @param {string=} invalidKeys
+ * @param {Object=} props
+ * @return {!TypeFormat}
+ */
+function newTypeFormat(invalidKeys, props) {
+
+  /** @type {!TypeFormat} */
+  var format;
+  /** @type {string} */
+  var keys;
+
+  format = newEmptyObj('Format');
+  format = amend(format, 'lineLimit', 0, 'number');
+  keys  = 'linesBefore, linesAfter';
+  each(keys, function(key) {
+    format = invalidKeys && has(invalidKeys, key)
+      ? amend(format, key, null, 'null')
+      : amend(format, key, 0, 'number');
+  });
+  each(TYPE_FORMAT_OPT_NEW_PROP, function(make, key) {
+    format = invalidKeys && has(invalidKeys, key)
+      ? amend(format, key, null, 'null')
+      : amend(format, key, make(), '!object');
+  });
+  each(TYPE_FORMAT_NEW_PROP, function(make, key) {
+    format = amend(format, key, make(), '!object');
+  });
+  keys  = 'undefined, null, nan';
+  format = amend(format, keys, '', 'string');
+  keys  = 'object, function, array, args, element, document';
+  each(keys, function(key) {
+    format = amend(format, key, newObjectFormat(), '!object');
+  });
+  format = seal(format);
+  return props ? fuse(format, props) : format;
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
