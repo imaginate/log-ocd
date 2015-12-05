@@ -279,7 +279,7 @@ var STYLE_FACTORY = freeze({
 var STYLE_VALID_KEYS = freeze({
   'toString': '',
   'log':      '',
-  'pass':     'header, msg',
+  'pass':     'header',
   'error':    'header, msg',
   'warn':     'header, msg',
   'debug':    'header',
