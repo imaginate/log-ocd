@@ -64,3 +64,53 @@ function newEmptyObj(type) {
     writable: false
   });
 }
+
+
+////////////////////////////////////////////////////////////////////////////////
+// DEFINE LOG-OCD METHODS
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @private
+ * @type {!Object}
+ */
+var LogOCD = (function() {
+
+  /**
+   * @private
+   * @return {!Object}
+   */
+  function setup() {
+
+    /** @type {!Object} */
+    var LogOCD;
+
+    LogOCD = newEmptyObj('LogOCD');
+    LogOCD = add(LogOCD,  'logs',   'log, pass, error, warn, debug, fail');
+    LogOCD = add(LogOCD,  'preps',  'toString');
+    LogOCD = add(LogOCD,  'sets',   'setConfig, setFormat, setStyle');
+    LogOCD = add(LogOCD,  'resets', 'resetConfig, resetFormat, resetStyle');
+    return freeze(LogOCD);
+  }
+
+  /**
+   * @private
+   * @param {!Object} LogOCD
+   * @param {string} section
+   * @param {string} keys
+   * @return {!Object}
+   */
+  function add(LogOCD, section, keys) {
+
+    /** @type {!Object} */
+    var obj;
+
+    obj = newEmptyObj('LogOCD.' + section);
+    obj = amend(obj, 'init', undefined, { enumerable: false }, 'function');
+    obj = amend(obj, keys, undefined, 'function');
+    obj = seal(obj);
+    return amend(LogOCD, section, obj);
+  }
+
+  return setup();
+})();
