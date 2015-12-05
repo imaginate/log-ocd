@@ -288,7 +288,192 @@ function newTypeFormat(invalidKeys, props) {
 // FORMAT SETUP METHODS
 ////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @private
+ * @type {!Object<string, function>}
+ * @const
+ */
+var FORMAT_FACTORY = freeze({
+  'toString': newTypeFormat,
+  'log':      newTypeFormat,
+  'pass':     newTypeFormat,
+  'error':    newTypeFormat,
+  'warn':     newTypeFormat,
+  'debug':    newTypeFormat,
+  'fail':     newTypeFormat,
+  'trace':    newTraceFormat
+});
 
+/**
+ * @private
+ * @type {!Object<string, string>}
+ * @const
+ */
+var FORMAT_VALID_KEYS = freeze({
+  'toString': '',
+  'log':      'linesBefore, linesAfter',
+  'pass':     'linesBefore, linesAfter, header',
+  'error':    'linesBefore, linesAfter, header, msg',
+  'warn':     'linesBefore, linesAfter, header, msg',
+  'debug':    'linesBefore, linesAfter, header',
+  'fail':     'linesBefore, linesAfter, msg',
+  'trace':    'linesBefore, linesAfter'
+});
+
+/**
+ * @private
+ * @type {!Object<string, function>}
+ * @const
+ */
+var FORMAT_PROPS = freeze({
+  'toString': makeDefaultTypeFormatProps,
+  'log': function() {
+    return makeDefaultTypeFormatProps({
+      linesBefore: 1,
+      linesAfter:  1
+    });
+  },
+  'pass': function() {
+    return makeDefaultTypeFormatProps({
+      linesBefore: 1,
+      linesAfter:  1,
+      header: newHeaderFormat({
+        spaceBefore: 1,
+        spaceAfter:  6,
+        accentMark:  '`',
+        lineLimit:   50
+      })
+    });
+  },
+  'error': function() {
+    return makeDefaultTypeFormatProps({
+      linesBefore: 1,
+      linesAfter:  1,
+      header: newHeaderFormat({
+        spaceBefore: 1,
+        spaceAfter:  6,
+        accentMark:  '`',
+        lineLimit:   50
+      }),
+      msg: newMsgFormat({
+        accentMark: '`',
+        lineLimit:  50,
+        indent:     2,
+        bullet:     '-'
+      })
+    });
+  },
+  'warn': function() {
+    return makeDefaultTypeFormatProps({
+      linesBefore: 1,
+      linesAfter:  1,
+      header: newHeaderFormat({
+        spaceBefore: 1,
+        spaceAfter:  6,
+        accentMark:  '`',
+        lineLimit:   50
+      }),
+      msg: newMsgFormat({
+        accentMark: '`',
+        lineLimit:  50,
+        indent:     2,
+        bullet:     '-'
+      })
+    });
+  },
+  'debug': function() {
+    return makeDefaultTypeFormatProps({
+      linesBefore: 1,
+      linesAfter:  1,
+      header: newHeaderFormat({
+        spaceBefore: 1,
+        spaceAfter:  6,
+        accentMark:  '`',
+        lineLimit:   50
+      })
+    });
+  },
+  'fail': function() {
+    return makeDefaultTypeFormatProps({
+      linesBefore: 1,
+      linesAfter:  1,
+      msg: newMsgFormat({
+        accentMark: '`',
+        lineLimit:  50,
+        indent:     2,
+        bullet:     '-'
+      })
+    });
+  },
+  'trace': function(){}
+});
+
+/**
+ * @typedef {!(TypeFormat|TraceFormat)} Format
+ */
+
+/**
+ * @private
+ * @param {string} method
+ * @return {!Format}
+ */
+function getDefaultFormat(method) {
+  return FORMAT_FACTORY[method](
+    FORMAT_VALID_KEYS[method],
+    FORMAT_PROPS[method]()
+  );
+}
+
+/**
+ * @private
+ * @param {Object=} props
+ * @return {!Object}
+ */
+function makeDefaultTypeFormatProps(props) {
+  return fuse({
+    lineLimit:   50,
+    'undefined': 'undefined',
+    'null':      'null',
+    'nan':       'nan',
+    'argMap': newArgMapFormat({ delimiter: ':' }),
+    'string': newStringFormat({ brackets: '"' }),
+    'object': newObjectFormat({
+      delimiter: ',',
+      brackets:  '{}',
+      indent:    2
+    }),
+    'function': newObjectFormat({
+      identifier: '[Function] ',
+      delimiter:  ',',
+      brackets:   '{}',
+      indent:     2
+    }),
+    'regexp': newRegExpFormat({ brackets: '/' }),
+    'array': newObjectFormat({
+      delimiter: ',',
+      brackets:  '[]',
+      indent:    2
+    }),
+    'args': newObjectFormat({
+      identifier: '[Arguments] ',
+      delimiter:  ',',
+      brackets:   '[]',
+      indent:     2
+    }),
+    'element': newObjectFormat({
+      identifier: '[DomElement] ',
+      delimiter:  ',',
+      brackets:   '{}',
+      indent:     2
+    }),
+    'document': newObjectFormat({
+      identifier: '[DomDocument] ',
+      delimiter:  ',',
+      brackets:   '{}',
+      indent:     2
+    })
+  }, props || null);
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
