@@ -26,7 +26,7 @@
 /**
  * @typedef {!{
  *   __TYPE: string,
- *   argMap: boolean,
+ *   ocdMap: boolean,
  *   header: ?boolean,
  *   stack:  boolean,
  *   throw:  boolean,
@@ -49,7 +49,7 @@ function newLogConfig(validKeys, trueKeys) {
   var keys;
 
   config = newEmptyObj('Config');
-  keys  = 'argMap, stack, throw, exit';
+  keys  = 'ocdMap, stack, throw, exit';
   config = amend(config, keys, false, 'boolean');
   keys  = 'header';
   each(keys, function(key) {

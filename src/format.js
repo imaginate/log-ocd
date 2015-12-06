@@ -91,22 +91,22 @@ function newMsgFormat(props) {
  *   spaceBefore: number,
  *   spaceAfter:  number,
  *   delimiter:   string
- * }} ArgMapFormat
+ * }} OcdMapFormat
  */
 
 /**
  * @private
  * @param {Object<string, (string|number)>=} props
- * @return {!ArgMapFormat}
+ * @return {!OcdMapFormat}
  */
-function newArgMapFormat(props) {
+function newOcdMapFormat(props) {
 
-  /** @type {!ArgMapFormat} */
+  /** @type {!OcdMapFormat} */
   var format;
   /** @type {string} */
   var keys;
 
-  format = newEmptyObj('ArgMapFormat');
+  format = newEmptyObj('OcdMapFormat');
   keys  = 'delimiter';
   format = amend(format, keys, '', 'string');
   keys  = 'spaceBefore, spaceAfter';
@@ -207,7 +207,7 @@ function newRegExpFormat(props) {
  *   lineLimit:   number,
  *   header:      ?HeaderFormat,
  *   msg:         ?MsgFormat,
- *   argMap:      !ArgMapFormat,
+ *   ocdMap:      !OcdMapFormat,
  *   undefined:   string,
  *   null:        string,
  *   nan:         string,
@@ -239,7 +239,7 @@ var TYPE_FORMAT_OPT_NEW_PROP = freeze({
  * @const
  */
 var TYPE_FORMAT_NEW_PROP = freeze({
-  'argMap': newArgMapFormat,
+  'ocdMap': newOcdMapFormat,
   'string': newStringFormat,
   'regexp': newRegExpFormat
 });
@@ -435,7 +435,7 @@ function makeDefaultTypeFormatProps(props) {
     'undefined': 'undefined',
     'null':      'null',
     'nan':       'nan',
-    'argMap': newArgMapFormat({ delimiter: ':' }),
+    'ocdMap': newOcdMapFormat({ delimiter: ':' }),
     'string': newStringFormat({ brackets: '"' }),
     'object': newObjectFormat({
       delimiter: ',',

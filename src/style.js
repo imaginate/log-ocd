@@ -159,7 +159,7 @@ function newAccentTheme(props) {
  *   __TYPE:    string,
  *   header:    ?AccentTheme,
  *   msg:       ?AccentTheme,
- *   argMap:    !Theme,
+ *   ocdMap:    !Theme,
  *   null:      !Theme,
  *   undefined: !Theme,
  *   boolean:   !Theme,
@@ -214,7 +214,7 @@ function newTypeStyle(validKeys, props) {
       ? amend(style, key, newAccentTheme(), '!object')
       : amend(style, key, null, 'null');
   });
-  keys = 'argMap, null, undefined, boolean, nan';
+  keys = 'ocdMap, null, undefined, boolean, nan';
   each(keys, function(key) {
     style = amend(style, key, newTheme(), '!object');
   });
@@ -393,7 +393,7 @@ function getDefaultStyle(method) {
  */
 function makeDefaultTypeStyleProps(props) {
   return fuse({
-    'argMap':    newTheme({ color: 'cyan'    }),
+    'ocdMap':    newTheme({ color: 'cyan'    }),
     'null':      newTheme({ color: 'magenta' }),
     'undefined': newTheme({ color: 'magenta' }),
     'boolean':   newTheme({ color: 'magenta' }),
