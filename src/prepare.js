@@ -102,8 +102,9 @@ makeString.string = function stringToString(method, val) {
   delimiter = color(' +');
 
   color = colors[method + 'string'];
-  return remap(val, /(.+)\n/g, function(match, line) {
-    return bracket[0] + color(line) + bracket[1] + delimiter + '\n';
+  return remap(val, /(.+)(\n)?/g, function(match, line, eol) {
+    eol = eol ? delimiter + eol : '';
+    return bracket[0] + color(line) + bracket[1] + eol;
   });
 };
 
