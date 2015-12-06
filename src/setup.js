@@ -88,8 +88,8 @@ var LogOCD = (function() {
     LogOCD = newEmptyObj('LogOCD');
     LogOCD = add(LogOCD,  'logs',   'log, pass, error, warn, debug, fail');
     LogOCD = add(LogOCD,  'preps',  'toString');
-    LogOCD = add(LogOCD,  'sets',   'setConfig, setFormat, setStyle');
-    LogOCD = add(LogOCD,  'resets', 'resetConfig, resetFormat, resetStyle');
+    LogOCD = add(LogOCD,  'sets',   'setConfig, setFormat, setStyle, '    +
+                                    'resetConfig, resetFormat, resetStyle');
     return freeze(LogOCD);
   }
 
