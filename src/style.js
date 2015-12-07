@@ -495,9 +495,23 @@ function makeColorsTheme(theme) {
 /**
  * @private
  * @param {string} name
+ * @param {!Theme} theme
+ */
+function setColorsTheme(name, theme) {
+
+  if ( !isTheme(theme) ) throw new TypeError('Internal Error: invalid theme');
+
+  colors.setTheme({
+    name: makeColorsTheme(theme)
+  });
+}
+
+/**
+ * @private
+ * @param {string} name
  * @param {!Object} obj
  */
-function setColorsTheme(name, obj) {
+function setColorsThemes(name, obj) {
 
   /** @type {!Object} */
   var themes;
