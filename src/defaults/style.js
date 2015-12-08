@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------------------------------
- * LOG-OCD: STYLE
+ * LOG-OCD: STYLE DEFAULTS
  * -----------------------------------------------------------------------------
  * @version 1.0.0
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
@@ -18,9 +18,121 @@
  * @see [Closure Compiler specific JSDoc]{@link https://developers.google.com/closure/compiler/docs/js-for-compiler}
  */
 
+'use strict';
+
+var help = require('../helpers');
+var amend  = help.amend;
+var each   = help.each;
+var freeze = help.freeze;
+var fuse   = help.fuse;
+var has    = help.has;
+var seal   = help.seal;
+
+var newEmptyObj = require('../helpers/new-empty-obj');
 
 ////////////////////////////////////////////////////////////////////////////////
-// STYLE FACTORY METHODS
+// DEFAULT VALUES
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @private
+ * @type {!Object<string, function>}
+ * @const
+ */
+var FACTORY = freeze({
+  'toString': newTypeStyle,
+  'log':      newTypeStyle,
+  'pass':     newTypeStyle,
+  'error':    newTypeStyle,
+  'warn':     newTypeStyle,
+  'debug':    newTypeStyle,
+  'fail':     newTypeStyle,
+  'trace':    newTraceStyle
+});
+
+/**
+ * @private
+ * @type {!Object<string, string>}
+ * @const
+ */
+var VALID_KEYS = freeze({
+  'toString': '',
+  'log':      '',
+  'pass':     'header, msg',
+  'error':    'header, msg',
+  'warn':     'header, msg',
+  'debug':    'header, msg',
+  'fail':     'header, msg',
+  'trace':    ''
+});
+
+/**
+ * @private
+ * @type {!Object<string, function>}
+ * @const
+ */
+var PROPS = freeze({
+  'toString': function() { return makeDefaultProps(); },
+  'log':      function() { return makeDefaultProps(); },
+  'pass':     function() { return makeDefaultProps({
+    header: newAccentTheme({
+      color: 'white',
+      bg:    'green',
+      bold:  true,
+      accent: newTheme({
+        color: 'yellow',
+        bg:    'green',
+        bold:  true
+      })
+    })
+  }); },
+  'error':    function() { return makeDefaultProps({
+    header: newAccentTheme({
+      color: 'white',
+      bg:    'red',
+      bold:  true,
+      accent: newTheme({
+        color: 'yellow',
+        bg:    'red',
+        bold:  true
+      })
+    })
+  }); },
+  'warn':     function() { return makeDefaultProps({
+    header: newAccentTheme({
+      color: 'white',
+      bg:    'yellow',
+      bold:  true,
+      accent: newTheme({
+        color: 'blue',
+        bg:    'yellow',
+        bold:  true
+      })
+    })
+  }); },
+  'debug':    function() { return makeDefaultProps({
+    header: newAccentTheme({
+      color: 'white',
+      bg:    'blue',
+      bold:  true,
+      accent: newTheme({
+        color: 'magenta',
+        bg:    'blue',
+        bold:  true
+      })
+    })
+  }); },
+  'fail':     function() { return makeDefaultProps({
+    msg: newAccentTheme({
+      color: 'red',
+      accent: newTheme({ color: 'yellow' })
+    })
+  }); },
+  'trace':    function() {}
+});
+
+////////////////////////////////////////////////////////////////////////////////
+// FACTORY METHODS
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -181,7 +293,7 @@ function newAccentTheme(props) {
  * @type {!Object<string, string>}
  * @const
  */
-var TYPE_THEME_VALID_KEYS = freeze({
+var TYPE_VALID_KEYS = freeze({
   'string':   '            delimiter, brackets       ',
   'number':   'identifier, delimiter                 ',
   'object':   'identifier, delimiter, brackets       ',
@@ -218,7 +330,7 @@ function newTypeStyle(validKeys, props) {
   each(keys, function(key) {
     style = amend(style, key, newTheme(), '!object');
   });
-  each(TYPE_THEME_VALID_KEYS, function(validKeys, key) {
+  each(TYPE_VALID_KEYS, function(validKeys, key) {
     style = amend(style, key, newTypeTheme(validKeys), '!object');
   });
   style = seal(style);
@@ -250,200 +362,103 @@ function newTraceStyle(validKeys, props) {
   return props ? fuse(style, props) : style;
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
-// STYLE SETUP METHODS
+// HELPER METHODS
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
  * @private
- * @type {!Object<string, function>}
- * @const
+ * @param {Object=} intro
+ * @return {!Object}
  */
-var STYLE_FACTORY = freeze({
-  'toString': newTypeStyle,
-  'log':      newTypeStyle,
-  'pass':     newTypeStyle,
-  'error':    newTypeStyle,
-  'warn':     newTypeStyle,
-  'debug':    newTypeStyle,
-  'fail':     newTypeStyle,
-  'trace':    newTraceStyle
-});
+function makeDefaultProps(intro) {
 
-/**
- * @private
- * @type {!Object<string, string>}
- * @const
- */
-var STYLE_VALID_KEYS = freeze({
-  'toString': '',
-  'log':      '',
-  'pass':     'header, msg',
-  'error':    'header, msg',
-  'warn':     'header, msg',
-  'debug':    'header, msg',
-  'fail':     'header, msg',
-  'trace':    ''
-});
+  /** @type {!Object} */
+  var props;
 
-/**
- * @private
- * @type {!Object<string, function>}
- * @const
- */
-var STYLE_PROPS = (function() {
+  props = {
+    'ocdMap':    newTheme({ color: 'cyan'    }),
+    'null':      newTheme({ color: 'magenta' }),
+    'undefined': newTheme({ color: 'magenta' }),
+    'boolean':   newTheme({ color: 'magenta' }),
+    'nan':       newTheme({ color: 'magenta' }),
+    'string': newTypeTheme({
+      color: 'yellow',
+      delimiter: newTheme({ color: 'red'    }),
+      brackets:  newTheme({ color: 'yellow' })
+    }),
+    'number': newTypeTheme({
+      color: 'magenta',
+      identifier: newTheme({ color: 'magenta' }),
+      delimiter:  newTheme({ color: 'magenta' })
+    }),
+    'object': newTypeTheme({
+      color: 'white',
+      identifier: newTheme({ color: 'white' }),
+      delimiter:  newTheme({ color: 'white' }),
+      brackets:   newTheme({ color: 'white' })
+    }),
+    'function': newTypeTheme({
+      color: 'white',
+      identifier: newTheme({ color: 'white' }),
+      delimiter:  newTheme({ color: 'white' }),
+      brackets:   newTheme({ color: 'white' })
+    }),
+    'regexp': newTypeTheme({
+      color: 'white',
+      identifier: newTheme({ color: 'yellow' }),
+      brackets:   newTheme({ color: 'yellow' }),
+      flags:      newTheme({ color: 'yellow' })
+    }),
+    'array': newTypeTheme({
+      color: 'white',
+      identifier: newTheme({ color: 'white' }),
+      delimiter:  newTheme({ color: 'white' }),
+      brackets:   newTheme({ color: 'white' })
+    }),
+    'args': newTypeTheme({
+      color: 'white',
+      identifier: newTheme({ color: 'white' }),
+      delimiter:  newTheme({ color: 'white' }),
+      brackets:   newTheme({ color: 'white' })
+    }),
+    'element': newTypeTheme({
+      color: 'white',
+      identifier: newTheme({ color: 'white' }),
+      delimiter:  newTheme({ color: 'white' }),
+      brackets:   newTheme({ color: 'white' })
+    }),
+    'document': newTypeTheme({
+      color: 'white',
+      identifier: newTheme({ color: 'white' }),
+      delimiter:  newTheme({ color: 'white' }),
+      brackets:   newTheme({ color: 'white' })
+    })
+  };
 
-  return freeze({
-    'toString': function() { return makeDefaultProps(); },
-    'log':      function() { return makeDefaultProps(); },
-    'pass':     function() { return makeDefaultProps({
-      header: newAccentTheme({
-        color: 'white',
-        bg:    'green',
-        bold:  true,
-        accent: newTheme({
-          color: 'yellow',
-          bg:    'green',
-          bold:  true
-        })
-      })
-    }); },
-    'error':    function() { return makeDefaultProps({
-      header: newAccentTheme({
-        color: 'white',
-        bg:    'red',
-        bold:  true,
-        accent: newTheme({
-          color: 'yellow',
-          bg:    'red',
-          bold:  true
-        })
-      })
-    }); },
-    'warn':     function() { return makeDefaultProps({
-      header: newAccentTheme({
-        color: 'white',
-        bg:    'yellow',
-        bold:  true,
-        accent: newTheme({
-          color: 'blue',
-          bg:    'yellow',
-          bold:  true
-        })
-      })
-    }); },
-    'debug':    function() { return makeDefaultProps({
-      header: newAccentTheme({
-        color: 'white',
-        bg:    'blue',
-        bold:  true,
-        accent: newTheme({
-          color: 'magenta',
-          bg:    'blue',
-          bold:  true
-        })
-      })
-    }); },
-    'fail':     function() { return makeDefaultProps({
-      msg: newAccentTheme({
-        color: 'red',
-        accent: newTheme({ color: 'yellow' })
-      })
-    }); },
-    'trace':    function() {}
-  });
-
-  /**
-   * @private
-   * @param {Object=} intro
-   * @return {!Object}
-   */
-  function makeDefaultProps(intro) {
-
-    /** @type {!Object} */
-    var props;
-
-    props = {
-      'ocdMap':    newTheme({ color: 'cyan'    }),
-      'null':      newTheme({ color: 'magenta' }),
-      'undefined': newTheme({ color: 'magenta' }),
-      'boolean':   newTheme({ color: 'magenta' }),
-      'nan':       newTheme({ color: 'magenta' }),
-      'string': newTypeTheme({
-        color: 'yellow',
-        delimiter: newTheme({ color: 'red'    }),
-        brackets:  newTheme({ color: 'yellow' })
-      }),
-      'number': newTypeTheme({
+  if (intro) props = fuse(props, {
+    header: newAccentTheme({
+      color: 'white',
+      bg:    'blue',
+      bold:  true,
+      accent: newTheme({
         color: 'magenta',
-        identifier: newTheme({ color: 'magenta' }),
-        delimiter:  newTheme({ color: 'magenta' })
-      }),
-      'object': newTypeTheme({
-        color: 'white',
-        identifier: newTheme({ color: 'white' }),
-        delimiter:  newTheme({ color: 'white' }),
-        brackets:   newTheme({ color: 'white' })
-      }),
-      'function': newTypeTheme({
-        color: 'white',
-        identifier: newTheme({ color: 'white' }),
-        delimiter:  newTheme({ color: 'white' }),
-        brackets:   newTheme({ color: 'white' })
-      }),
-      'regexp': newTypeTheme({
-        color: 'white',
-        identifier: newTheme({ color: 'yellow' }),
-        brackets:   newTheme({ color: 'yellow' }),
-        flags:      newTheme({ color: 'yellow' })
-      }),
-      'array': newTypeTheme({
-        color: 'white',
-        identifier: newTheme({ color: 'white' }),
-        delimiter:  newTheme({ color: 'white' }),
-        brackets:   newTheme({ color: 'white' })
-      }),
-      'args': newTypeTheme({
-        color: 'white',
-        identifier: newTheme({ color: 'white' }),
-        delimiter:  newTheme({ color: 'white' }),
-        brackets:   newTheme({ color: 'white' })
-      }),
-      'element': newTypeTheme({
-        color: 'white',
-        identifier: newTheme({ color: 'white' }),
-        delimiter:  newTheme({ color: 'white' }),
-        brackets:   newTheme({ color: 'white' })
-      }),
-      'document': newTypeTheme({
-        color: 'white',
-        identifier: newTheme({ color: 'white' }),
-        delimiter:  newTheme({ color: 'white' }),
-        brackets:   newTheme({ color: 'white' })
-      })
-    };
-
-    if (intro) props = fuse(props, {
-      header: newAccentTheme({
-        color: 'white',
         bg:    'blue',
-        bold:  true,
-        accent: newTheme({
-          color: 'magenta',
-          bg:    'blue',
-          bold:  true
-        })
-      }),
-      msg: newAccentTheme({
-        color: 'white',
-        accent: newTheme({ color: 'magenta' })
+        bold:  true
       })
-    }, intro);
+    }),
+    msg: newAccentTheme({
+      color: 'white',
+      accent: newTheme({ color: 'magenta' })
+    })
+  }, intro);
 
-    return props;
-  }
-})();
+  return props;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// EXPORTS
+////////////////////////////////////////////////////////////////////////////////
 
 /**
  * @typedef {!(TypeStyle|TraceStyle)} Style
@@ -454,104 +469,6 @@ var STYLE_PROPS = (function() {
  * @param {string} method
  * @return {!Style}
  */
-function getDefaultStyle(method) {
-  return STYLE_FACTORY[method](
-    STYLE_VALID_KEYS[method],
-    STYLE_PROPS[method]()
-  );
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// STYLE CHECK METHODS
-////////////////////////////////////////////////////////////////////////////////
-
-/**
- * @private
- * @param {!Object} obj
- * @return {boolean}
- */
-function isTheme(obj) {
-  return has(obj, '__TYPE') && has(obj.__TYPE, /Theme$/);
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// COLORS SETUP METHODS
-////////////////////////////////////////////////////////////////////////////////
-
-/**
- * @private
- * @param {!Theme} theme
- * @return {!Array}
- */
-function makeColorsTheme(theme) {
-
-  /** @type {!Array} */
-  var result;
-  /** @type {string} */
-  var keys;
-
-  result = [];
-  keys = 'color, bg';
-  each(keys, function(key) { theme[key] && result.push( theme[key] ); });
-  keys = 'bold, dim, hidden, inverse, italic, reset, strikethrough, underline';
-  each(keys, function(key) { theme[key] && result.push(key); });
-  return result;
-}
-
-/**
- * @private
- * @param {string} name
- * @param {!Object} obj
- * @return {!Object}
- */
-function buildColorsTheme(name, obj) {
-
-  /** @type {!Object} */
-  var themes;
-
-  themes = {};
-
-  if ( isTheme(obj) ) themes[name] = makeColorsTheme(obj);
-
-  each(obj, function(val, key) {
-    if ( !is.obj(val) ) return;
-    val = buildColorsTheme(name + key, val);
-    themes = fuse(themes, val);
-  });
-
-  return themes;
-}
-
-/**
- * @private
- * @param {string} name
- * @param {!Object} obj
- */
-function setColorsTheme(name, obj) {
-
-  /** @type {!Object} */
-  var themes;
-
-  themes = buildColorsTheme(name, obj);
-  if ( !is.empty(themes) ) colors.setTheme(themes);
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// SET ADDITIONAL THEMES FOR COLORS
-////////////////////////////////////////////////////////////////////////////////
-
-// stacktrace themes
-colors.setTheme({
-  ostack:   'white',
-  estack: [ 'white', 'bgBlue' ]
+module.exports = function getDefaultStyle(method) {
+  return FACTORY[method]( VALID_KEYS[method], PROPS[method]() );
 };
-
-
-////////////////////////////////////////////////////////////////////////////////
-// STYLE SETTER
-////////////////////////////////////////////////////////////////////////////////
-
-
