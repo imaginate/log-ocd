@@ -27,9 +27,8 @@ var has  = help.has;
 
 var colors = require('../helpers/colors');
 
-////////////////////////////////////////////////////////////////////////////////
-// MAIN METHOD
-////////////////////////////////////////////////////////////////////////////////
+var getIdentifier = require('./helpers/get-identifier');
+var getDelimiter = require('./helpers/get-delimiter');
 
 /**
  * @this {!Settings}
@@ -49,12 +48,12 @@ module.exports = function numberToString(method, val) {
   style = 'ocd' + this[method].__INST + method + 'number';
   val = String(val);
   identifier = get(val, /^[+-]/)[0] || '';
-  identifier = identifier && colors[style + 'identifier'](identifier);
+  identifier = getIdentifier(identifier, style);
   val = cut(val, /^[+-]/);
 
   if ( !has(val, '\.') ) return identifier + colors[style](val);
 
-  delimiter = colors[style + 'delimiter']('.');
+  delimiter = getDelimiter('.', style);
   val = val.split('.');
   return identifier + colors[style]( val[0] ) +
          delimiter  + colors[style]( val[1] );
