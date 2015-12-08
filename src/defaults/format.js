@@ -22,7 +22,6 @@
 
 var help = require('../helpers');
 var amend  = help.amend;
-var create = help.create;
 var each   = help.each;
 var freeze = help.freeze;
 var fuse   = help.fuse;
