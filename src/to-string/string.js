@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------------------------------
- * LOG-OCD: TO-STRING HELPER
+ * LOG-OCD: STRING-TO-STRING HELPER
  * -----------------------------------------------------------------------------
  * @version 1.0.0
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
@@ -40,7 +40,7 @@ var colors = require('../helpers/colors');
  * @param {string} val
  * @return {string}
  */
-function toString(method, val) {
+function stringToString(method, val) {
 
   /** @type {string} */
   var delimiter;
@@ -144,4 +144,4 @@ function getLastSpace(str, limit) {
 // EXPORTS
 ////////////////////////////////////////////////////////////////////////////////
 
-module.exports = toString;
+module.exports = stringToString;
