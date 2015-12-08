@@ -21,22 +21,12 @@
 'use strict';
 
 var help = require('../helpers');
-var is     = help.is;
-var are    = help.are;
 var amend  = help.amend;
-var copy   = help.copy;
 var create = help.create;
-var cut    = help.cut;
 var each   = help.each;
-var fill   = help.fill;
 var freeze = help.freeze;
-var fuse   = help.fuse;
-var get    = help.get;
 var has    = help.has;
-var remap  = help.remap;
 var seal   = help.seal;
-var slice  = help.slice;
-var until  = help.until;
 
 var newEmptyObj = require('../helpers/new-empty-obj');
 
@@ -49,7 +39,7 @@ var newEmptyObj = require('../helpers/new-empty-obj');
  * @type {!Object<string, function>}
  * @const
  */
-var CONFIG_FACTORY = freeze({
+var FACTORY = freeze({
   'toString': newPrepConfig,
   'log':      newLogConfig,
   'pass':     newLogConfig,
@@ -65,7 +55,7 @@ var CONFIG_FACTORY = freeze({
  * @type {!Object<string, string>}
  * @const
  */
-var CONFIG_VALID_KEYS = freeze({
+var VALID_KEYS = freeze({
   'toString': 'style',
   'log':      '',
   'pass':     'header, msg',
@@ -81,7 +71,7 @@ var CONFIG_VALID_KEYS = freeze({
  * @type {!Object<string, string>}
  * @const
  */
-var CONFIG_TRUE_KEYS = freeze({
+var TRUE_KEYS = freeze({
   'toString': '',
   'log':      '',
   'pass':     'header',
@@ -210,8 +200,5 @@ function newPrepConfig(validKeys, trueKeys) {
  * @return {!Config}
  */
 module.exports = function getDefaultConfig(method) {
-  return CONFIG_FACTORY[method](
-    CONFIG_VALID_KEYS[method],
-    CONFIG_TRUE_KEYS[method]
-  );
+  return FACTORY[method](VALID_KEYS[method], TRUE_KEYS[method]);
 };
