@@ -334,7 +334,14 @@ var FORMAT_PROPS = (function() {
     'error':    function() { return makeDefaultProps(true, true); },
     'warn':     function() { return makeDefaultProps(true, true); },
     'debug':    function() { return makeDefaultProps(true, true); },
-    'fail':     function() { return makeDefaultProps(true, true); },
+    'fail':     function() { return makeDefaultProps(true, true, {
+      msg: newMsgFormat({
+        accentMark: '`',
+        lineLimit:  50,
+        indent:     0,
+        bullet:     ''
+      })
+    }); },
     'trace':    function() {}
   });
 
@@ -342,9 +349,10 @@ var FORMAT_PROPS = (function() {
    * @private
    * @param {boolean=} lines
    * @param {boolean=} intro
+   * @param {Object=} extra
    * @return {!Object}
    */
-  function makeDefaultProps(lines, intro) {
+  function makeDefaultProps(lines, intro, extra) {
 
     /** @type {!Object} */
     var props;
@@ -413,7 +421,7 @@ var FORMAT_PROPS = (function() {
       })
     });
 
-    return props;
+    return extra ? fuse(props, extra) : props;
   }
 })();
 
