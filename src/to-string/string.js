@@ -52,21 +52,20 @@ module.exports = function stringToString(method, val) {
   var delimiter;
   /** @type {!Array} */
   var brackets;
-  /** @type {!TypeFormat} */
+  /** @type {!StringFormat} */
   var format;
   /** @type {string} */
   var style;
 
   style = 'ocd' + this[method].__INST + method + 'string';
-  format = this[method].format;
 
   if ( has(val, FILLER) ) {
     val = cut(val, /^<<|>>$/g);
     return colors[style](val);
   }
 
-  val = divideString(format.lineLimit, val);
-  format = format.string;
+  val = divideString(this[method].format.lineLimit, val);
+  format = this[method].format.string;
   brackets = getBrackets(format.brackets, style);
 
   if ( !has(val, '\n') ) return brackets[0] + colors[style](val) + brackets[1];
