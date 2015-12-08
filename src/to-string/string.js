@@ -89,13 +89,7 @@ var FILLER = freeze(/^<[\s\S]+>$/);
  * @param {function} color
  * @return {!Array}
  */
-function getBrackets(brackets, color) {
-  brackets += brackets.length > 1 ? '' : brackets;
-  return [
-    color( brackets[0] ),
-    color( brackets[1] )
-  ];
-}
+var getBrackets = require('./helpers/getBrackets');
 
 /**
  * @private
