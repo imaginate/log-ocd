@@ -30,7 +30,8 @@
  *   header: ?boolean,
  *   stack:  boolean,
  *   throw:  boolean,
- *   exit:   boolean
+ *   exit:   boolean,
+ *   msg:    ?boolean
  * }} LogConfig
  */
 
@@ -51,7 +52,7 @@ function newLogConfig(validKeys, trueKeys) {
   config = newEmptyObj('Config');
   keys  = 'ocdMap, stack, throw, exit';
   config = amend(config, keys, false, 'boolean');
-  keys  = 'header';
+  keys  = 'header, msg';
   each(keys, function(key) {
     config = validKeys && has(validKeys, key)
       ? amend(config, key, false, 'boolean')
@@ -154,11 +155,11 @@ var CONFIG_FACTORY = freeze({
 var CONFIG_VALID_KEYS = freeze({
   'toString': 'style',
   'log':      '',
-  'pass':     'header',
-  'error':    'header',
-  'warn':     'header',
-  'debug':    'header',
-  'fail':     '',
+  'pass':     'header, msg',
+  'error':    'header, msg',
+  'warn':     'header, msg',
+  'debug':    'header, msg',
+  'fail':     'header, msg',
   'trace':    ''
 });
 
@@ -171,10 +172,10 @@ var CONFIG_TRUE_KEYS = freeze({
   'toString': '',
   'log':      '',
   'pass':     'header',
-  'error':    'header, stack, throw',
-  'warn':     'header',
+  'error':    'header, stack, throw, msg',
+  'warn':     'header, msg',
   'debug':    'header',
-  'fail':     '',
+  'fail':     'msg',
   'trace':    ''
 });
 
