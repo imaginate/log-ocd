@@ -109,7 +109,6 @@ var CONFIG_TRUE_KEYS = freeze({
  */
 
 /**
- * A factory method for LogConfig objects.
  * @private
  * @param {string} validKeys
  * @param {string=} trueKeys
@@ -147,7 +146,6 @@ function newLogConfig(validKeys, trueKeys) {
  */
 
 /**
- * A factory method for TraceConfig objects.
  * @private
  * @return {!TraceConfig}
  */
@@ -172,7 +170,6 @@ function newTraceConfig() {
  */
 
 /**
- * A factory method for PrepConfig objects.
  * @private
  * @param {string} validKeys
  * @param {string=} trueKeys
