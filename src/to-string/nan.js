@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------------------------------
- * LOG-OCD: NAN-TO-STRING HELPER
+ * LOG-OCD: NAN-TO-STRING
  * -----------------------------------------------------------------------------
  * @version 1.0.0
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}

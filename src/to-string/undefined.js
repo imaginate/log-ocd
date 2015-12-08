@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------------------------------
- * LOG-OCD: UNDEFINED-TO-STRING HELPER
+ * LOG-OCD: UNDEFINED-TO-STRING
  * -----------------------------------------------------------------------------
  * @version 1.0.0
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
