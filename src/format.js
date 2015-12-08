@@ -312,11 +312,11 @@ var FORMAT_FACTORY = freeze({
 var FORMAT_VALID_KEYS = freeze({
   'toString': '',
   'log':      'linesBefore, linesAfter',
-  'pass':     'linesBefore, linesAfter, header',
+  'pass':     'linesBefore, linesAfter, header, msg',
   'error':    'linesBefore, linesAfter, header, msg',
   'warn':     'linesBefore, linesAfter, header, msg',
-  'debug':    'linesBefore, linesAfter, header',
-  'fail':     'linesBefore, linesAfter, msg',
+  'debug':    'linesBefore, linesAfter, header, msg',
+  'fail':     'linesBefore, linesAfter, header, msg',
   'trace':    'linesBefore, linesAfter'
 });
 
@@ -325,30 +325,80 @@ var FORMAT_VALID_KEYS = freeze({
  * @type {!Object<string, function>}
  * @const
  */
-var FORMAT_PROPS = freeze({
-  'toString': makeDefaultTypeFormatProps,
-  'log': function() {
-    return makeDefaultTypeFormatProps({
+var FORMAT_PROPS = (function() {
+
+  return freeze({
+    'toString': function() { return makeDefaultProps(); },
+    'log':      function() { return makeDefaultProps(true); },
+    'pass':     function() { return makeDefaultProps(true, true); },
+    'error':    function() { return makeDefaultProps(true, true); },
+    'warn':     function() { return makeDefaultProps(true, true); },
+    'debug':    function() { return makeDefaultProps(true, true); },
+    'fail':     function() { return makeDefaultProps(true, true); },
+    'trace':    function() {}
+  });
+
+  /**
+   * @private
+   * @param {boolean=} lines
+   * @param {boolean=} intro
+   * @return {!Object}
+   */
+  function makeDefaultProps(lines, intro) {
+
+    /** @type {!Object} */
+    var props;
+
+    props = {
+      lineLimit:   50,
+      'undefined': 'undefined',
+      'null':      'null',
+      'nan':       'nan',
+      'ocdMap': newOcdMapFormat({ delimiter: ':' }),
+      'string': newStringFormat({ brackets: '"' }),
+      'object': newObjectFormat({
+        delimiter: ',',
+        brackets:  '{}',
+        indent:    2
+      }),
+      'function': newObjectFormat({
+        identifier: '[Function] ',
+        delimiter:  ',',
+        brackets:   '{}',
+        indent:     2
+      }),
+      'regexp': newRegExpFormat({ brackets: '/' }),
+      'array': newObjectFormat({
+        delimiter: ',',
+        brackets:  '[]',
+        indent:    2
+      }),
+      'args': newObjectFormat({
+        identifier: '[Arguments] ',
+        delimiter:  ',',
+        brackets:   '[]',
+        indent:     2
+      }),
+      'element': newObjectFormat({
+        identifier: '[DomElement] ',
+        delimiter:  ',',
+        brackets:   '{}',
+        indent:     2
+      }),
+      'document': newObjectFormat({
+        identifier: '[DomDocument] ',
+        delimiter:  ',',
+        brackets:   '{}',
+        indent:     2
+      })
+    };
+
+    if (lines) props = fuse(props, {
       linesBefore: 1,
       linesAfter:  1
     });
-  },
-  'pass': function() {
-    return makeDefaultTypeFormatProps({
-      linesBefore: 1,
-      linesAfter:  1,
-      header: newHeaderFormat({
-        spaceBefore: 1,
-        spaceAfter:  6,
-        accentMark:  '`',
-        lineLimit:   50
-      })
-    });
-  },
-  'error': function() {
-    return makeDefaultTypeFormatProps({
-      linesBefore: 1,
-      linesAfter:  1,
+
+    if (intro) props = fuse(props, {
       header: newHeaderFormat({
         spaceBefore: 1,
         spaceAfter:  6,
@@ -362,51 +412,10 @@ var FORMAT_PROPS = freeze({
         bullet:     '-'
       })
     });
-  },
-  'warn': function() {
-    return makeDefaultTypeFormatProps({
-      linesBefore: 1,
-      linesAfter:  1,
-      header: newHeaderFormat({
-        spaceBefore: 1,
-        spaceAfter:  6,
-        accentMark:  '`',
-        lineLimit:   50
-      }),
-      msg: newMsgFormat({
-        accentMark: '`',
-        lineLimit:  50,
-        indent:     2,
-        bullet:     '-'
-      })
-    });
-  },
-  'debug': function() {
-    return makeDefaultTypeFormatProps({
-      linesBefore: 1,
-      linesAfter:  1,
-      header: newHeaderFormat({
-        spaceBefore: 1,
-        spaceAfter:  6,
-        accentMark:  '`',
-        lineLimit:   50
-      })
-    });
-  },
-  'fail': function() {
-    return makeDefaultTypeFormatProps({
-      linesBefore: 1,
-      linesAfter:  1,
-      msg: newMsgFormat({
-        accentMark: '`',
-        lineLimit:  50,
-        indent:     2,
-        bullet:     '-'
-      })
-    });
-  },
-  'trace': function(){}
-});
+
+    return props;
+  }
+})();
 
 /**
  * @typedef {!(TypeFormat|TraceFormat)} Format
@@ -422,57 +431,6 @@ function getDefaultFormat(method) {
     FORMAT_VALID_KEYS[method],
     FORMAT_PROPS[method]()
   );
-}
-
-/**
- * @private
- * @param {Object=} props
- * @return {!Object}
- */
-function makeDefaultTypeFormatProps(props) {
-  return fuse({
-    lineLimit:   50,
-    'undefined': 'undefined',
-    'null':      'null',
-    'nan':       'nan',
-    'ocdMap': newOcdMapFormat({ delimiter: ':' }),
-    'string': newStringFormat({ brackets: '"' }),
-    'object': newObjectFormat({
-      delimiter: ',',
-      brackets:  '{}',
-      indent:    2
-    }),
-    'function': newObjectFormat({
-      identifier: '[Function] ',
-      delimiter:  ',',
-      brackets:   '{}',
-      indent:     2
-    }),
-    'regexp': newRegExpFormat({ brackets: '/' }),
-    'array': newObjectFormat({
-      delimiter: ',',
-      brackets:  '[]',
-      indent:    2
-    }),
-    'args': newObjectFormat({
-      identifier: '[Arguments] ',
-      delimiter:  ',',
-      brackets:   '[]',
-      indent:     2
-    }),
-    'element': newObjectFormat({
-      identifier: '[DomElement] ',
-      delimiter:  ',',
-      brackets:   '{}',
-      indent:     2
-    }),
-    'document': newObjectFormat({
-      identifier: '[DomDocument] ',
-      delimiter:  ',',
-      brackets:   '{}',
-      indent:     2
-    })
-  }, props || null);
 }
 
 
