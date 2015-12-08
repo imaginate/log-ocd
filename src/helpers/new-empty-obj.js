@@ -23,7 +23,6 @@
 var create = require('./index').create;
 
 /**
- * @private
  * @param {string} type
  * @return {!Object}
  */

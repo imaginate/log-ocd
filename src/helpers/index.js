@@ -49,7 +49,6 @@ exports.until  = vitals.until;
 var has = vitals.has;
 
 /**
- * @private
  * @param {!Object} obj
  * @return {boolean}
  */
