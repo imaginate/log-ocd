@@ -460,11 +460,11 @@ function makeDefaultTypeStyleProps(props) {
 
 /**
  * @private
- * @param {*} val
+ * @param {!Object} obj
  * @return {boolean}
  */
-function isTheme(val) {
-  return is.obj(val) && val.__TYPE === 'Theme';
+function isTheme(obj) {
+  return has(obj, '__TYPE') && has(obj.__TYPE, /Theme$/);
 }
 
 
@@ -495,15 +495,25 @@ function makeColorsTheme(theme) {
 /**
  * @private
  * @param {string} name
- * @param {!Theme} theme
+ * @param {!Object} obj
+ * @return {!Object}
  */
-function setColorsTheme(name, theme) {
+function buildColorsTheme(name, obj) {
 
-  if ( !isTheme(theme) ) throw new TypeError('Internal Error: invalid theme');
+  /** @type {!Object} */
+  var themes;
 
-  colors.setTheme({
-    name: makeColorsTheme(theme)
+  themes = {};
+
+  if ( isTheme(obj) ) themes[name] = makeColorsTheme(obj);
+
+  each(obj, function(val, key) {
+    if ( !is.obj(val) ) return;
+    val = buildColorsTheme(name + key, val);
+    themes = fuse(themes, val);
   });
+
+  return themes;
 }
 
 /**
@@ -511,20 +521,13 @@ function setColorsTheme(name, theme) {
  * @param {string} name
  * @param {!Object} obj
  */
-function setColorsThemes(name, obj) {
+function setColorsTheme(name, obj) {
 
   /** @type {!Object} */
   var themes;
 
-  each(obj, function(val, key) {
-    if ( isTheme(val) ) {
-      themes = themes || {};
-      themes[name + key] = makeColorsTheme(val);
-    }
-    else if ( is.obj(val) ) setColorsTheme(name + key, val);
-  });
-
-  if (themes) colors.setTheme(themes);
+  themes = buildColorsTheme(name, obj);
+  if ( !is.empty(themes) ) colors.setTheme(themes);
 }
 
 
