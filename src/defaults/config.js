@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------------------------------
- * LOG-OCD: CONFIG
+ * LOG-OCD: CONFIG DEFAULTS
  * -----------------------------------------------------------------------------
  * @version 1.0.0
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
@@ -18,9 +18,82 @@
  * @see [Closure Compiler specific JSDoc]{@link https://developers.google.com/closure/compiler/docs/js-for-compiler}
  */
 
+'use strict';
+
+var help = require('../helpers');
+var is     = help.is;
+var are    = help.are;
+var amend  = help.amend;
+var copy   = help.copy;
+var create = help.create;
+var cut    = help.cut;
+var each   = help.each;
+var fill   = help.fill;
+var freeze = help.freeze;
+var fuse   = help.fuse;
+var get    = help.get;
+var has    = help.has;
+var remap  = help.remap;
+var seal   = help.seal;
+var slice  = help.slice;
+var until  = help.until;
+
+var newEmptyObj = require('../helpers/new-empty-obj');
 
 ////////////////////////////////////////////////////////////////////////////////
-// CONFIG FACTORY METHODS
+// DEFAULT VALUES
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @private
+ * @type {!Object<string, function>}
+ * @const
+ */
+var CONFIG_FACTORY = freeze({
+  'toString': newPrepConfig,
+  'log':      newLogConfig,
+  'pass':     newLogConfig,
+  'error':    newLogConfig,
+  'warn':     newLogConfig,
+  'debug':    newLogConfig,
+  'fail':     newLogConfig,
+  'trace':    newTraceConfig
+});
+
+/**
+ * @private
+ * @type {!Object<string, string>}
+ * @const
+ */
+var CONFIG_VALID_KEYS = freeze({
+  'toString': 'style',
+  'log':      '',
+  'pass':     'header, msg',
+  'error':    'header, msg',
+  'warn':     'header, msg',
+  'debug':    'header, msg',
+  'fail':     'header, msg',
+  'trace':    ''
+});
+
+/**
+ * @private
+ * @type {!Object<string, string>}
+ * @const
+ */
+var CONFIG_TRUE_KEYS = freeze({
+  'toString': '',
+  'log':      '',
+  'pass':     'header',
+  'error':    'header, stack, throw, msg',
+  'warn':     'header, msg',
+  'debug':    'header',
+  'fail':     'msg',
+  'trace':    ''
+});
+
+////////////////////////////////////////////////////////////////////////////////
+// FACTORY METHODS
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -126,58 +199,9 @@ function newPrepConfig(validKeys, trueKeys) {
   return config;
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
-// CONFIG SETUP
+// EXPORTS
 ////////////////////////////////////////////////////////////////////////////////
-
-/**
- * @private
- * @type {!Object<string, function>}
- * @const
- */
-var CONFIG_FACTORY = freeze({
-  'toString': newPrepConfig,
-  'log':      newLogConfig,
-  'pass':     newLogConfig,
-  'error':    newLogConfig,
-  'warn':     newLogConfig,
-  'debug':    newLogConfig,
-  'fail':     newLogConfig,
-  'trace':    newTraceConfig
-});
-
-/**
- * @private
- * @type {!Object<string, string>}
- * @const
- */
-var CONFIG_VALID_KEYS = freeze({
-  'toString': 'style',
-  'log':      '',
-  'pass':     'header, msg',
-  'error':    'header, msg',
-  'warn':     'header, msg',
-  'debug':    'header, msg',
-  'fail':     'header, msg',
-  'trace':    ''
-});
-
-/**
- * @private
- * @type {!Object<string, string>}
- * @const
- */
-var CONFIG_TRUE_KEYS = freeze({
-  'toString': '',
-  'log':      '',
-  'pass':     'header',
-  'error':    'header, stack, throw, msg',
-  'warn':     'header, msg',
-  'debug':    'header',
-  'fail':     'msg',
-  'trace':    ''
-});
 
 /**
  * @typedef {!(LogConfig|TraceConfig|PrepConfig)} Config
@@ -188,16 +212,9 @@ var CONFIG_TRUE_KEYS = freeze({
  * @param {string} method
  * @return {!Config}
  */
-function getDefaultConfig(method) {
+module.exports = function getDefaultConfig(method) {
   return CONFIG_FACTORY[method](
     CONFIG_VALID_KEYS[method],
     CONFIG_TRUE_KEYS[method]
   );
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// CONFIG SETTERS
-////////////////////////////////////////////////////////////////////////////////
-
-
+};
