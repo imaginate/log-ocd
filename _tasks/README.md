@@ -2,7 +2,6 @@
 This directory consists of tasks called by a custom [makefile](https://github.com/imaginate/log-ocd/blob/master/make.js). Each script in this directory must export one [Task object](https://github.com/imaginate/log-ocd/blob/master/_tasks/_helpers/new-task.js) with at least one method. Below are instructions for using the makefile and its tasks.
 - [Overview](#overview)
 - [Examples](#examples)
-- [Shortcuts](#shortcuts)
 - [Methods](#methods)
 - [Values](#values)
 
@@ -28,17 +27,9 @@ $ node make --task=defaultValue-method-method-method=value
 ```
 
 
-## Shortcuts
-| Shortcut                 | Command Equivalent                    |
-| :----------------------- | :------------------------------------ |
-| ```$ node make ```       | ```$ node make --dev ```              |
-| ```$ node make --dev ``` | ```$ node make --compile ``` |
-
-
 ## Methods
 | Task    | Methods         | Default Methods |
 | :------ | :-------------- | :-------------- |
-| compile | main            | main            |
 | test    | all,logs,config | all             |
 | version | all             | all             |
 
@@ -50,7 +41,7 @@ $ node make --task=defaultValue-method-method-method=value
 | version | all    | Semantic Version | ```$ node make --version=1.2.4 ```           |
 
 
-<br />
+<br>
 --
 **Happy Developing,**
 
