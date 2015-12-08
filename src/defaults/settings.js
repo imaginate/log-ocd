@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------------------------------
- * LOG-OCD: SETTINGS
+ * LOG-OCD: SETTINGS DEFAULTS
  * -----------------------------------------------------------------------------
  * @version 1.0.0
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
@@ -18,9 +18,61 @@
  * @see [Closure Compiler specific JSDoc]{@link https://developers.google.com/closure/compiler/docs/js-for-compiler}
  */
 
+'use strict';
+
+var help = require('../helpers');
+var is     = help.is;
+var are    = help.are;
+var amend  = help.amend;
+var copy   = help.copy;
+var create = help.create;
+var cut    = help.cut;
+var each   = help.each;
+var fill   = help.fill;
+var freeze = help.freeze;
+var fuse   = help.fuse;
+var get    = help.get;
+var has    = help.has;
+var remap  = help.remap;
+var seal   = help.seal;
+var slice  = help.slice;
+var until  = help.until;
+
+var newEmptyObj = require('../helpers/new-empty-obj');
 
 ////////////////////////////////////////////////////////////////////////////////
-// SETTINGS FACTORY METHODS
+// DEFAULT VALUES
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @private
+ * @type {!Object<string, function>}
+ * @const
+ */
+var SETTINGS_GET_DEFAULT = freeze({
+  'config': require('./config'),
+  'format': require('./format'),
+  'style':  require('./style')
+});
+
+/**
+ * @private
+ * @type {!Object<string, string>}
+ * @const
+ */
+var SETTINGS_INVALID_KEYS = freeze({
+  'toString': '',
+  'log':      '',
+  'pass':     '',
+  'error':    '',
+  'warn':     '',
+  'debug':    '',
+  'fail':     '',
+  'trace':    ''
+});
+
+////////////////////////////////////////////////////////////////////////////////
+// FACTORY METHODS
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -33,18 +85,6 @@
  */
 
 /**
- * @private
- * @type {!Object<string, function>}
- * @const
- */
-var SETTINGS_GET_DEFAULT = freeze({
-  'config': getDefaultConfig,
-  'format': getDefaultFormat,
-  'style':  getDefaultStyle
-});
-
-/**
- * A factory method for Setting objects.
  * @private
  * @param {string} method
  * @param {string=} invalidKeys
@@ -81,23 +121,6 @@ function newSetting(method, invalidKeys) {
 
 /**
  * @private
- * @type {!Object<string, string>}
- * @const
- */
-var SETTINGS_INVALID_KEYS = freeze({
-  'toString': '',
-  'log':      '',
-  'pass':     '',
-  'error':    '',
-  'warn':     '',
-  'debug':    '',
-  'fail':     '',
-  'trace':    ''
-});
-
-/**
- * A factory method for Settings objects.
- * @private
  * @param {number} inst
  * @return {!Settings}
  */
@@ -117,3 +140,16 @@ function newSettings(inst) {
   });
   return freeze(settings);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// EXPORTS
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @private
+ * @param {number} inst
+ * @return {!Settings}
+ */
+module.exports = function getDefaultSettings(inst) {
+  return newSettings(inst);
+};
