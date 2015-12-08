@@ -20,14 +20,15 @@
 
 'use strict';
 
-var help  = require('./index');
-var is    = help.is;
-var cut   = help.cut;
-var has   = help.has;
-var remap = help.remap;
-var slice = help.slice;
+var help = require('../helpers');
+var is     = help.is;
+var cut    = help.cut;
+var freeze = help.freeze;
+var has    = help.has;
+var remap  = help.remap;
+var slice  = help.slice;
 
-var colors = require('./colors');
+var colors = require('../helpers/colors');
 
 ////////////////////////////////////////////////////////////////////////////////
 // MAIN METHOD
@@ -53,7 +54,7 @@ function toString(method, val) {
   format = this[method].format;
   style = 'ocd' + this[method].__INST + method + 'string';
 
-  if ( isFiller(val) ) {
+  if ( has(val, FILLER) ) {
     val = cut(val, /^<<|>>$/g);
     return colors[style](val);
   }
@@ -75,6 +76,14 @@ function toString(method, val) {
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * Checks whether a string is a type filler instead of a string (e.g. <type>).
+ * @private
+ * @type {!RegExp}
+ * @const
+ */
+var FILLER = freeze(/^<[\s\S]+>$/);
+
+/**
  * @private
  * @param {string} brackets
  * @param {function} color
@@ -86,16 +95,6 @@ function getBrackets(brackets, color) {
     color( brackets[0] ),
     color( brackets[1] )
   ];
-}
-
-/**
- * Checks whether a string is a type filler instead of a string (e.g. <type>).
- * @private
- * @param {string} str
- * @return {boolean}
- */
-function isFiller(str) {
-  return /^<[\s\S]+>$/.test(str);
 }
 
 /**
