@@ -26,6 +26,7 @@
  * @return {!Array}
  */
 module.exports = function getBrackets(brackets, color) {
+  if (!brackets) return [ '','' ];
   brackets += brackets.length > 1 ? '' : brackets;
   return [
     color( brackets[0] ),
