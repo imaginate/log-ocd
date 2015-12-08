@@ -41,3 +41,18 @@ exports.remap  = vitals.remap;
 exports.seal   = vitals.seal;
 exports.slice  = vitals.slice;
 exports.until  = vitals.until;
+
+////////////////////////////////////////////////////////////////////////////////
+// STYLE CHECK METHODS
+////////////////////////////////////////////////////////////////////////////////
+
+var has = vitals.has;
+
+/**
+ * @private
+ * @param {!Object} obj
+ * @return {boolean}
+ */
+are.is.theme = function isTheme(obj) {
+  return has(obj, '__TYPE') && has(obj.__TYPE, /Theme$/);
+};
