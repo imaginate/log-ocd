@@ -21,11 +21,9 @@
 'use strict';
 
 // see https://github.com/imaginate/are
-exports.is  = require('node-are').is;
-exports.are = require('node-are').are;
-
-// see https://github.com/Marak/colors.js
-exports.colors = require('colors/safe');
+var are = require('node-are');
+exports.is  = are.is;
+exports.are = are.are;
 
 // see https://github.com/imaginate/vitals
 var vitals = require('node-vitals')('base', 'strict');
