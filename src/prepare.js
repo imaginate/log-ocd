@@ -75,18 +75,21 @@ makeString.string = function stringToString(method, val) {
   var bracket;
   /** @type {!TypeFormat} */
   var format;
+  /** @type {string} */
+  var style;
   /** @type {function} */
   var color;
 
   format = this[method].format;
+  style = this[method].__INST + method + 'string';
 
   if ( has(val, /^<[\s\S]+>$/) ) {
-    color = colors[method + 'string'];
+    color = colors[style];
     val = remap(val, /^<<|>>$/g, '');
     return color(val);
   }
 
-  color = colors[method + 'stringbrackets'];
+  color = colors[style + 'brackets'];
   brackets = format.string.brackets;
   brackets += brackets.length > 1 ? '' : brackets;
   bracket = [ color( brackets[0] ), color( brackets[1] ) ];
@@ -94,14 +97,14 @@ makeString.string = function stringToString(method, val) {
   val = makeString.string.divide(format.lineLimit, val);
 
   if ( !has(val, '\n') ) {
-    color = colors[method + 'string'];
+    color = colors[style];
     return bracket[0] + color(val) + bracket[1];
   }
 
-  color = colors[method + 'stringdelimiter'];
+  color = colors[style + 'delimiter'];
   delimiter = color(' +');
 
-  color = colors[method + 'string'];
+  color = colors[style];
   return remap(val, /(.+)(\n)?/g, function(match, line, eol) {
     eol = eol ? delimiter + eol : '';
     return bracket[0] + color(line) + bracket[1] + eol;
