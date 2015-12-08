@@ -20,16 +20,19 @@
 
 'use strict';
 
+var colors = require('../../helpers/colors');
+
 /**
  * @param {string} brackets
- * @param {function} color
+ * @param {string} style
  * @return {!Array}
  */
-module.exports = function getBrackets(brackets, color) {
+module.exports = function getBrackets(brackets, style) {
   if (!brackets) return [ '','' ];
   brackets += brackets.length > 1 ? '' : brackets;
+  style += 'brackets';
   return [
-    color( brackets[0] ),
-    color( brackets[1] )
+    colors[style]( brackets[0] ),
+    colors[style]( brackets[1] )
   ];
 };
