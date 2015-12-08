@@ -279,11 +279,11 @@ var STYLE_FACTORY = freeze({
 var STYLE_VALID_KEYS = freeze({
   'toString': '',
   'log':      '',
-  'pass':     'header',
+  'pass':     'header, msg',
   'error':    'header, msg',
   'warn':     'header, msg',
-  'debug':    'header',
-  'fail':     'msg',
+  'debug':    'header, msg',
+  'fail':     'header, msg',
   'trace':    ''
 });
 
@@ -292,11 +292,12 @@ var STYLE_VALID_KEYS = freeze({
  * @type {!Object<string, function>}
  * @const
  */
-var STYLE_PROPS = freeze({
-  'toString': makeDefaultTypeStyleProps,
-  'log':  makeDefaultTypeStyleProps,
-  'pass': function() {
-    return makeDefaultTypeStyleProps({
+var STYLE_PROPS = (function() {
+
+  return freeze({
+    'toString': function() { return makeDefaultProps(); },
+    'log':      function() { return makeDefaultProps(); },
+    'pass':     function() { return makeDefaultProps({
       header: newAccentTheme({
         color: 'white',
         bg:    'green',
@@ -307,10 +308,8 @@ var STYLE_PROPS = freeze({
           bold:  true
         })
       })
-    });
-  },
-  'error': function() {
-    return makeDefaultTypeStyleProps({
+    }); },
+    'error':    function() { return makeDefaultProps({
       header: newAccentTheme({
         color: 'white',
         bg:    'red',
@@ -320,15 +319,9 @@ var STYLE_PROPS = freeze({
           bg:    'red',
           bold:  true
         })
-      }),
-      msg: newAccentTheme({
-        color: 'white',
-        accent: newTheme({ color: 'magenta' })
       })
-    });
-  },
-  'warn': function() {
-    return makeDefaultTypeStyleProps({
+    }); },
+    'warn':     function() { return makeDefaultProps({
       header: newAccentTheme({
         color: 'white',
         bg:    'yellow',
@@ -338,15 +331,9 @@ var STYLE_PROPS = freeze({
           bg:    'yellow',
           bold:  true
         })
-      }),
-      msg: newAccentTheme({
-        color: 'white',
-        accent: newTheme({ color: 'magenta' })
       })
-    });
-  },
-  'debug': function() {
-    return makeDefaultTypeStyleProps({
+    }); },
+    'debug':    function() { return makeDefaultProps({
       header: newAccentTheme({
         color: 'white',
         bg:    'blue',
@@ -357,18 +344,106 @@ var STYLE_PROPS = freeze({
           bold:  true
         })
       })
-    });
-  },
-  'fail': function() {
-    return makeDefaultTypeStyleProps({
+    }); },
+    'fail':     function() { return makeDefaultProps({
       msg: newAccentTheme({
         color: 'red',
         accent: newTheme({ color: 'yellow' })
       })
-    });
-  },
-  'trace': function(){}
-});
+    }); },
+    'trace':    function() {}
+  });
+
+  /**
+   * @private
+   * @param {Object=} intro
+   * @return {!Object}
+   */
+  function makeDefaultProps(intro) {
+
+    /** @type {!Object} */
+    var props;
+
+    props = {
+      'ocdMap':    newTheme({ color: 'cyan'    }),
+      'null':      newTheme({ color: 'magenta' }),
+      'undefined': newTheme({ color: 'magenta' }),
+      'boolean':   newTheme({ color: 'magenta' }),
+      'nan':       newTheme({ color: 'magenta' }),
+      'string': newTypeTheme({
+        color: 'yellow',
+        delimiter: newTheme({ color: 'red'    }),
+        brackets:  newTheme({ color: 'yellow' })
+      }),
+      'number': newTypeTheme({
+        color: 'magenta',
+        identifier: newTheme({ color: 'magenta' }),
+        delimiter:  newTheme({ color: 'magenta' })
+      }),
+      'object': newTypeTheme({
+        color: 'white',
+        identifier: newTheme({ color: 'white' }),
+        delimiter:  newTheme({ color: 'white' }),
+        brackets:   newTheme({ color: 'white' })
+      }),
+      'function': newTypeTheme({
+        color: 'white',
+        identifier: newTheme({ color: 'white' }),
+        delimiter:  newTheme({ color: 'white' }),
+        brackets:   newTheme({ color: 'white' })
+      }),
+      'regexp': newTypeTheme({
+        color: 'white',
+        identifier: newTheme({ color: 'yellow' }),
+        brackets:   newTheme({ color: 'yellow' }),
+        flags:      newTheme({ color: 'yellow' })
+      }),
+      'array': newTypeTheme({
+        color: 'white',
+        identifier: newTheme({ color: 'white' }),
+        delimiter:  newTheme({ color: 'white' }),
+        brackets:   newTheme({ color: 'white' })
+      }),
+      'args': newTypeTheme({
+        color: 'white',
+        identifier: newTheme({ color: 'white' }),
+        delimiter:  newTheme({ color: 'white' }),
+        brackets:   newTheme({ color: 'white' })
+      }),
+      'element': newTypeTheme({
+        color: 'white',
+        identifier: newTheme({ color: 'white' }),
+        delimiter:  newTheme({ color: 'white' }),
+        brackets:   newTheme({ color: 'white' })
+      }),
+      'document': newTypeTheme({
+        color: 'white',
+        identifier: newTheme({ color: 'white' }),
+        delimiter:  newTheme({ color: 'white' }),
+        brackets:   newTheme({ color: 'white' })
+      })
+    };
+
+    if (intro) props = fuse(props, {
+      header: newAccentTheme({
+        color: 'white',
+        bg:    'blue',
+        bold:  true,
+        accent: newTheme({
+          color: 'magenta',
+          bg:    'blue',
+          bold:  true
+        })
+      }),
+      msg: newAccentTheme({
+        color: 'white',
+        accent: newTheme({ color: 'magenta' })
+      })
+    }, intro);
+
+    return props;
+  }
+})();
 
 /**
  * @typedef {!(TypeStyle|TraceStyle)} Style
@@ -384,73 +459,6 @@ function getDefaultStyle(method) {
     STYLE_VALID_KEYS[method],
     STYLE_PROPS[method]()
   );
-}
-
-/**
- * @private
- * @param {Object=} props
- * @return {!Object}
- */
-function makeDefaultTypeStyleProps(props) {
-  return fuse({
-    'ocdMap':    newTheme({ color: 'cyan'    }),
-    'null':      newTheme({ color: 'magenta' }),
-    'undefined': newTheme({ color: 'magenta' }),
-    'boolean':   newTheme({ color: 'magenta' }),
-    'nan':       newTheme({ color: 'magenta' }),
-    'string': newTypeTheme({
-      color: 'yellow',
-      delimiter: newTheme({ color: 'red'    }),
-      brackets:  newTheme({ color: 'yellow' })
-    }),
-    'number': newTypeTheme({
-      color: 'magenta',
-      identifier: newTheme({ color: 'magenta' }),
-      delimiter:  newTheme({ color: 'magenta' })
-    }),
-    'object': newTypeTheme({
-      color: 'white',
-      identifier: newTheme({ color: 'white' }),
-      delimiter:  newTheme({ color: 'white' }),
-      brackets:   newTheme({ color: 'white' })
-    }),
-    'function': newTypeTheme({
-      color: 'white',
-      identifier: newTheme({ color: 'white' }),
-      delimiter:  newTheme({ color: 'white' }),
-      brackets:   newTheme({ color: 'white' })
-    }),
-    'regexp': newTypeTheme({
-      color: 'white',
-      identifier: newTheme({ color: 'yellow' }),
-      brackets:   newTheme({ color: 'yellow' }),
-      flags:      newTheme({ color: 'yellow' })
-    }),
-    'array': newTypeTheme({
-      color: 'white',
-      identifier: newTheme({ color: 'white' }),
-      delimiter:  newTheme({ color: 'white' }),
-      brackets:   newTheme({ color: 'white' })
-    }),
-    'args': newTypeTheme({
-      color: 'white',
-      identifier: newTheme({ color: 'white' }),
-      delimiter:  newTheme({ color: 'white' }),
-      brackets:   newTheme({ color: 'white' })
-    }),
-    'element': newTypeTheme({
-      color: 'white',
-      identifier: newTheme({ color: 'white' }),
-      delimiter:  newTheme({ color: 'white' }),
-      brackets:   newTheme({ color: 'white' })
-    }),
-    'document': newTypeTheme({
-      color: 'white',
-      identifier: newTheme({ color: 'white' }),
-      delimiter:  newTheme({ color: 'white' }),
-      brackets:   newTheme({ color: 'white' })
-    })
-  }, props || null);
 }
 
 
