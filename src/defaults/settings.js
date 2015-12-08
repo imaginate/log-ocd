@@ -21,22 +21,12 @@
 'use strict';
 
 var help = require('../helpers');
-var is     = help.is;
-var are    = help.are;
 var amend  = help.amend;
-var copy   = help.copy;
 var create = help.create;
-var cut    = help.cut;
 var each   = help.each;
-var fill   = help.fill;
 var freeze = help.freeze;
-var fuse   = help.fuse;
-var get    = help.get;
 var has    = help.has;
-var remap  = help.remap;
 var seal   = help.seal;
-var slice  = help.slice;
-var until  = help.until;
 
 var newEmptyObj = require('../helpers/new-empty-obj');
 
@@ -46,21 +36,10 @@ var newEmptyObj = require('../helpers/new-empty-obj');
 
 /**
  * @private
- * @type {!Object<string, function>}
- * @const
- */
-var SETTINGS_GET_DEFAULT = freeze({
-  'config': require('./config'),
-  'format': require('./format'),
-  'style':  require('./style')
-});
-
-/**
- * @private
  * @type {!Object<string, string>}
  * @const
  */
-var SETTINGS_INVALID_KEYS = freeze({
+var INVALID_KEYS = freeze({
   'toString': '',
   'log':      '',
   'pass':     '',
@@ -94,12 +73,16 @@ function newSetting(method, invalidKeys) {
 
   /** @type {!Setting} */
   var setting;
+  /** @type {function} */
+  var getDefault;
 
   setting = newEmptyObj('Setting');
-  each(SETTINGS_GET_DEFAULT, function(getDefault, key) {
-    setting = invalidKeys && has(invalidKeys, key)
-      ? amend(setting, key, null, 'null')
-      : amend(setting, key, getDefault(method), '!object');
+  invalidKeys = invalidKeys || '';
+  each('config, format, style', function(key) {
+    getDefault = has(invalidKeys, key) ? null : require('./' + key);
+    setting = getDefault
+      ? amend(setting, key, getDefault(method), '!object')
+      : amend(setting, key, null, 'null');
   });
   return seal(setting);
 }
@@ -135,8 +118,8 @@ function newSettings(inst) {
     enumerable: false,
     writable: false
   });
-  each(SETTINGS_INVALID_KEYS, function(invalidKeys, method) {
-    settings = amend(settings,method,newSetting(method,invalidKeys), '!object');
+  each(INVALID_KEYS, function(keys, method) {
+    settings = amend(settings, method, newSetting(method, keys), '!object');
   });
   return freeze(settings);
 }
