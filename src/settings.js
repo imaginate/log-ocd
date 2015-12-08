@@ -67,6 +67,7 @@ function newSetting(method, invalidKeys) {
 /**
  * @typedef {!{
  *   __TYPE:   string,
+ *   __INST:   number,
  *   toString: !Setting,
  *   log:      !Setting,
  *   pass:     !Setting,
@@ -97,14 +98,20 @@ var SETTINGS_INVALID_KEYS = freeze({
 /**
  * A factory method for Settings objects.
  * @private
+ * @param {number} inst
  * @return {!Settings}
  */
-function newSettings() {
+function newSettings(inst) {
 
   /** @type {!Settings} */
   var settings;
 
   settings = newEmptyObj('Settings');
+  settings = amend(settings, '__INST', inst, {
+    configurable: false,
+    enumerable: false,
+    writable: false
+  });
   each(SETTINGS_INVALID_KEYS, function(invalidKeys, method) {
     settings = amend(settings,method,newSetting(method,invalidKeys), '!object');
   });
