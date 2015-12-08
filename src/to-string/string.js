@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------------------------------
- * LOG-OCD: STRING-TO-STRING HELPER
+ * LOG-OCD: STRING-TO-STRING
  * -----------------------------------------------------------------------------
  * @version 1.0.0
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
@@ -21,59 +21,16 @@
 'use strict';
 
 var help = require('../helpers');
-var is     = help.is;
 var cut    = help.cut;
 var freeze = help.freeze;
 var has    = help.has;
 var remap  = help.remap;
-var slice  = help.slice;
 
 var colors = require('../helpers/colors');
 
-////////////////////////////////////////////////////////////////////////////////
-// MAIN METHOD
-////////////////////////////////////////////////////////////////////////////////
-
-/**
- * @this {!Settings}
- * @param {string} method
- * @param {string} val
- * @return {string}
- */
-function stringToString(method, val) {
-
-  /** @type {string} */
-  var delimiter;
-  /** @type {!Array} */
-  var brackets;
-  /** @type {!TypeFormat} */
-  var format;
-  /** @type {string} */
-  var style;
-
-  format = this[method].format;
-  style = 'ocd' + this[method].__INST + method + 'string';
-
-  if ( has(val, FILLER) ) {
-    val = cut(val, /^<<|>>$/g);
-    return colors[style](val);
-  }
-
-  brackets = getBrackets(format.string.brackets, colors[style + 'brackets']);
-  val = divideStr(format.lineLimit, val);
-
-  if ( !has(val, '\n') ) return bracket[0] + colors[style](val) + bracket[1];
-
-  delimiter = colors[style + 'delimiter'](' +');
-  return remap(val, /(.+)(\n)?/g, function(match, line, eol) {
-    eol = eol ? delimiter + eol : '';
-    return bracket[0] + colors[style](line) + bracket[1] + eol;
-  });
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// HELPERS
-////////////////////////////////////////////////////////////////////////////////
+var getDelimiter = require('./helpers/get-delimiter');
+var getBrackets = require('./helpers/get-brackets');
+var divideString = require('./helpers/divide-string');
 
 /**
  * Checks whether a string is a type filler instead of a string (e.g. <type>).
@@ -84,58 +41,39 @@ function stringToString(method, val) {
 var FILLER = freeze(/^<[\s\S]+>$/);
 
 /**
- * @private
- * @param {string} brackets
- * @param {function} color
- * @return {!Array}
- */
-var getBrackets = require('./helpers/getBrackets');
-
-/**
- * @private
- * @param {number} limit
+ * @this {!Settings}
+ * @param {string} method
  * @param {string} val
  * @return {string}
  */
-function divideStr(limit, val) {
+module.exports = function stringToString(method, val) {
 
   /** @type {string} */
-  var result;
-  /** @type {number} */
-  var i;
+  var delimiter;
+  /** @type {!Array} */
+  var brackets;
+  /** @type {!TypeFormat} */
+  var format;
+  /** @type {string} */
+  var style;
 
-  if (val.length <= limit) return val;
+  style = 'ocd' + this[method].__INST + method + 'string';
+  format = this[method].format;
 
-  result = '';
-  while (val.length > limit) {
-    i = getLastSpace(val, limit) || val.length;
-    result += '\n' + slice(val, 0, i);
-    val = slice(val, i);
+  if ( has(val, FILLER) ) {
+    val = cut(val, /^<<|>>$/g);
+    return colors[style](val);
   }
-  result += val && '\n' + val;
-  return result;
-}
 
-/**
- * @private
- * @param {string} str
- * @param {number=} limit
- * @return {number}
- */
-function getLastSpace(str, limit) {
+  val = divideString(format.lineLimit, val);
+  format = format.string;
+  brackets = getBrackets(format.brackets, style);
 
-  /** @type {string} */
-  var temp;
-  /** @type {number} */
-  var i;
+  if ( !has(val, '\n') ) return brackets[0] + colors[style](val) + brackets[1];
 
-  temp = limit ? slice(str, 0, limit) : str;
-  i = temp.lastIndexOf(' ') || str.indexOf(' ');
-  return ++i;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// EXPORTS
-////////////////////////////////////////////////////////////////////////////////
-
-module.exports = stringToString;
+  delimiter = getDelimiter(' +', style);
+  return remap(val, /(.+)(\n)?/g, function(match, line, eol) {
+    eol = eol ? delimiter + eol : '';
+    return brackets[0] + colors[style](line) + brackets[1] + eol;
+  });
+};
