@@ -29,7 +29,7 @@ var objPropsToString = require('./object-props');
 /**
  * @this {!Settings}
  * @param {string} method
- * @param {!Object} val
+ * @param {!Document} val
  * @return {string}
  */
 module.exports = function documentToString(method, val) {
