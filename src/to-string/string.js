@@ -58,6 +58,7 @@ module.exports = function stringToString(method, val) {
   var style;
 
   style = 'ocd' + this[method].__INST + method + 'string';
+  val = remap(val, /\n/g, '\\n');
 
   if ( has(val, FILLER) ) {
     val = cut(val, /^<<|>>$/g);
