@@ -26,6 +26,9 @@ var freeze = help.freeze;
 var has    = help.has;
 var until  = help.until;
 
+var stripStyle = require('./helpers/strip-style');
+var noStyle = require('./helpers/no-style');
+
 /**
  * @private
  * @type {!Object<string, string>}
@@ -47,6 +50,8 @@ module.exports = function toString(method, val) {
   /** @type {!Setting} */
   var setting;
   /** @type {string} */
+  var result;
+  /** @type {string} */
   var types;
   /** @type {string} */
   var type;
@@ -58,8 +63,6 @@ module.exports = function toString(method, val) {
     return !!type;
   });
   type = type || 'object';
-  setting = this[method];
-  return has(setting.config, 'style') && setting.config.style === false
-    ? require('./no-style/'+ type).call(this, val)
-    : require('./'+ type).call(this, method, val);
+  result = require('./' + type).call(this, method, val);
+  return noStyle(this[method].config) ? stripStyle(result) : result;
 };
