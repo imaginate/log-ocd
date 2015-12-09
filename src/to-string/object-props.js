@@ -41,30 +41,26 @@ var toString = require('./index');
  */
 module.exports = function objectPropsToString(method, vals, obj) {
 
-  /** @type {!Array<string>} */
+  /** @type {(string|!Array<string>)} */
   var result;
-  /** @type {string} */
-  var indent;
   /** @type {function} */
   var color;
   /** @type {!Array<string>} */
   var keys;
-  /** @type {number} */
+  /** @type {(number|string)} */
   var last;
-  /** @type {number} */
+  /** @type {(number|boolean)} */
   var len;
 
   keys = getKeys(obj);
+  result = vals.identifier + vals.brackets[0];
 
-  if (!keys.length) return vals.identifier + vals.brackets[0] + vals.brackets[1];
+  if (!keys.length) return result + vals.brackets[1];
 
-  result = [];
-  result = fuse(result, vals.identifier + vals.brackets[0]);
-
-  // convert all object values to a string
-  len = stripStyle( result[0] ).length;
+  len = stripStyle(result).length;
   last = keys.length - 1;
   color = colors[vals.style];
+  result = [ result ];
   each(keys, function(key, i) {
     key = color(key + ':') + ' ' + toString.call(this, method, obj[key]);
     len += stripStyle(key).length;
@@ -73,8 +69,8 @@ module.exports = function objectPropsToString(method, vals, obj) {
   }, this);
 
   len = len < vals.limit;
-  indent = len ? ' ' : '\n' + fill(vals.indent, ' ');
-  result = result.join(indent);
+  last = len ? ' ' : '\n' + fill(vals.indent, ' ');
+  result = result.join(last);
   result += len ? ' ' : '\n';
   return result + vals.brackets[1];
 };
