@@ -271,7 +271,7 @@ function newAccentTheme(props) {
  *   __TYPE:    string,
  *   header:    ?AccentTheme,
  *   msg:       ?AccentTheme,
- *   ocdMap:    !Theme,
+ *   ocdMap:    !TypeTheme,
  *   null:      !Theme,
  *   undefined: !Theme,
  *   boolean:   !Theme,
@@ -294,6 +294,7 @@ function newAccentTheme(props) {
  * @const
  */
 var TYPE_VALID_KEYS = freeze({
+  'ocdMap':   '            delimiter                 ',
   'string':   '            delimiter, brackets       ',
   'number':   'identifier, delimiter                 ',
   'object':   'identifier, delimiter, brackets       ',
@@ -326,7 +327,7 @@ function newTypeStyle(validKeys, props) {
       ? amend(style, key, newAccentTheme(), '!object')
       : amend(style, key, null, 'null');
   });
-  keys = 'ocdMap, null, undefined, boolean, nan';
+  keys = 'null, undefined, boolean, nan';
   each(keys, function(key) {
     style = amend(style, key, newTheme(), '!object');
   });
