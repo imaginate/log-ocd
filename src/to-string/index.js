@@ -28,6 +28,7 @@ var until  = help.until;
 
 var stripStyle = require('./helpers/strip-style');
 var noStyle = require('./helpers/no-style');
+var ocdMap = require('./helpers/ocd-map');
 
 /**
  * @private
@@ -49,6 +50,8 @@ module.exports = function toString(method, val) {
 
   /** @type {!Setting} */
   var setting;
+  /** @type {!Config} */
+  var config;
   /** @type {string} */
   var result;
   /** @type {string} */
@@ -63,6 +66,8 @@ module.exports = function toString(method, val) {
     return !!type;
   });
   type = type || 'object';
+  config = this[method].config;
+  type = ocdMap(config, type, val) ? 'ocd-map' : type;
   result = require('./' + type).call(this, method, val);
-  return noStyle(this[method].config) ? stripStyle(result) : result;
+  return noStyle(config) ? stripStyle(result) : result;
 };

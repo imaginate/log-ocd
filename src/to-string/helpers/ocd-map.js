@@ -21,6 +21,7 @@
 'use strict';
 
 var help = require('../../helpers');
+var is     = help.is;
 var has    = help.has;
 var freeze = help.freeze;
 var until  = help.until;
@@ -36,14 +37,19 @@ var KEYS = freeze(
 
 /**
  * @param {!Object} config
- * @param {!Object} obj
+ * @param {string} type
+ * @param {*} val
  * @return {boolean}
  */
-module.exports = function ocdMap(config, obj) {
-  return check(config, 'ocdMap') ||
-    until(true, KEYS, function(key) {
-      return check(obj, key);
-    });
+module.exports = function ocdMap(config, type, val) {
+
+  if ( !is._obj(val) ) return false;
+
+  if ( type === 'object' && check(config, 'ocdMap') ) return true;
+
+  return until(true, KEYS, function(key) {
+    return check(val, key);
+  });
 };
 
 /**
