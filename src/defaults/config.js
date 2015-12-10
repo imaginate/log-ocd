@@ -24,7 +24,6 @@ var help = require('../helpers');
 var amend  = help.amend;
 var each   = help.each;
 var freeze = help.freeze;
-var has    = help.has;
 var seal   = help.seal;
 
 var newEmptyObj = require('../helpers/new-empty-obj');
@@ -65,6 +64,19 @@ var TRUE_KEYS = freeze({
   'trace':    ''
 });
 
+/**
+ * All the valid boolean keys for each config object. Note that the logger prop
+ *   is applied separately.
+ * @private
+ * @type {!Object<string, string>}
+ * @const
+ */
+var CONFIG_KEYS = freeze({
+  'log':   'ocdMap, header, stack, throw, exit, msg',
+  'prep':  'style',
+  'trace': 'throw, exit'
+});
+
 ////////////////////////////////////////////////////////////////////////////////
 // FACTORY METHODS
 ////////////////////////////////////////////////////////////////////////////////
@@ -91,13 +103,36 @@ function newLogConfig(trueKeys) {
 
   /** @type {!LogConfig} */
   var config;
-  /** @type {string} */
-  var keys;
 
   config = newEmptyObj('Config');
   config = amend(config, 'logger', console.log, 'function');
-  keys  = 'ocdMap, header, stack, throw, exit, msg';
-  config = amend(config, keys, false, 'boolean');
+  config = amend(config, CONFIG_KEYS.log, false, 'boolean');
+  config = seal(config);
+  trueKeys && each(trueKeys, function(key) {
+    config[key] = true;
+  });
+  return config;
+}
+
+/**
+ * @typedef {!{
+ *   __TYPE: string,
+ *   style:  boolean
+ * }} PrepConfig
+ */
+
+/**
+ * @private
+ * @param {string} trueKeys
+ * @return {!PrepConfig}
+ */
+function newPrepConfig(trueKeys) {
+
+  /** @type {!PrepConfig} */
+  var config;
+
+  config = newEmptyObj('Config');
+  config = amend(config, CONFIG_KEYS.prep, false, 'boolean');
   config = seal(config);
   trueKeys && each(trueKeys, function(key) {
     config[key] = true;
@@ -123,42 +158,10 @@ function newTraceConfig(trueKeys) {
 
   /** @type {!TraceConfig} */
   var config;
-  /** @type {string} */
-  var keys;
 
   config = newEmptyObj('Config');
   config = amend(config, 'logger', console.log, 'function');
-  keys  = 'throw, exit';
-  config = amend(config, keys, false, 'boolean');
-  config = seal(config);
-  trueKeys && each(trueKeys, function(key) {
-    config[key] = true;
-  });
-  return config;
-}
-
-/**
- * @typedef {!{
- *   __TYPE: string,
- *   style:  ?boolean
- * }} PrepConfig
- */
-
-/**
- * @private
- * @param {string} trueKeys
- * @return {!PrepConfig}
- */
-function newPrepConfig(trueKeys) {
-
-  /** @type {!PrepConfig} */
-  var config;
-  /** @type {string} */
-  var keys;
-
-  config = newEmptyObj('Config');
-  keys  = 'style';
-  config = amend(config, keys, false, 'boolean');
+  config = amend(config, CONFIG_KEYS.trace, false, 'boolean');
   config = seal(config);
   trueKeys && each(trueKeys, function(key) {
     config[key] = true;
