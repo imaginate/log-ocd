@@ -41,54 +41,159 @@ var newEmptyObj = require('../helpers/new-empty-obj');
  * @const
  */
 var FACTORY = freeze({
-  'toString': newTypeFormat,
-  'log':      newTypeFormat,
-  'pass':     newTypeFormat,
-  'error':    newTypeFormat,
-  'warn':     newTypeFormat,
-  'debug':    newTypeFormat,
-  'fail':     newTypeFormat,
+  'toString': newPrepFormat,
+  'log':      newLogFormat,
+  'pass':     newLogFormat,
+  'error':    newLogFormat,
+  'warn':     newLogFormat,
+  'debug':    newLogFormat,
+  'fail':     newLogFormat,
   'trace':    newTraceFormat
 });
 
 /**
  * @private
- * @type {!Object<string, string>}
+ * @type {!Object<string, ?function>}
  * @const
  */
-var VALID_KEYS = freeze({
-  'toString': '',
-  'log':      'linesBefore, linesAfter',
-  'pass':     'linesBefore, linesAfter, header, msg',
-  'error':    'linesBefore, linesAfter, header, msg',
-  'warn':     'linesBefore, linesAfter, header, msg',
-  'debug':    'linesBefore, linesAfter, header, msg',
-  'fail':     'linesBefore, linesAfter, header, msg',
-  'trace':    'linesBefore, linesAfter'
+var PROPS = freeze({
+  'toString': null,
+  'log':      null,
+  'pass':     null,
+  'error':    null,
+  'warn':     null,
+  'debug':    null,
+  'fail': function() {
+    return {
+      msg: newMsgFormat({ bullet: '', indent: 0 })
+    };
+  },
+  'trace': null
 });
 
 /**
  * @private
- * @type {!Object<string, function>}
+ * @type {!Object}
  * @const
  */
-var PROPS = freeze({
-  'toString': function() { return makeDefaultProps(); },
-  'log':      function() { return makeDefaultProps(true); },
-  'pass':     function() { return makeDefaultProps(true, true); },
-  'error':    function() { return makeDefaultProps(true, true); },
-  'warn':     function() { return makeDefaultProps(true, true); },
-  'debug':    function() { return makeDefaultProps(true, true); },
-  'fail':     function() { return makeDefaultProps(true, true, {
-    msg: newMsgFormat({
-      accentMark: '`',
-      lineLimit:  50,
-      indent:     0,
-      bullet:     ''
-    })
-  }); },
-  'trace':    function() {}
-});
+var HEADER_PROPS = freeze({
+  'spaceBefore': { type: 'number', val: 1   },
+  'spaceAfter':  { type: 'number', val: 6   },
+  'accentMark':  { type: 'string', val: '`' },
+  'lineLimit':   { type: 'number', val: 50  }
+}, true);
+
+/**
+ * @private
+ * @type {!Object}
+ * @const
+ */
+var MSG_PROPS = freeze({
+  'accentMark': { type: 'string', val: '`' },
+  'lineLimit':  { type: 'number', val: 50  },
+  'bullet':     { type: 'string', val: '-' },
+  'indent':     { type: 'number', val: 2   }
+}, true);
+
+/**
+ * @private
+ * @type {!Object}
+ * @const
+ */
+var OCD_MAP_PROPS = freeze({
+  'spaceBefore': { type: 'number', val: 0   },
+  'spaceAfter':  { type: 'number', val: 0   },
+  'delimiter':   { type: 'string', val: ':' }
+}, true);
+
+/**
+ * @private
+ * @type {!Object}
+ * @const
+ */
+var STRING_PROPS = freeze({
+  'brackets': { type: 'string', val: '"' }
+}, true);
+
+/**
+ * @private
+ * @type {!Object}
+ * @const
+ */
+var OBJECT_PROPS = freeze({
+  'identifier': { type: 'string', val: ''   },
+  'delimiter':  { type: 'string', val: ','  },
+  'brackets':   { type: 'string', val: '{}' },
+  'indent':     { type: 'number', val: 2    }
+}, true);
+
+/**
+ * @private
+ * @type {!Object}
+ * @const
+ */
+var ARRAY_PROPS = freeze({
+  'identifier': { type: 'string', val: ''   },
+  'delimiter':  { type: 'string', val: ','  },
+  'brackets':   { type: 'string', val: '[]' },
+  'indent':     { type: 'number', val: 2    }
+}, true);
+
+/**
+ * @private
+ * @type {!Object}
+ * @const
+ */
+var REG_EXP_PROPS = freeze({
+  'identifier': { type: 'string', val: ''  },
+  'brackets':   { type: 'string', val: '/' }
+}, true);
+
+/**
+ * @private
+ * @type {!Object}
+ * @const
+ */
+var TYPE_PROPS = freeze({
+  'undefined': { type: 'string', val: 'undefined' },
+  'null':      { type: 'string', val: 'null'      },
+  'nan':       { type: 'string', val: 'nan'       },
+  'ocdMap':   { type: '!object', make: newOcdMapFormat, props: null },
+  'string':   { type: '!object', make: newStringFormat, props: null },
+  'regexp':   { type: '!object', make: newRegExpFormat, props: null },
+  'object':   { type: '!object', make: newObjectFormat, props: null },
+  'array':    { type: '!object', make: newArrayFormat,  props: null },
+  'args':     { type: '!object', make: newArrayFormat,
+                                 props: { identifier: '[Arguments] '   } },
+  'function': { type: '!object', make: newObjectFormat,
+                                 props: { identifier: '[Function] '    } },
+  'element':  { type: '!object', make: newObjectFormat,
+                                 props: { identifier: '[DomElement] '  } },
+  'document': { type: '!object', make: newObjectFormat,
+                                 props: { identifier: '[DomDocument] ' } }
+}, true);
+
+/**
+ * @private
+ * @type {!Object}
+ * @const
+ */
+var LOG_PROPS = freeze({
+  'linesBefore': { type: 'number', val: 1  },
+  'linesAfter':  { type: 'number', val: 1  },
+  'lineLimit':   { type: 'number', val: 50 },
+  'header': { type: '!object', make: newHeaderFormat, props: null },
+  'msg':    { type: '!object', make: newMsgFormat,    props: null }
+}, true);
+
+/**
+ * @private
+ * @type {!Object}
+ * @const
+ */
+var PREP_PROPS = freeze({
+  'lineLimit': { type: 'number', val: 50 }
+}, true);
 
 ////////////////////////////////////////////////////////////////////////////////
 // FACTORY METHODS
@@ -113,14 +218,11 @@ function newHeaderFormat(props) {
 
   /** @type {!HeaderFormat} */
   var format;
-  /** @type {string} */
-  var keys;
 
   format = newEmptyObj('HeaderFormat');
-  keys  = 'accentMark';
-  format = amend(format, keys, '', 'string');
-  keys  = 'spaceBefore, spaceAfter, lineLimit';
-  format = amend(format, keys, 0, 'number');
+  each(HEADER_PROPS, function(obj, key) {
+    format = amend(format, key, obj.val, obj.type);
+  });
   format = seal(format);
   return props ? fuse(format, props) : format;
 }
@@ -144,14 +246,11 @@ function newMsgFormat(props) {
 
   /** @type {!MsgFormat} */
   var format;
-  /** @type {string} */
-  var keys;
 
   format = newEmptyObj('MsgFormat');
-  keys  = 'accentMark, bullet';
-  format = amend(format, keys, '', 'string');
-  keys  = 'lineLimit, indent';
-  format = amend(format, keys, 0, 'number');
+  each(MSG_PROPS, function(obj, key) {
+    format = amend(format, key, obj.val, obj.type);
+  });
   format = seal(format);
   return props ? fuse(format, props) : format;
 }
@@ -174,14 +273,11 @@ function newOcdMapFormat(props) {
 
   /** @type {!OcdMapFormat} */
   var format;
-  /** @type {string} */
-  var keys;
 
   format = newEmptyObj('OcdMapFormat');
-  keys  = 'delimiter';
-  format = amend(format, keys, '', 'string');
-  keys  = 'spaceBefore, spaceAfter';
-  format = amend(format, keys, 0, 'number');
+  each(OCD_MAP_PROPS, function(obj, key) {
+    format = amend(format, key, obj.val, obj.type);
+  });
   format = seal(format);
   return props ? fuse(format, props) : format;
 }
@@ -202,12 +298,11 @@ function newStringFormat(props) {
 
   /** @type {!StringFormat} */
   var format;
-  /** @type {string} */
-  var keys;
 
   format = newEmptyObj('StringFormat');
-  keys  = 'brackets';
-  format = amend(format, keys, '', 'string');
+  each(STRING_PROPS, function(obj, key) {
+    format = amend(format, key, obj.val, obj.type);
+  });
   format = seal(format);
   return props ? fuse(format, props) : format;
 }
@@ -231,14 +326,39 @@ function newObjectFormat(props) {
 
   /** @type {!ObjectFormat} */
   var format;
-  /** @type {string} */
-  var keys;
 
   format = newEmptyObj('ObjectFormat');
-  keys  = 'identifier, delimiter, brackets';
-  format = amend(format, keys, '', 'string');
-  keys  = 'indent';
-  format = amend(format, keys, 0, 'number');
+  each(OBJECT_PROPS, function(obj, key) {
+    format = amend(format, key, obj.val, obj.type);
+  });
+  format = seal(format);
+  return props ? fuse(format, props) : format;
+}
+
+/**
+ * @typedef {!{
+ *   __TYPE:     string,
+ *   identifier: string,
+ *   delimiter:  string,
+ *   brackets:   string,
+ *   indent:     number
+ * }} ArrayFormat
+ */
+
+/**
+ * @private
+ * @param {Object<string, (string|number)>=} props
+ * @return {!ArrayFormat}
+ */
+function newArrayFormat(props) {
+
+  /** @type {!ArrayFormat} */
+  var format;
+
+  format = newEmptyObj('ArrayFormat');
+  each(ARRAY_PROPS, function(obj, key) {
+    format = amend(format, key, obj.val, obj.type);
+  });
   format = seal(format);
   return props ? fuse(format, props) : format;
 }
@@ -260,12 +380,59 @@ function newRegExpFormat(props) {
 
   /** @type {!RegExpFormat} */
   var format;
-  /** @type {string} */
-  var keys;
 
   format = newEmptyObj('RegExpFormat');
-  keys  = 'identifier, brackets';
-  format = amend(format, keys, '', 'string');
+  each(REG_EXP_PROPS, function(obj, key) {
+    format = amend(format, key, obj.val, obj.type);
+  });
+  format = seal(format);
+  return props ? fuse(format, props) : format;
+}
+
+/**
+ * @typedef {!{
+ *   __TYPE:      string,
+ *   linesBefore: number,
+ *   linesAfter:  number,
+ *   lineLimit:   number,
+ *   header:      HeaderFormat,
+ *   msg:         MsgFormat,
+ *   ocdMap:      !OcdMapFormat,
+ *   undefined:   string,
+ *   null:        string,
+ *   nan:         string,
+ *   string:      !StringFormat,
+ *   regexp:      !RegExpFormat,
+ *   array:       !ArrayFormat,
+ *   args:        !ArrayFormat,
+ *   object:      !ObjectFormat,
+ *   function:    !ObjectFormat,
+ *   element:     !ObjectFormat,
+ *   document:    !ObjectFormat
+ * }} LogFormat
+ */
+
+/**
+ * @private
+ * @param {Object=} props
+ * @return {!LogFormat}
+ */
+function newLogFormat(props) {
+
+  /** @type {!LogFormat} */
+  var format;
+  /** @type {*} */
+  var val;
+
+  format = newEmptyObj('Format');
+  each(LOG_PROPS, function(obj, key) {
+    val = obj.make ? obj.make(obj.props) : obj.val;
+    format = amend(format, key, val, obj.type);
+  });
+  each(TYPE_PROPS, function(obj, key) {
+    val = obj.make ? obj.make(obj.props) : obj.val;
+    format = amend(format, key, val, obj.type);
+  });
   format = seal(format);
   return props ? fuse(format, props) : format;
 }
@@ -273,172 +440,45 @@ function newRegExpFormat(props) {
 /**
  * @typedef {!{
  *   __TYPE:    string,
- *   linesBefore: ?number,
- *   linesAfter:  ?number,
- *   lineLimit:   number,
- *   header:      ?HeaderFormat,
- *   msg:         ?MsgFormat,
- *   ocdMap:      !OcdMapFormat,
- *   undefined:   string,
- *   null:        string,
- *   nan:         string,
- *   string:      !StringFormat,
- *   object:      !ObjectFormat,
- *   function:    !ObjectFormat,
- *   regexp:      !RegExpFormat,
- *   array:       !ObjectFormat,
- *   args:        !ObjectFormat,
- *   element:     !ObjectFormat,
- *   document:    !ObjectFormat
- * }} TypeFormat
+ *   lineLimit: number,
+ *   ocdMap:    !OcdMapFormat,
+ *   undefined: string,
+ *   null:      string,
+ *   nan:       string,
+ *   string:    !StringFormat,
+ *   regexp:    !RegExpFormat,
+ *   array:     !ArrayFormat,
+ *   args:      !ArrayFormat,
+ *   object:    !ObjectFormat,
+ *   function:  !ObjectFormat,
+ *   element:   !ObjectFormat,
+ *   document:  !ObjectFormat
+ * }} PrepFormat
  */
 
 /**
  * @private
- * @type {!Object}
- * @const
- */
-var OPT_TYPE_PROPS = freeze({
-  'linesBefore': { type: 'number', val: 1 },
-  'linesAfter':  { type: 'number', val: 1 },
-  'header': { type: '!object', make: newHeaderFormat },
-  'msg':    { type: '!object', make: newMsgFormat }
-});
-
-/**
- * @private
- * @type {!Object<string, function>}
- * @const
- */
-var TYPE_PROPS = freeze({
-  'lineLimit': { type: 'number', val: 0 },
-  'undefined': { type: 'string', val: '' },
-  'null':      { type: 'string', val: '' },
-  'nan':       { type: 'string', val: '' },
-  'ocdMap':   { type: '!object', make: newOcdMapFormat },
-  'string':   { type: '!object', make: newStringFormat },
-  'regexp':   { type: '!object', make: newRegExpFormat },
-  'object':   { type: '!object', make: newObjectFormat },
-  'function': { type: '!object', make: newObjectFormat },
-  'array':    { type: '!object', make: newObjectFormat },
-  'args':     { type: '!object', make: newObjectFormat },
-  'element':  { type: '!object', make: newObjectFormat },
-  'document': { type: '!object', make: newObjectFormat }
-});
-
-/**
- * @private
- * @param {string=} invalidKeys
  * @param {Object=} props
- * @return {!TypeFormat}
+ * @return {!PrepFormat}
  */
-function newTypeFormat(invalidKeys, props) {
+function newPrepFormat(props) {
 
-  /** @type {!TypeFormat} */
+  /** @type {!PrepFormat} */
   var format;
-  /** @type {string} */
-  var keys;
   /** @type {*} */
   var val;
 
   format = newEmptyObj('Format');
-  each(TYPE_PROPS, function(obj, key) {
-    val = obj.make ? obj.make() : obj.val;
+  each(PREP_PROPS, function(obj, key) {
+    val = obj.make ? obj.make(obj.props) : obj.val;
     format = amend(format, key, val, obj.type);
   });
-  invalidKeys = invalidKeys || '';
-  each(OPT_TYPE_PROPS, function(obj, key) {
-    if ( has(invalidKeys, key) ) format = amend(format, key, null, 'null');
-    else {
-      val = obj.make ? obj.make() : obj.val;
-      format = amend(format, key, val, obj.type);
-    }
+  each(TYPE_PROPS, function(obj, key) {
+    val = obj.make ? obj.make(obj.props) : obj.val;
+    format = amend(format, key, val, obj.type);
   });
   format = seal(format);
   return props ? fuse(format, props) : format;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// HELPER METHODS
-////////////////////////////////////////////////////////////////////////////////
-
-/**
- * @private
- * @param {boolean=} lines
- * @param {boolean=} intro
- * @param {Object=} extra
- * @return {!Object}
- */
-function makeDefaultProps(lines, intro, extra) {
-
-  /** @type {!Object} */
-  var props;
-
-  props = {
-    lineLimit:   50,
-    'undefined': 'undefined',
-    'null':      'null',
-    'nan':       'nan',
-    'ocdMap': newOcdMapFormat({ delimiter: ':' }),
-    'string': newStringFormat({ brackets: '"' }),
-    'object': newObjectFormat({
-      delimiter: ',',
-      brackets:  '{}',
-      indent:    2
-    }),
-    'function': newObjectFormat({
-      identifier: '[Function] ',
-      delimiter:  ',',
-      brackets:   '{}',
-      indent:     2
-    }),
-    'regexp': newRegExpFormat({ brackets: '/' }),
-    'array': newObjectFormat({
-      delimiter: ',',
-      brackets:  '[]',
-      indent:    2
-    }),
-    'args': newObjectFormat({
-      identifier: '[Arguments] ',
-      delimiter:  ',',
-      brackets:   '[]',
-      indent:     2
-    }),
-    'element': newObjectFormat({
-      identifier: '[DomElement] ',
-      delimiter:  ',',
-      brackets:   '{}',
-      indent:     2
-    }),
-    'document': newObjectFormat({
-      identifier: '[DomDocument] ',
-      delimiter:  ',',
-      brackets:   '{}',
-      indent:     2
-    })
-  };
-
-  if (lines) props = fuse(props, {
-    linesBefore: 1,
-    linesAfter:  1
-  });
-
-  if (intro) props = fuse(props, {
-    header: newHeaderFormat({
-      spaceBefore: 1,
-      spaceAfter:  6,
-      accentMark:  '`',
-      lineLimit:   50
-    }),
-    msg: newMsgFormat({
-      accentMark: '`',
-      lineLimit:  50,
-      indent:     2,
-      bullet:     '-'
-    })
-  });
-
-  return extra ? fuse(props, extra) : props;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -446,7 +486,7 @@ function makeDefaultProps(lines, intro, extra) {
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @typedef {!(TypeFormat|TraceFormat)} Format
+ * @typedef {!(LogFormat|PrepFormat)} Format
  */
 
 /**
@@ -455,5 +495,11 @@ function makeDefaultProps(lines, intro, extra) {
  * @return {!Format}
  */
 module.exports = function getDefaultFormat(method) {
-  return FACTORY[method]( VALID_KEYS[method], PROPS[method]() );
+
+  /** @type {?(function|Object)} */
+  var props;
+
+  props = PROPS[method];
+  props = props && props();
+  return FACTORY[method](props);
 };
