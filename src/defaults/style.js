@@ -131,21 +131,81 @@ var PROPS = freeze({
   'trace':    function() {}
 });
 
+/**
+ * @private
+ * @type {!Object}
+ * @const
+ */
+var THEME_PROPS = freeze({
+  'color':         { type: 'string',  val: ''    },
+  'bg':            { type: 'string',  val: ''    },
+  'bold':          { type: 'boolean', val: false },
+  'dim':           { type: 'boolean', val: false },
+  'hidden':        { type: 'boolean', val: false },
+  'inverse':       { type: 'boolean', val: false },
+  'italic':        { type: 'boolean', val: false },
+  'reset':         { type: 'boolean', val: false },
+  'strikethrough': { type: 'boolean', val: false },
+  'underline':     { type: 'boolean', val: false }
+}, true);
+
+/**
+ * @private
+ * @type {!Object}
+ * @const
+ */
+var HEADER_PROPS = freeze({
+  'color':         { type: 'string',  val: 'white' },
+  'bg':            { type: 'string',  val: 'blue'  },
+  'bold':          { type: 'boolean', val: true    },
+  'dim':           { type: 'boolean', val: false   },
+  'hidden':        { type: 'boolean', val: false   },
+  'inverse':       { type: 'boolean', val: false   },
+  'italic':        { type: 'boolean', val: false   },
+  'reset':         { type: 'boolean', val: false   },
+  'strikethrough': { type: 'boolean', val: false   },
+  'underline':     { type: 'boolean', val: false   },
+  'accent':        { type: '!object', make: newTheme,
+                     props: { color: 'magenta',
+                              bg:    'blue',
+                              bold:  true       }  }
+}, true);
+
+/**
+ * @private
+ * @type {!Object}
+ * @const
+ */
+var MSG_PROPS = freeze({
+  'color':         { type: 'string',  val: 'white' },
+  'bg':            { type: 'string',  val: ''      },
+  'bold':          { type: 'boolean', val: false   },
+  'dim':           { type: 'boolean', val: false   },
+  'hidden':        { type: 'boolean', val: false   },
+  'inverse':       { type: 'boolean', val: false   },
+  'italic':        { type: 'boolean', val: false   },
+  'reset':         { type: 'boolean', val: false   },
+  'strikethrough': { type: 'boolean', val: false   },
+  'underline':     { type: 'boolean', val: false   },
+  'accent':        { type: '!object', make: newTheme,
+                     props: { color: 'magenta' }   }
+}, true);
+
 ////////////////////////////////////////////////////////////////////////////////
 // FACTORY METHODS
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
  * @typedef {!{
- *   __TYPE:  string,
- *   color:   string,
- *   bg:      string,
- *   bold:    boolean,
- *   dim:     boolean,
- *   hidden:  boolean,
- *   inverse: boolean,
- *   italic:  boolean,
- *   reset:   boolean,
+ *   __TYPE:        string,
+ *   color:         string,
+ *   bg:            string,
+ *   bold:          boolean,
+ *   dim:           boolean,
+ *   hidden:        boolean,
+ *   inverse:       boolean,
+ *   italic:        boolean,
+ *   reset:         boolean,
  *   strikethrough: boolean,
  *   underline:     boolean
  * }} Theme
@@ -161,62 +221,10 @@ function newTheme(props) {
 
   /** @type {!Theme} */
   var theme;
-  /** @type {string} */
-  var keys;
 
   theme = newEmptyObj('Theme');
-  keys  = 'color, bg';
-  theme = amend(theme, keys, '', 'string');
-  keys  = 'bold, dim, hidden, inverse, italic, reset, strikethrough, underline';
-  theme = amend(theme, keys, false, 'boolean');
-  theme = seal(theme);
-  return props ? fuse(theme, props) : theme;
-}
-
-/**
- * @typedef {!{
- *   __TYPE:     string,
- *   identifier: ?Theme,
- *   delimiter:  ?Theme,
- *   brackets:   ?Theme,
- *   flags:      ?Theme,
- *   color:      string,
- *   bg:         string,
- *   bold:       boolean,
- *   dim:        boolean,
- *   hidden:     boolean,
- *   inverse:    boolean,
- *   italic:     boolean,
- *   reset:      boolean,
- *   strikethrough: boolean,
- *   underline:     boolean
- * }} TypeTheme
- */
-
-/**
- * A factory method for TypeTheme objects.
- * @private
- * @param {string} validKeys
- * @param {Object<string, (string|boolean|Theme)>=} props
- * @return {!TypeTheme}
- */
-function newTypeTheme(validKeys, props) {
-
-  /** @type {!TypeTheme} */
-  var theme;
-  /** @type {string} */
-  var keys;
-
-  theme = newEmptyObj('TypeTheme');
-  keys  = 'color, bg';
-  theme = amend(theme, keys, '', 'string');
-  keys  = 'bold, dim, hidden, inverse, italic, reset, strikethrough, underline';
-  theme = amend(theme, keys, false, 'boolean');
-  keys  = 'identifier, delimiter, brackets, flags';
-  each(keys, function(key) {
-    theme = validKeys && has(validKeys, key)
-      ? amend(theme, key, newTheme(), '!object')
-      : amend(theme, key, null, 'null');
+  each(THEME_PROPS, function(obj, key) {
+    theme = amend(theme, key, obj.val, obj.type);
   });
   theme = seal(theme);
   return props ? fuse(theme, props) : theme;
@@ -224,40 +232,120 @@ function newTypeTheme(validKeys, props) {
 
 /**
  * @typedef {!{
- *   __TYPE:  string,
- *   accent:  !Theme,
- *   color:   string,
- *   bg:      string,
- *   bold:    boolean,
- *   dim:     boolean,
- *   hidden:  boolean,
- *   inverse: boolean,
- *   italic:  boolean,
- *   reset:   boolean,
+ *   __TYPE:        string,
+ *   identifier:    ?Theme,
+ *   delimiter:     ?Theme,
+ *   brackets:      ?Theme,
+ *   flags:         ?Theme,
+ *   color:         string,
+ *   bg:            string,
+ *   bold:          boolean,
+ *   dim:           boolean,
+ *   hidden:        boolean,
+ *   inverse:       boolean,
+ *   italic:        boolean,
+ *   reset:         boolean,
  *   strikethrough: boolean,
  *   underline:     boolean
- * }} AccentTheme
+ * }} TypeTheme
  */
 
 /**
- * A factory method for AccentTheme objects.
  * @private
  * @param {Object<string, (string|boolean|Theme)>=} props
- * @return {!AccentTheme}
+ * @return {!TypeTheme}
  */
-function newAccentTheme(props) {
+function newTypeTheme(props) {
 
-  /** @type {!AccentTheme} */
+  /** @type {!TypeTheme} */
   var theme;
-  /** @type {string} */
-  var keys;
+  /** @type {*} */
+  var val;
 
-  theme = newEmptyObj('AccentTheme');
-  keys  = 'color, bg';
-  theme = amend(theme, keys, '', 'string');
-  keys  = 'bold, dim, hidden, inverse, italic, reset, strikethrough, underline';
-  theme = amend(theme, keys, false, 'boolean');
-  theme = amend(theme, 'accent', newTheme(), '!object');
+  theme = newEmptyObj('TypeTheme');
+  each(, function(obj, key) {
+    val = obj.make ? obj.make(obj.props) : obj.val;
+    format = amend(format, key, val, obj.type);
+  });
+  each(THEME_PROPS, function(obj, key) {
+    theme = amend(theme, key, obj.val, obj.type);
+  });
+  theme = seal(theme);
+  return props ? fuse(theme, props) : theme;
+}
+
+/**
+ * @typedef {!{
+ *   __TYPE:        string,
+ *   accent:        Theme,
+ *   color:         string,
+ *   bg:            string,
+ *   bold:          boolean,
+ *   dim:           boolean,
+ *   hidden:        boolean,
+ *   inverse:       boolean,
+ *   italic:        boolean,
+ *   reset:         boolean,
+ *   strikethrough: boolean,
+ *   underline:     boolean
+ * }} HeaderTheme
+ */
+
+/**
+ * @private
+ * @param {Object<string, (string|boolean|Theme)>=} props
+ * @return {!HeaderTheme}
+ */
+function newHeaderTheme(props) {
+
+  /** @type {!HeaderTheme} */
+  var theme;
+  /** @type {*} */
+  var val;
+
+  theme = newEmptyObj('HeaderTheme');
+  each(HEADER_PROPS, function(obj, key) {
+    val = obj.make ? obj.make(obj.props) : obj.val;
+    format = amend(format, key, val, obj.type);
+  });
+  theme = seal(theme);
+  return props ? fuse(theme, props) : theme;
+}
+
+/**
+ * @typedef {!{
+ *   __TYPE:        string,
+ *   accent:        Theme,
+ *   color:         string,
+ *   bg:            string,
+ *   bold:          boolean,
+ *   dim:           boolean,
+ *   hidden:        boolean,
+ *   inverse:       boolean,
+ *   italic:        boolean,
+ *   reset:         boolean,
+ *   strikethrough: boolean,
+ *   underline:     boolean
+ * }} MsgTheme
+ */
+
+/**
+ * @private
+ * @param {Object<string, (string|boolean|Theme)>=} props
+ * @return {!MsgTheme}
+ */
+function newMsgTheme(props) {
+
+  /** @type {!MsgTheme} */
+  var theme;
+  /** @type {*} */
+  var val;
+
+  theme = newEmptyObj('MsgTheme');
+  each(MSG_PROPS, function(obj, key) {
+    val = obj.make ? obj.make(obj.props) : obj.val;
+    format = amend(format, key, val, obj.type);
+  });
   theme = seal(theme);
   return props ? fuse(theme, props) : theme;
 }
