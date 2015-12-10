@@ -88,6 +88,7 @@ var TRUE_KEYS = freeze({
 /**
  * @typedef {!{
  *   __TYPE: string,
+ *   logger: function,
  *   ocdMap: boolean,
  *   header: ?boolean,
  *   stack:  boolean,
@@ -111,6 +112,7 @@ function newLogConfig(validKeys, trueKeys) {
   var keys;
 
   config = newEmptyObj('Config');
+  config = amend(config, 'logger', console.log, 'function');
   keys  = 'ocdMap, stack, throw, exit';
   config = amend(config, keys, false, 'boolean');
   keys  = 'header, msg';
@@ -129,6 +131,7 @@ function newLogConfig(validKeys, trueKeys) {
 /**
  * @typedef {!{
  *   __TYPE: string,
+ *   logger: function,
  *   throw:  boolean,
  *   exit:   boolean
  * }} TraceConfig
@@ -146,6 +149,7 @@ function newTraceConfig() {
   var keys;
 
   config = newEmptyObj('Config');
+  config = amend(config, 'logger', console.log, 'function');
   keys  = 'throw, exit';
   config = amend(config, keys, false, 'boolean');
   return seal(config);
