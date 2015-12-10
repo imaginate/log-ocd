@@ -54,22 +54,6 @@ var FACTORY = freeze({
  * @type {!Object<string, string>}
  * @const
  */
-var VALID_KEYS = freeze({
-  'toString': 'style',
-  'log':      '',
-  'pass':     'header, msg',
-  'error':    'header, msg',
-  'warn':     'header, msg',
-  'debug':    'header, msg',
-  'fail':     'header, msg',
-  'trace':    ''
-});
-
-/**
- * @private
- * @type {!Object<string, string>}
- * @const
- */
 var TRUE_KEYS = freeze({
   'toString': '',
   'log':      '',
@@ -90,21 +74,20 @@ var TRUE_KEYS = freeze({
  *   __TYPE: string,
  *   logger: function,
  *   ocdMap: boolean,
- *   header: ?boolean,
+ *   header: boolean,
  *   stack:  boolean,
  *   throw:  boolean,
  *   exit:   boolean,
- *   msg:    ?boolean
+ *   msg:    boolean
  * }} LogConfig
  */
 
 /**
  * @private
- * @param {string} validKeys
- * @param {string=} trueKeys
+ * @param {string} trueKeys
  * @return {!LogConfig}
  */
-function newLogConfig(validKeys, trueKeys) {
+function newLogConfig(trueKeys) {
 
   /** @type {!LogConfig} */
   var config;
@@ -113,14 +96,8 @@ function newLogConfig(validKeys, trueKeys) {
 
   config = newEmptyObj('Config');
   config = amend(config, 'logger', console.log, 'function');
-  keys  = 'ocdMap, stack, throw, exit';
+  keys  = 'ocdMap, header, stack, throw, exit, msg';
   config = amend(config, keys, false, 'boolean');
-  keys  = 'header, msg';
-  each(keys, function(key) {
-    config = validKeys && has(validKeys, key)
-      ? amend(config, key, false, 'boolean')
-      : amend(config, key, null, 'null');
-  });
   config = seal(config);
   trueKeys && each(trueKeys, function(key) {
     config[key] = true;
@@ -139,9 +116,10 @@ function newLogConfig(validKeys, trueKeys) {
 
 /**
  * @private
+ * @param {string} trueKeys
  * @return {!TraceConfig}
  */
-function newTraceConfig() {
+function newTraceConfig(trueKeys) {
 
   /** @type {!TraceConfig} */
   var config;
@@ -152,7 +130,11 @@ function newTraceConfig() {
   config = amend(config, 'logger', console.log, 'function');
   keys  = 'throw, exit';
   config = amend(config, keys, false, 'boolean');
-  return seal(config);
+  config = seal(config);
+  trueKeys && each(trueKeys, function(key) {
+    config[key] = true;
+  });
+  return config;
 }
 
 /**
@@ -164,11 +146,10 @@ function newTraceConfig() {
 
 /**
  * @private
- * @param {string} validKeys
- * @param {string=} trueKeys
+ * @param {string} trueKeys
  * @return {!PrepConfig}
  */
-function newPrepConfig(validKeys, trueKeys) {
+function newPrepConfig(trueKeys) {
 
   /** @type {!PrepConfig} */
   var config;
@@ -177,11 +158,7 @@ function newPrepConfig(validKeys, trueKeys) {
 
   config = newEmptyObj('Config');
   keys  = 'style';
-  each(keys, function(key) {
-    config = validKeys && has(validKeys, key)
-      ? amend(config, key, false, 'boolean')
-      : amend(config, key, null, 'null');
-  });
+  config = amend(config, keys, false, 'boolean');
   config = seal(config);
   trueKeys && each(trueKeys, function(key) {
     config[key] = true;
@@ -203,5 +180,5 @@ function newPrepConfig(validKeys, trueKeys) {
  * @return {!Config}
  */
 module.exports = function getDefaultConfig(method) {
-  return FACTORY[method](VALID_KEYS[method], TRUE_KEYS[method]);
+  return FACTORY[method]( TRUE_KEYS[method] );
 };
