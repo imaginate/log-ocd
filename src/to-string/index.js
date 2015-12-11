@@ -48,8 +48,6 @@ var TYPES = freeze({
  */
 module.exports = function toString(method, val) {
 
-  /** @type {!Setting} */
-  var setting;
   /** @type {!Config} */
   var config;
   /** @type {string} */
