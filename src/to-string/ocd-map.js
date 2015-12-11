@@ -60,8 +60,8 @@ module.exports = function ocdMapToString(method, obj) {
 
   if (!keys.length) return result;
 
-  style  = 'ocd' + this[method].__INST + method + 'ocdMap';
-  format = this[method].format.ocdMap;
+  style  = 'ocd' + this[method].__INST + method + 'ocdmap';
+  format = this[method].format.ocdmap;
   space  = [
     fill(format.spaceBefore, ' '),
     fill(format.spaceAfter,  ' ')
