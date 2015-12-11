@@ -73,8 +73,8 @@ var METHODS = freeze({
   } },
   'fail': { category: 'log', makeProps: function() {
     return {
-      msg: newTypeTheme('msg', {
-        color: 'red', accent: newTheme({ color: 'yellow' })
+      header: newTypeTheme('header', {
+        bg: 'red', accent: newTheme({ color: 'yellow', bg: 'red' })
       })
     };
   } },

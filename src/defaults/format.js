@@ -42,28 +42,15 @@ var newEmptyObj = require('../helpers/new-empty-obj');
  * @const
  */
 var METHODS = freeze({
-  'toString': { category: 'prep',  makeProps: null          },
-  'log':      { category: 'log',   makeProps: null          },
-  'pass':     { category: 'log',   makeProps: null          },
-  'error':    { category: 'log',   makeProps: null          },
-  'warn':     { category: 'log',   makeProps: null          },
-  'debug':    { category: 'log',   makeProps: null          },
-  'fail':     { category: 'log',   makeProps: makeFailProps },
-  'trace':    { category: 'trace', makeProps: null          }
+  'toString': { category: 'prep',  makeProps: null },
+  'log':      { category: 'log',   makeProps: null },
+  'pass':     { category: 'log',   makeProps: null },
+  'error':    { category: 'log',   makeProps: null },
+  'warn':     { category: 'log',   makeProps: null },
+  'debug':    { category: 'log',   makeProps: null },
+  'fail':     { category: 'log',   makeProps: null },
+  'trace':    { category: 'trace', makeProps: null }
 }, true);
-
-/**
- * @private
- * @return {!Object}
- */
-function makeFailProps() {
-  return {
-    msg: newTypeFormat('msg', {
-      bullet: '',
-      indent: 0
-    })
-  };
-}
 
 /**
  * @private

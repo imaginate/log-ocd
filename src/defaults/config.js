@@ -44,7 +44,7 @@ var METHODS = freeze({
   'error':    { category: 'log',   trueKeys: 'header, stack, throw, msg' },
   'warn':     { category: 'log',   trueKeys: 'header, msg'               },
   'debug':    { category: 'log',   trueKeys: 'header'                    },
-  'fail':     { category: 'log',   trueKeys: 'msg'                       },
+  'fail':     { category: 'log',   trueKeys: 'header'                    },
   'trace':    { category: 'trace', trueKeys: ''                          }
 }, true);
 
