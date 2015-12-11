@@ -24,7 +24,6 @@ var help = require('../helpers');
 var amend  = help.amend;
 var each   = help.each;
 var freeze = help.freeze;
-var has    = help.has;
 var seal   = help.seal;
 
 var newEmptyObj = require('../helpers/new-empty-obj');
@@ -35,40 +34,58 @@ var newEmptyObj = require('../helpers/new-empty-obj');
 
 /**
  * @private
- * @type {!Object<string, string>}
+ * @type {!Array<string>}
  * @const
  */
-var INVALID_KEYS = freeze({
-  'toString': '',
-  'log':      '',
-  'pass':     '',
-  'error':    '',
-  'warn':     '',
-  'debug':    '',
-  'fail':     '',
-  'trace':    ''
-});
+var METHODS = freeze([
+  'toString',
+  'log',
+  'pass',
+  'error',
+  'warn',
+  'debug',
+  'fail',
+  'trace'
+]);
+
+////////////////////////////////////////////////////////////////////////////////
+// SETTINGS TYPEDEFS
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @typedef {!{
+ *   __TYPE: string,
+ *   config: Config,
+ *   format: Format,
+ *   style:  Style
+ * }} Setting
+ */
+
+/**
+ * @typedef {!{
+ *   __TYPE:   string,
+ *   __INST:   number,
+ *   toString: Setting,
+ *   log:      Setting,
+ *   pass:     Setting,
+ *   error:    Setting,
+ *   warn:     Setting,
+ *   debug:    Setting,
+ *   fail:     Setting,
+ *   trace:    Setting
+ * }} Settings
+ */
 
 ////////////////////////////////////////////////////////////////////////////////
 // FACTORY METHODS
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @typedef {!{
- *   __TYPE: string,
- *   config: ?Config,
- *   format: ?Format,
- *   style:  ?Style
- * }} Setting
- */
-
-/**
  * @private
  * @param {string} method
- * @param {string=} invalidKeys
  * @return {!Setting}
  */
-function newSetting(method, invalidKeys) {
+function newSetting(method) {
 
   /** @type {!Setting} */
   var setting;
@@ -76,30 +93,12 @@ function newSetting(method, invalidKeys) {
   var getDefault;
 
   setting = newEmptyObj('Setting');
-  invalidKeys = invalidKeys || '';
   each('config, format, style', function(key) {
-    getDefault = has(invalidKeys, key) ? null : require('./' + key);
-    setting = getDefault
-      ? amend(setting, key, getDefault(method), '!object')
-      : amend(setting, key, null, 'null');
+    getDefault = require('./' + key);
+    setting = amend(setting, key, getDefault(method), '!object');
   });
   return seal(setting);
 }
-
-/**
- * @typedef {!{
- *   __TYPE:   string,
- *   __INST:   number,
- *   toString: !Setting,
- *   log:      !Setting,
- *   pass:     !Setting,
- *   error:    !Setting,
- *   warn:     !Setting,
- *   debug:    !Setting,
- *   fail:     !Setting,
- *   trace:    !Setting
- * }} Settings
- */
 
 /**
  * @private
@@ -117,8 +116,8 @@ function newSettings(inst) {
     enumerable: false,
     writable: false
   });
-  each(INVALID_KEYS, function(keys, method) {
-    settings = amend(settings, method, newSetting(method, keys), '!object');
+  each(METHODS, function(method) {
+    settings = amend(settings, method, newSetting(method), '!object');
   });
   return freeze(settings);
 }
