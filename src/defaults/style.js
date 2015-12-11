@@ -22,6 +22,7 @@
 
 var help = require('../helpers');
 var amend  = help.amend;
+var copy   = help.copy;
 var each   = help.each;
 var freeze = help.freeze;
 var fuse   = help.fuse;
@@ -36,99 +37,67 @@ var newEmptyObj = require('../helpers/new-empty-obj');
 
 /**
  * @private
- * @type {!Object<string, function>}
+ * @type {!Object<string, !{ category: string, makeProps: ?function }>}
  * @const
  */
-var FACTORY = freeze({
-  'toString': newTypeStyle,
-  'log':      newTypeStyle,
-  'pass':     newTypeStyle,
-  'error':    newTypeStyle,
-  'warn':     newTypeStyle,
-  'debug':    newTypeStyle,
-  'fail':     newTypeStyle,
-  'trace':    newTraceStyle
-});
+var METHODS = freeze({
+  'toString': { category: 'prep',  makeProps: null },
+  'log':      { category: 'log',   makeProps: null },
+  'pass':     { category: 'log',   makeProps: function() {
+    return {
+      header: newTypeTheme('header', {
+        bg: 'green', accent: newTheme({ color: 'yellow', bg: 'green' })
+      })
+    };
+  } },
+  'error': { category: 'log', makeProps: function() {
+    return {
+      header: newTypeTheme('header', {
+        bg: 'red', accent: newTheme({ color: 'yellow', bg: 'red' })
+      })
+    };
+  } },
+  'warn': { category: 'log', makeProps: function() {
+    return {
+      header: newTypeTheme('header', {
+        bg: 'yellow', accent: newTheme({ color: 'blue', bg: 'yellow' })
+      })
+    };
+  } },
+  'debug': { category: 'log', makeProps: function() {
+    return {
+      header: newTypeTheme('header', {
+        bg: 'blue', accent: newTheme({ color: 'magenta', bg: 'blue' })
+      })
+    };
+  } },
+  'fail': { category: 'log', makeProps: function() {
+    return {
+      msg: newTypeTheme('msg', {
+        color: 'red', accent: newTheme({ color: 'yellow' })
+      })
+    };
+  } },
+  'trace': { category: 'trace', makeProps: null }
+}, true);
+
+/**
+ * @private
+ * @type {string}
+ * @const
+ */
+var TYPES = 'ocdmap, null, undefined, boolean, nan, string, number, ' +
+            'regexp, array, args, object, function, element, document';
 
 /**
  * @private
  * @type {!Object<string, string>}
  * @const
  */
-var VALID_KEYS = freeze({
-  'toString': '',
-  'log':      '',
-  'pass':     'header, msg',
-  'error':    'header, msg',
-  'warn':     'header, msg',
-  'debug':    'header, msg',
-  'fail':     'header, msg',
-  'trace':    ''
-});
-
-/**
- * @private
- * @type {!Object<string, function>}
- * @const
- */
-var PROPS = freeze({
-  'toString': function() { return makeDefaultProps(); },
-  'log':      function() { return makeDefaultProps(); },
-  'pass':     function() { return makeDefaultProps({
-    header: newAccentTheme({
-      color: 'white',
-      bg:    'green',
-      bold:  true,
-      accent: newTheme({
-        color: 'yellow',
-        bg:    'green',
-        bold:  true
-      })
-    })
-  }); },
-  'error':    function() { return makeDefaultProps({
-    header: newAccentTheme({
-      color: 'white',
-      bg:    'red',
-      bold:  true,
-      accent: newTheme({
-        color: 'yellow',
-        bg:    'red',
-        bold:  true
-      })
-    })
-  }); },
-  'warn':     function() { return makeDefaultProps({
-    header: newAccentTheme({
-      color: 'white',
-      bg:    'yellow',
-      bold:  true,
-      accent: newTheme({
-        color: 'blue',
-        bg:    'yellow',
-        bold:  true
-      })
-    })
-  }); },
-  'debug':    function() { return makeDefaultProps({
-    header: newAccentTheme({
-      color: 'white',
-      bg:    'blue',
-      bold:  true,
-      accent: newTheme({
-        color: 'magenta',
-        bg:    'blue',
-        bold:  true
-      })
-    })
-  }); },
-  'fail':     function() { return makeDefaultProps({
-    msg: newAccentTheme({
-      color: 'red',
-      accent: newTheme({ color: 'yellow' })
-    })
-  }); },
-  'trace':    function() {}
+var CATEGORY_KEYS = freeze({
+  'log':   'header, msg' + TYPES,
+  'prep':  TYPES,
+  'trace': ''
 });
 
 /**
@@ -136,7 +105,7 @@ var PROPS = freeze({
  * @type {!Object}
  * @const
  */
-var THEME_PROPS = freeze({
+var THEME_BASE = freeze({
   'color':         { type: 'string',  val: ''    },
   'bg':            { type: 'string',  val: ''    },
   'bold':          { type: 'boolean', val: false },
@@ -154,45 +123,91 @@ var THEME_PROPS = freeze({
  * @type {!Object}
  * @const
  */
-var HEADER_PROPS = freeze({
-  'color':         { type: 'string',  val: 'white' },
-  'bg':            { type: 'string',  val: 'blue'  },
-  'bold':          { type: 'boolean', val: true    },
-  'dim':           { type: 'boolean', val: false   },
-  'hidden':        { type: 'boolean', val: false   },
-  'inverse':       { type: 'boolean', val: false   },
-  'italic':        { type: 'boolean', val: false   },
-  'reset':         { type: 'boolean', val: false   },
-  'strikethrough': { type: 'boolean', val: false   },
-  'underline':     { type: 'boolean', val: false   },
-  'accent':        { type: '!object', make: newTheme,
-                     props: { color: 'magenta',
-                              bg:    'blue',
-                              bold:  true       }  }
-}, true);
-
-/**
- * @private
- * @type {!Object}
- * @const
- */
-var MSG_PROPS = freeze({
-  'color':         { type: 'string',  val: 'white' },
-  'bg':            { type: 'string',  val: ''      },
-  'bold':          { type: 'boolean', val: false   },
-  'dim':           { type: 'boolean', val: false   },
-  'hidden':        { type: 'boolean', val: false   },
-  'inverse':       { type: 'boolean', val: false   },
-  'italic':        { type: 'boolean', val: false   },
-  'reset':         { type: 'boolean', val: false   },
-  'strikethrough': { type: 'boolean', val: false   },
-  'underline':     { type: 'boolean', val: false   },
-  'accent':        { type: '!object', make: newTheme,
-                     props: { color: 'magenta' }   }
+var THEME_PROPS = freeze({
+  'header': fromThemeBase({
+    'color':  { type: 'string',  val: 'white' },
+    'bg':     { type: 'string',  val: 'blue'  },
+    'bold':   { type: 'boolean', val:  true   },
+    'accent': { type: '!object', make: true,
+      props: { color: 'magenta', bg: 'blue', bold: true }
+    }
+  }),
+  'msg': fromThemeBase({
+    'color':  { type: 'string',  val: 'white' },
+    'accent': { type: '!object', make: true, props: { color: 'magenta' } }
+  }),
+  'ocdmap': fromThemeBase({
+    'color':     { type: 'string',  val: 'cyan' },
+    'delimiter': { type: '!object', make: true, props: { color: 'cyan' } }
+  }),
+  'null': fromThemeBase({
+    'color': { type: 'string', val: 'magenta' }
+  }),
+  'undefined': fromThemeBase({
+    'color': { type: 'string', val: 'magenta' }
+  }),
+  'boolean': fromThemeBase({
+    'color': { type: 'string', val: 'magenta' }
+  }),
+  'string': fromThemeBase({
+    'color':     { type: 'string',  val: 'yellow' },
+    'delimiter': { type: '!object', make: true, props: { color: 'red'    } },
+    'brackets':  { type: '!object', make: true, props: { color: 'yellow' } }
+  }),
+  'number': fromThemeBase({
+    'color':      { type: 'string',  val: 'magenta' },
+    'identifier': { type: '!object', make: true, props: { color: 'magenta' } },
+    'delimiter':  { type: '!object', make: true, props: { color: 'magenta' } }
+  }),
+  'nan': fromThemeBase({
+    'color': { type: 'string', val: 'magenta' }
+  }),
+  'regexp': fromThemeBase({
+    'color':      { type: 'string',  val: 'white' },
+    'identifier': { type: '!object', make: true, props: { color: 'yellow' } },
+    'brackets':   { type: '!object', make: true, props: { color: 'yellow' } },
+    'flags':      { type: '!object', make: true, props: { color: 'yellow' } }
+  }),
+  'array': fromThemeBase({
+    'color':      { type: 'string',  val: 'white' },
+    'identifier': { type: '!object', make: true, props: { color: 'white' } },
+    'delimiter':  { type: '!object', make: true, props: { color: 'white' } },
+    'brackets':   { type: '!object', make: true, props: { color: 'white' } }
+  }),
+  'args': fromThemeBase({
+    'color':      { type: 'string',  val: 'white' },
+    'identifier': { type: '!object', make: true, props: { color: 'white' } },
+    'delimiter':  { type: '!object', make: true, props: { color: 'white' } },
+    'brackets':   { type: '!object', make: true, props: { color: 'white' } }
+  }),
+  'object': fromThemeBase({
+    'color':      { type: 'string',  val: 'white' },
+    'identifier': { type: '!object', make: true, props: { color: 'white' } },
+    'delimiter':  { type: '!object', make: true, props: { color: 'white' } },
+    'brackets':   { type: '!object', make: true, props: { color: 'white' } }
+  }),
+  'function': fromThemeBase({
+    'color':      { type: 'string',  val: 'white' },
+    'identifier': { type: '!object', make: true, props: { color: 'white' } },
+    'delimiter':  { type: '!object', make: true, props: { color: 'white' } },
+    'brackets':   { type: '!object', make: true, props: { color: 'white' } }
+  }),
+  'element': fromThemeBase({
+    'color':      { type: 'string',  val: 'white' },
+    'identifier': { type: '!object', make: true, props: { color: 'white' } },
+    'delimiter':  { type: '!object', make: true, props: { color: 'white' } },
+    'brackets':   { type: '!object', make: true, props: { color: 'white' } }
+  }),
+  'document': fromThemeBase({
+    'color':      { type: 'string',  val: 'white' },
+    'identifier': { type: '!object', make: true, props: { color: 'white' } },
+    'delimiter':  { type: '!object', make: true, props: { color: 'white' } },
+    'brackets':   { type: '!object', make: true, props: { color: 'white' } }
+  })
 }, true);
 
 ////////////////////////////////////////////////////////////////////////////////
-// FACTORY METHODS
+// THEME TYPEDEFS
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -212,69 +227,6 @@ var MSG_PROPS = freeze({
  */
 
 /**
- * A factory method for Theme objects.
- * @private
- * @param {Object<string, (string|boolean)>=} props
- * @return {!Theme}
- */
-function newTheme(props) {
-
-  /** @type {!Theme} */
-  var theme;
-
-  theme = newEmptyObj('Theme');
-  each(THEME_PROPS, function(obj, key) {
-    theme = amend(theme, key, obj.val, obj.type);
-  });
-  theme = seal(theme);
-  return props ? fuse(theme, props) : theme;
-}
-
-/**
- * @typedef {!{
- *   __TYPE:        string,
- *   identifier:    ?Theme,
- *   delimiter:     ?Theme,
- *   brackets:      ?Theme,
- *   flags:         ?Theme,
- *   color:         string,
- *   bg:            string,
- *   bold:          boolean,
- *   dim:           boolean,
- *   hidden:        boolean,
- *   inverse:       boolean,
- *   italic:        boolean,
- *   reset:         boolean,
- *   strikethrough: boolean,
- *   underline:     boolean
- * }} TypeTheme
- */
-
-/**
- * @private
- * @param {Object<string, (string|boolean|Theme)>=} props
- * @return {!TypeTheme}
- */
-function newTypeTheme(props) {
-
-  /** @type {!TypeTheme} */
-  var theme;
-  /** @type {*} */
-  var val;
-
-  theme = newEmptyObj('TypeTheme');
-  each(, function(obj, key) {
-    val = obj.make ? obj.make(obj.props) : obj.val;
-    format = amend(format, key, val, obj.type);
-  });
-  each(THEME_PROPS, function(obj, key) {
-    theme = amend(theme, key, obj.val, obj.type);
-  });
-  theme = seal(theme);
-  return props ? fuse(theme, props) : theme;
-}
-
-/**
  * @typedef {!{
  *   __TYPE:        string,
  *   accent:        Theme,
@@ -290,27 +242,6 @@ function newTypeTheme(props) {
  *   underline:     boolean
  * }} HeaderTheme
  */
-
-/**
- * @private
- * @param {Object<string, (string|boolean|Theme)>=} props
- * @return {!HeaderTheme}
- */
-function newHeaderTheme(props) {
-
-  /** @type {!HeaderTheme} */
-  var theme;
-  /** @type {*} */
-  var val;
-
-  theme = newEmptyObj('HeaderTheme');
-  each(HEADER_PROPS, function(obj, key) {
-    val = obj.make ? obj.make(obj.props) : obj.val;
-    format = amend(format, key, val, obj.type);
-  });
-  theme = seal(theme);
-  return props ? fuse(theme, props) : theme;
-}
 
 /**
  * @typedef {!{
@@ -330,101 +261,236 @@ function newHeaderTheme(props) {
  */
 
 /**
- * @private
- * @param {Object<string, (string|boolean|Theme)>=} props
- * @return {!MsgTheme}
+ * @typedef {!{
+ *   __TYPE:        string,
+ *   delimiter:     Theme,
+ *   color:         string,
+ *   bg:            string,
+ *   bold:          boolean,
+ *   dim:           boolean,
+ *   hidden:        boolean,
+ *   inverse:       boolean,
+ *   italic:        boolean,
+ *   reset:         boolean,
+ *   strikethrough: boolean,
+ *   underline:     boolean
+ * }} OcdMapTheme
  */
-function newMsgTheme(props) {
 
-  /** @type {!MsgTheme} */
+/**
+ * @typedef {!{
+ *   __TYPE:        string,
+ *   delimiter:     Theme,
+ *   brackets:      Theme,
+ *   color:         string,
+ *   bg:            string,
+ *   bold:          boolean,
+ *   dim:           boolean,
+ *   hidden:        boolean,
+ *   inverse:       boolean,
+ *   italic:        boolean,
+ *   reset:         boolean,
+ *   strikethrough: boolean,
+ *   underline:     boolean
+ * }} StringTheme
+ */
+
+/**
+ * @typedef {!{
+ *   __TYPE:        string,
+ *   identifier:    Theme,
+ *   delimiter:     Theme,
+ *   color:         string,
+ *   bg:            string,
+ *   bold:          boolean,
+ *   dim:           boolean,
+ *   hidden:        boolean,
+ *   inverse:       boolean,
+ *   italic:        boolean,
+ *   reset:         boolean,
+ *   strikethrough: boolean,
+ *   underline:     boolean
+ * }} NumberTheme
+ */
+
+/**
+ * @typedef {!{
+ *   __TYPE:        string,
+ *   identifier:    Theme,
+ *   brackets:      Theme,
+ *   flags:         Theme,
+ *   color:         string,
+ *   bg:            string,
+ *   bold:          boolean,
+ *   dim:           boolean,
+ *   hidden:        boolean,
+ *   inverse:       boolean,
+ *   italic:        boolean,
+ *   reset:         boolean,
+ *   strikethrough: boolean,
+ *   underline:     boolean
+ * }} RegExpTheme
+ */
+
+/**
+ * @typedef {!{
+ *   __TYPE:        string,
+ *   identifier:    Theme,
+ *   delimiter:     Theme,
+ *   brackets:      Theme,
+ *   color:         string,
+ *   bg:            string,
+ *   bold:          boolean,
+ *   dim:           boolean,
+ *   hidden:        boolean,
+ *   inverse:       boolean,
+ *   italic:        boolean,
+ *   reset:         boolean,
+ *   strikethrough: boolean,
+ *   underline:     boolean
+ * }} ArrayTheme
+ */
+
+/**
+ * @typedef {!{
+ *   __TYPE:        string,
+ *   identifier:    Theme,
+ *   delimiter:     Theme,
+ *   brackets:      Theme,
+ *   color:         string,
+ *   bg:            string,
+ *   bold:          boolean,
+ *   dim:           boolean,
+ *   hidden:        boolean,
+ *   inverse:       boolean,
+ *   italic:        boolean,
+ *   reset:         boolean,
+ *   strikethrough: boolean,
+ *   underline:     boolean
+ * }} ObjectTheme
+ */
+
+/**
+ * @typedef {!(
+ *   Theme|
+ *   HeaderTheme|
+ *   MsgTheme|
+ *   OcdMapTheme|
+ *   StringTheme|
+ *   NumberTheme|
+ *   RegExpTheme|
+ *   ArrayTheme|
+ *   ObjectTheme
+ * )} TypeTheme
+ */
+
+////////////////////////////////////////////////////////////////////////////////
+// THEME FACTORY METHODS
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @private
+ * @param {Object=} props
+ * @return {!Object}
+ */
+function fromThemeBase(props) {
+
+  /** @type {!Object} */
+  var base;
+
+  props = props || null;
+  base = copy(THEME_BASE);
+  base = fuse(base, props);
+  return freeze(base, true);
+}
+
+/**
+ * @private
+ * @param {Object<string, (string|boolean)>=} props
+ * @return {!Theme}
+ */
+function newTheme(props) {
+
+  /** @type {!Theme} */
+  var theme;
+
+  props = props || null;
+  theme = newEmptyObj('Theme');
+  each(THEME_BASE, function(obj, key) {
+    theme = amend(theme, key, obj.val, obj.type);
+  });
+  theme = seal(theme);
+  return fuse(theme, props);
+}
+
+/**
+ * @private
+ * @param {string} type
+ * @param {Object<string, (string|boolean|Theme)>=} props
+ * @return {!TypeTheme}
+ */
+function newTypeTheme(type, props) {
+
+  /** @type {!TypeTheme} */
   var theme;
   /** @type {*} */
   var val;
 
-  theme = newEmptyObj('MsgTheme');
-  each(MSG_PROPS, function(obj, key) {
-    val = obj.make ? obj.make(obj.props) : obj.val;
-    format = amend(format, key, val, obj.type);
+  props = props || null;
+  theme = newEmptyObj(type + 'Theme');
+  each(THEME_PROPS[type], function(obj, key) {
+    val = obj.make ? newTheme(obj.props) : obj.val;
+    theme = amend(theme, key, val, obj.type);
   });
   theme = seal(theme);
-  return props ? fuse(theme, props) : theme;
+  return fuse(theme, props);
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// STYLE TYPEDEFS
+////////////////////////////////////////////////////////////////////////////////
+
 /**
- * @typedef {!(Theme|TypeTheme|AccentTheme)} AnyTheme
+ * @typedef {!{
+ *   __TYPE:    string,
+ *   header:    HeaderTheme,
+ *   msg:       MsgTheme,
+ *   ocdmap:    OcdMapTheme,
+ *   null:      Theme,
+ *   undefined: Theme,
+ *   boolean:   Theme,
+ *   nan:       Theme,
+ *   string:    StringTheme,
+ *   number:    NumberTheme,
+ *   regexp:    RegExpTheme,
+ *   array:     ArrayTheme,
+ *   args:      ArrayTheme,
+ *   object:    ObjectTheme,
+ *   function:  ObjectTheme,
+ *   element:   ObjectTheme,
+ *   document:  ObjectTheme
+ * }} LogStyle
  */
 
 /**
  * @typedef {!{
  *   __TYPE:    string,
- *   header:    ?AccentTheme,
- *   msg:       ?AccentTheme,
- *   ocdMap:    !TypeTheme,
- *   null:      !Theme,
- *   undefined: !Theme,
- *   boolean:   !Theme,
- *   string:    !TypeTheme,
- *   number:    !TypeTheme,
- *   nan:       !Theme,
- *   object:    !TypeTheme,
- *   function:  !TypeTheme,
- *   regexp:    !TypeTheme,
- *   array:     !TypeTheme,
- *   args:      !TypeTheme,
- *   element:   !TypeTheme,
- *   document:  !TypeTheme
- * }} TypeStyle
+ *   ocdmap:    OcdMapTheme,
+ *   null:      Theme,
+ *   undefined: Theme,
+ *   boolean:   Theme,
+ *   nan:       Theme,
+ *   string:    StringTheme,
+ *   number:    NumberTheme,
+ *   regexp:    RegExpTheme,
+ *   array:     ArrayTheme,
+ *   args:      ArrayTheme,
+ *   object:    ObjectTheme,
+ *   function:  ObjectTheme,
+ *   element:   ObjectTheme,
+ *   document:  ObjectTheme
+ * }} PrepStyle
  */
-
-/**
- * @private
- * @type {!Object<string, string>}
- * @const
- */
-var TYPE_VALID_KEYS = freeze({
-  'ocdMap':   '            delimiter                 ',
-  'string':   '            delimiter, brackets       ',
-  'number':   'identifier, delimiter                 ',
-  'object':   'identifier, delimiter, brackets       ',
-  'function': 'identifier, delimiter, brackets       ',
-  'regexp':   'identifier,            brackets, flags',
-  'array':    'identifier, delimiter, brackets       ',
-  'args':     'identifier, delimiter, brackets       ',
-  'element':  'identifier, delimiter, brackets       ',
-  'document': 'identifier, delimiter, brackets       '
-});
-
-/**
- * A factory method for TypeStyle objects.
- * @private
- * @param {string=} validKeys
- * @param {Object<string, AnyTheme>=} props
- * @return {!TypeStyle}
- */
-function newTypeStyle(validKeys, props) {
-
-  /** @type {!TypeStyle} */
-  var style;
-  /** @type {string} */
-  var keys;
-
-  style = newEmptyObj('Style');
-  keys = 'header, msg';
-  each(keys, function(key) {
-    style = validKeys && has(validKeys, key)
-      ? amend(style, key, newAccentTheme(), '!object')
-      : amend(style, key, null, 'null');
-  });
-  keys = 'null, undefined, boolean, nan';
-  each(keys, function(key) {
-    style = amend(style, key, newTheme(), '!object');
-  });
-  each(TYPE_VALID_KEYS, function(validKeys, key) {
-    style = amend(style, key, newTypeTheme(validKeys), '!object');
-  });
-  style = seal(style);
-  return props ? fuse(style, props) : style;
-}
 
 /**
  * @typedef {!{
@@ -433,116 +499,33 @@ function newTypeStyle(validKeys, props) {
  */
 
 /**
- * A factory method for TraceStyle objects.
- * @private
- * @param {string=} validKeys
- * @param {Object<string, AnyTheme>=} props
- * @return {!TraceStyle}
+ * @typedef {!(LogStyle|PrepStyle|TraceStyle)} Style
  */
-function newTraceStyle(validKeys, props) {
-
-  /** @type {!TraceStyle} */
-  var style;
-  /** @type {string} */
-  var keys;
-
-  style = newEmptyObj('Style');
-  style = seal(style);
-  return props ? fuse(style, props) : style;
-}
 
 ////////////////////////////////////////////////////////////////////////////////
-// HELPER METHODS
+// STYLE FACTORY METHODS
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
  * @private
- * @param {Object=} intro
- * @return {!Object}
+ * @param {string} category
+ * @param {Object<string, TypeTheme>=} props
+ * @return {!Style}
  */
-function makeDefaultProps(intro) {
+function newStyle(category, props) {
 
-  /** @type {!Object} */
-  var props;
+  /** @type {!Style} */
+  var style;
+  /** @type {*} */
+  var val;
 
-  props = {
-    'ocdMap':    newTheme({ color: 'cyan'    }),
-    'null':      newTheme({ color: 'magenta' }),
-    'undefined': newTheme({ color: 'magenta' }),
-    'boolean':   newTheme({ color: 'magenta' }),
-    'nan':       newTheme({ color: 'magenta' }),
-    'string': newTypeTheme({
-      color: 'yellow',
-      delimiter: newTheme({ color: 'red'    }),
-      brackets:  newTheme({ color: 'yellow' })
-    }),
-    'number': newTypeTheme({
-      color: 'magenta',
-      identifier: newTheme({ color: 'magenta' }),
-      delimiter:  newTheme({ color: 'magenta' })
-    }),
-    'object': newTypeTheme({
-      color: 'white',
-      identifier: newTheme({ color: 'white' }),
-      delimiter:  newTheme({ color: 'white' }),
-      brackets:   newTheme({ color: 'white' })
-    }),
-    'function': newTypeTheme({
-      color: 'white',
-      identifier: newTheme({ color: 'white' }),
-      delimiter:  newTheme({ color: 'white' }),
-      brackets:   newTheme({ color: 'white' })
-    }),
-    'regexp': newTypeTheme({
-      color: 'white',
-      identifier: newTheme({ color: 'yellow' }),
-      brackets:   newTheme({ color: 'yellow' }),
-      flags:      newTheme({ color: 'yellow' })
-    }),
-    'array': newTypeTheme({
-      color: 'white',
-      identifier: newTheme({ color: 'white' }),
-      delimiter:  newTheme({ color: 'white' }),
-      brackets:   newTheme({ color: 'white' })
-    }),
-    'args': newTypeTheme({
-      color: 'white',
-      identifier: newTheme({ color: 'white' }),
-      delimiter:  newTheme({ color: 'white' }),
-      brackets:   newTheme({ color: 'white' })
-    }),
-    'element': newTypeTheme({
-      color: 'white',
-      identifier: newTheme({ color: 'white' }),
-      delimiter:  newTheme({ color: 'white' }),
-      brackets:   newTheme({ color: 'white' })
-    }),
-    'document': newTypeTheme({
-      color: 'white',
-      identifier: newTheme({ color: 'white' }),
-      delimiter:  newTheme({ color: 'white' }),
-      brackets:   newTheme({ color: 'white' })
-    })
-  };
-
-  if (intro) props = fuse(props, {
-    header: newAccentTheme({
-      color: 'white',
-      bg:    'blue',
-      bold:  true,
-      accent: newTheme({
-        color: 'magenta',
-        bg:    'blue',
-        bold:  true
-      })
-    }),
-    msg: newAccentTheme({
-      color: 'white',
-      accent: newTheme({ color: 'magenta' })
-    })
-  }, intro);
-
-  return props;
+  props = props || null;
+  style = newEmptyObj('Style');
+  each(CATEGORY_KEYS[category], function(key) {
+    style = amend(style, key, newTypeTheme(key), '!object');
+  });
+  style = seal(style);
+  return fuse(style, props);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -550,14 +533,16 @@ function makeDefaultProps(intro) {
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @typedef {!(TypeStyle|TraceStyle)} Style
- */
-
-/**
  * @private
  * @param {string} method
  * @return {!Style}
  */
 module.exports = function getDefaultStyle(method) {
-  return FACTORY[method]( VALID_KEYS[method], PROPS[method]() );
+
+  /** @type {Object} */
+  var props;
+
+  method = METHODS[method];
+  props = method.makeProps && method.makeProps();
+  return newStyle(method.category, props);
 };
