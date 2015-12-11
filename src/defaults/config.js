@@ -34,58 +34,54 @@ var newEmptyObj = require('../helpers/new-empty-obj');
 
 /**
  * @private
- * @type {!Object<string, function>}
+ * @type {!Object<string, !{ category: string, trueKeys: string }>}
  * @const
  */
-var FACTORY = freeze({
-  'toString': newPrepConfig,
-  'log':      newLogConfig,
-  'pass':     newLogConfig,
-  'error':    newLogConfig,
-  'warn':     newLogConfig,
-  'debug':    newLogConfig,
-  'fail':     newLogConfig,
-  'trace':    newTraceConfig
-});
+var METHODS = freeze({
+  'toString': { category: 'prep',  trueKeys: ''                          },
+  'log':      { category: 'log',   trueKeys: ''                          },
+  'pass':     { category: 'log',   trueKeys: 'header'                    },
+  'error':    { category: 'log',   trueKeys: 'header, stack, throw, msg' },
+  'warn':     { category: 'log',   trueKeys: 'header, msg'               },
+  'debug':    { category: 'log',   trueKeys: 'header'                    },
+  'fail':     { category: 'log',   trueKeys: 'msg'                       },
+  'trace':    { category: 'trace', trueKeys: ''                          }
+}, true);
 
 /**
  * @private
- * @type {!Object<string, string>}
+ * @type {!Object}
  * @const
  */
-var TRUE_KEYS = freeze({
-  'toString': '',
-  'log':      '',
-  'pass':     'header',
-  'error':    'header, stack, throw, msg',
-  'warn':     'header, msg',
-  'debug':    'header',
-  'fail':     'msg',
-  'trace':    ''
-});
-
-/**
- * All the valid boolean keys for each config object. Note that the logger prop
- *   is applied separately.
- * @private
- * @type {!Object<string, string>}
- * @const
- */
-var CONFIG_KEYS = freeze({
-  'log':   'ocdMap, header, stack, throw, exit, msg',
-  'prep':  'style',
-  'trace': 'throw, exit'
-});
+var PROPS = freeze({
+  'log': {
+    'logger': { type: 'function', val: console.log },
+    'ocdmap': { type: 'boolean',  val: false       },
+    'header': { type: 'boolean',  val: false       },
+    'stack':  { type: 'boolean',  val: false       },
+    'throw':  { type: 'boolean',  val: false       },
+    'exit':   { type: 'boolean',  val: false       },
+    'msg':    { type: 'boolean',  val: false       }
+  },
+  'prep': {
+    'style':  { type: 'boolean',  val: false }
+  },
+  'trace': {
+    'logger': { type: 'function', val: console.log },
+    'throw':  { type: 'boolean',  val: false       },
+    'exit':   { type: 'boolean',  val: false       }
+  }
+}, true);
 
 ////////////////////////////////////////////////////////////////////////////////
-// FACTORY METHODS
+// CONFIG TYPEDEFS
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
  * @typedef {!{
  *   __TYPE: string,
  *   logger: function,
- *   ocdMap: boolean,
+ *   ocdmap: boolean,
  *   header: boolean,
  *   stack:  boolean,
  *   throw:  boolean,
@@ -95,50 +91,11 @@ var CONFIG_KEYS = freeze({
  */
 
 /**
- * @private
- * @param {string} trueKeys
- * @return {!LogConfig}
- */
-function newLogConfig(trueKeys) {
-
-  /** @type {!LogConfig} */
-  var config;
-
-  config = newEmptyObj('Config');
-  config = amend(config, 'logger', console.log, 'function');
-  config = amend(config, CONFIG_KEYS.log, false, 'boolean');
-  config = seal(config);
-  trueKeys && each(trueKeys, function(key) {
-    config[key] = true;
-  });
-  return config;
-}
-
-/**
  * @typedef {!{
  *   __TYPE: string,
  *   style:  boolean
  * }} PrepConfig
  */
-
-/**
- * @private
- * @param {string} trueKeys
- * @return {!PrepConfig}
- */
-function newPrepConfig(trueKeys) {
-
-  /** @type {!PrepConfig} */
-  var config;
-
-  config = newEmptyObj('Config');
-  config = amend(config, CONFIG_KEYS.prep, false, 'boolean');
-  config = seal(config);
-  trueKeys && each(trueKeys, function(key) {
-    config[key] = true;
-  });
-  return config;
-}
 
 /**
  * @typedef {!{
@@ -150,19 +107,29 @@ function newPrepConfig(trueKeys) {
  */
 
 /**
- * @private
- * @param {string} trueKeys
- * @return {!TraceConfig}
+ * @typedef {!(LogConfig|TraceConfig|PrepConfig)} Config
  */
-function newTraceConfig(trueKeys) {
 
-  /** @type {!TraceConfig} */
+////////////////////////////////////////////////////////////////////////////////
+// FACTORY METHODS
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @private
+ * @param {string} category
+ * @param {string} trueKeys
+ * @return {!Config}
+ */
+function newConfig(category, trueKeys) {
+
+  /** @type {!Config} */
   var config;
 
   config = newEmptyObj('Config');
-  config = amend(config, 'logger', console.log, 'function');
-  config = amend(config, CONFIG_KEYS.trace, false, 'boolean');
-  config = seal(config);
+  each(PROPS[category], function(obj, key) {
+    config = amend(config, key, obj.val, obj.type);
+  });
+  format = seal(format);
   trueKeys && each(trueKeys, function(key) {
     config[key] = true;
   });
@@ -174,14 +141,11 @@ function newTraceConfig(trueKeys) {
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @typedef {!(LogConfig|TraceConfig|PrepConfig)} Config
- */
-
-/**
  * @private
  * @param {string} method
  * @return {!Config}
  */
 module.exports = function getDefaultConfig(method) {
-  return FACTORY[method]( TRUE_KEYS[method] );
+  method = METHODS[method];
+  return newConfig(method.category, method.trueKeys);
 };
