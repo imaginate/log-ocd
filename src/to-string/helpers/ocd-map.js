@@ -32,7 +32,7 @@ var until  = help.until;
  * @const
  */
 var KEYS = freeze(
-  'ocdMap, ocdmap, _ocdMap, _ocdmap, __ocdMap, __ocdmap'.split(', ')
+  'ocdmap, _ocdmap, __ocdmap, ocdMap, _ocdMap, __ocdMap'.split(', ')
 );
 
 /**
@@ -45,7 +45,7 @@ module.exports = function ocdMap(config, type, val) {
 
   if ( !is._obj(val) ) return false;
 
-  if ( type === 'object' && check(config, 'ocdMap') ) return true;
+  if ( type === 'object' && check(config, 'ocdmap') ) return true;
 
   return until(true, KEYS, function(key) {
     return check(val, key);
