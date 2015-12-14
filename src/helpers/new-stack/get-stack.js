@@ -38,6 +38,10 @@ module.exports = function getStack(error) {
 
   hasError = !!error;
   error = error || new Error();
+  if (!error.stack) {
+    hasError = false;
+    error = new Error();
+  }
   stack = cleanStack(error.stack);
   return hasError ? stack : stripTraces(stack);
 };
