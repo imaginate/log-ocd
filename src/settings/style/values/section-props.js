@@ -138,7 +138,9 @@ type['document'] = {
 };
 
 stack['root'] = {
-  'color': 'white'
+  'color':      'white',
+  'identifier': { color: 'white' },
+  'brackets':   { color: 'white' }
 };
 
 stack['title'] = {

@@ -199,6 +199,24 @@
 /**
  * @typedef {!{
  *   __TYPE:        string,
+ *   identifier:    Theme,
+ *   brackets:      Theme,
+ *   color:         string,
+ *   bg:            string,
+ *   bold:          boolean,
+ *   dim:           boolean,
+ *   hidden:        boolean,
+ *   inverse:       boolean,
+ *   italic:        boolean,
+ *   reset:         boolean,
+ *   strikethrough: boolean,
+ *   underline:     boolean
+ * }} StackRootTheme
+ */
+
+/**
+ * @typedef {!{
+ *   __TYPE:        string,
  *   event:         Theme,
  *   file:          Theme,
  *   module:        Theme,
@@ -241,7 +259,7 @@
 
 /**
  * @typedef {!(
- *   Theme|
+ *   StackRootTheme|
  *   StackTitleTheme|
  *   StackRowTheme
  * )} StackTheme
