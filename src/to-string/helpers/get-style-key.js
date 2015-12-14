@@ -28,5 +28,5 @@
  */
 module.exports = function getStyleKey(method, key) {
   key = key ? '.' + key : '';
-  return 'ocd' + this[method].__INST + '.' + method + key;
+  return 'ocd' + this.__INST + '.' + method + key;
 };
