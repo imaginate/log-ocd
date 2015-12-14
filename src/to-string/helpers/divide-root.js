@@ -28,9 +28,10 @@ var slice = help.slice;
  * @param {!Array} dirpath
  * @param {number} limit
  * @param {number} indent
+ * @param {number} end
  * @return {string}
  */
-module.exports = function divideRoot(dirpath, limit, indent) {
+module.exports = function divideRoot(dirpath, limit, indent, end) {
 
   /** @type {string} */
   var result;
@@ -42,6 +43,7 @@ module.exports = function divideRoot(dirpath, limit, indent) {
   if (limit < 0) return dirpath;
 
   limit -= indent;
+  limit -= end;
 
   if (dirpath.length <= limit) return dirpath;
 
@@ -49,12 +51,13 @@ module.exports = function divideRoot(dirpath, limit, indent) {
   result = slice(dirpath, 0, i);
   dirpath = slice(dirpath, i);
   indent = fill(indent, ' ');
+  end = fill(end, ' ');
   while (dirpath.length > limit) {
     i = getLastDir(dirpath, limit);
-    result += '\n' + indent + slice(dirpath, 0, i);
+    result += end + '\n' + indent + slice(dirpath, 0, i);
     dirpath = slice(dirpath, i);
   }
-  result += dirpath && '\n' + indent + dirpath;
+  result += dirpath && end + '\n' + indent + dirpath;
   return result;
 };
 

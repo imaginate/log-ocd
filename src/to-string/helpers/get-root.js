@@ -52,12 +52,11 @@ module.exports = function getRoot(stack, style) {
   format = this.trace.format.root;
   len = format.brackets.length;
   len += len && 1;
-  len += format.identifier.length;
-  len += format.spaceBefore + format.spaceAfter;
+  len += format.identifier.length + format.spaceBefore;
   identifier = getIdentifier(format.identifier, style);
   brackets = getBrackets(format.brackets, style);
   space = getSpace(format.spaceBefore, format.spaceAfter, style);
-  dirs = divideRoot(stack.base, format.lineLimit, len);
+  dirs = divideRoot(stack.base, format.lineLimit, len, format.spaceAfter);
   dirs = colors[style](dirs);
   return space[0] + identifier + brackets[0] + dirs + brackets[1] + space[1];
 };
