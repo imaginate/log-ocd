@@ -155,6 +155,7 @@
 /**
  * @typedef {!(
  *   RootFormat|
+ *   TitleFormat|
  *   RowFormat|
  *   EventFormat|
  *   FileFormat|
@@ -214,6 +215,7 @@
  *   linesBefore: number,
  *   linesAfter:  number,
  *   root:        RootFormat,
+ *   title:       TitleFormat,
  *   row:         RowFormat,
  *   event:       EventFormat,
  *   file:        FileFormat,
