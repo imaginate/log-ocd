@@ -58,5 +58,6 @@ module.exports = function getRoot(stack, style) {
   space = getSpace(format.spaceBefore, format.spaceAfter, style);
   dirs = divideRoot(stack.base, format.lineLimit, len, format.spaceAfter);
   dirs = colors[style](dirs);
-  return space[0] + identifier + brackets[0] + dirs + brackets[1] + space[1];
+  return space[0] + identifier + brackets[0] +
+         dirs + brackets[1] + space[1] + '\n';
 };
