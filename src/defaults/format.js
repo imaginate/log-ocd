@@ -122,20 +122,73 @@ var TYPE_PROPS = freeze(remap({
  * @type {!Object}
  * @const
  */
+var STACK_PROPS = freeze({
+  'root': {
+    'spaceBefore': { type: 'number', val: 0  },
+    'spaceAfter':  { type: 'number', val: 0  },
+    'identifier':  { type: 'string', val: '' },
+    'lineLimit':   { type: 'number', val: 60 },
+    'brackets':    { type: 'string', val: '' }
+  },
+  'title': {
+    'spaceBefore': { type: 'number', val: 1 },
+    'spaceAfter':  { type: 'number', val: 1 }
+  },
+  'row': {
+    'spaceBefore': { type: 'number', val: 1 },
+    'spaceAfter':  { type: 'number', val: 1 }
+  },
+  'event': {
+    'spaceBefore': { type: 'number', val: 0       },
+    'spaceAfter':  { type: 'number', val: 0       },
+    'lineLimit':   { type: 'number', val: 25      },
+    'title':       { type: 'string', val: 'event' }
+  },
+  'file': {
+    'spaceBefore': { type: 'number', val: 0      },
+    'spaceAfter':  { type: 'number', val: 0      },
+    'lineLimit':   { type: 'number', val: 25     },
+    'dirDepth':    { type: 'number', val: -1     },
+    'title':       { type: 'string', val: 'file' }
+  },
+  'module': {
+    'spaceBefore': { type: 'number', val: 0        },
+    'spaceAfter':  { type: 'number', val: 0        },
+    'lineLimit':   { type: 'number', val: 25       },
+    'title':       { type: 'string', val: 'module' }
+  }
+}, true);
+
+/**
+ * @private
+ * @type {!Object}
+ * @const
+ */
 var CATEGORY_BASE = freeze({
-  'lineLimit': { type: 'number',  val: 50          },
-  'undefined': { type: 'string',  val: 'undefined' },
-  'null':      { type: 'string',  val: 'null'      },
-  'nan':       { type: 'string',  val: 'nan'       },
-  'ocdmap':    { type: '!object', makeType: true   },
-  'string':    { type: '!object', makeType: true   },
-  'regexp':    { type: '!object', makeType: true   },
-  'object':    { type: '!object', makeType: true   },
-  'array':     { type: '!object', makeType: true   },
-  'args':      { type: '!object', makeType: true   },
-  'function':  { type: '!object', makeType: true   },
-  'element':   { type: '!object', makeType: true   },
-  'document':  { type: '!object', makeType: true   }
+  'type': {
+    'lineLimit': { type: 'number',  val: 50          },
+    'undefined': { type: 'string',  val: 'undefined' },
+    'null':      { type: 'string',  val: 'null'      },
+    'nan':       { type: 'string',  val: 'nan'       },
+    'ocdmap':    { type: '!object', makeType: true   },
+    'string':    { type: '!object', makeType: true   },
+    'regexp':    { type: '!object', makeType: true   },
+    'object':    { type: '!object', makeType: true   },
+    'array':     { type: '!object', makeType: true   },
+    'args':      { type: '!object', makeType: true   },
+    'function':  { type: '!object', makeType: true   },
+    'element':   { type: '!object', makeType: true   },
+    'document':  { type: '!object', makeType: true   }
+  },
+  'stack': {
+    'linesBefore': { type: 'number',  val: 1          },
+    'linesAfter':  { type: 'number',  val: 1          },
+    'root':        { type: '!object', makeStack: true },
+    'row':         { type: '!object', makeStack: true },
+    'event':       { type: '!object', makeStack: true },
+    'file':        { type: '!object', makeStack: true },
+    'module':      { type: '!object', makeStack: true }
+  }
 }, true);
 
 /**
@@ -144,14 +197,14 @@ var CATEGORY_BASE = freeze({
  * @const
  */
 var CATEGORY_PROPS = freeze({
-  'prep': fromCategoryBase(null),
-  'log':  fromCategoryBase({
+  'prep': fromCategoryBase('type'),
+  'log':  fromCategoryBase('type', {
     'linesBefore': { type: 'number',  val: 1         },
     'linesAfter':  { type: 'number',  val: 1         },
     'header':      { type: '!object', makeType: true },
     'msg':         { type: '!object', makeType: true }
   }),
-  'trace': {}
+  'trace': fromCategoryBase('stack')
 }, true);
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -237,6 +290,74 @@ var CATEGORY_PROPS = freeze({
 /**
  * @typedef {!{
  *   __TYPE:      string,
+ *   spaceBefore: number,
+ *   spaceAfter:  number,
+ *   identifier:  string,
+ *   lineLimit:   number,
+ *   brackets:    string
+ * }} RootFormat
+ */
+
+/**
+ * @typedef {!{
+ *   __TYPE:      string,
+ *   spaceBefore: number,
+ *   spaceAfter:  number
+ * }} TitleFormat
+ */
+
+/**
+ * @typedef {!{
+ *   __TYPE:      string,
+ *   spaceBefore: number,
+ *   spaceAfter:  number
+ * }} RowFormat
+ */
+
+/**
+ * @typedef {!{
+ *   __TYPE:      string,
+ *   spaceBefore: number,
+ *   spaceAfter:  number,
+ *   lineLimit:   number,
+ *   title:       string
+ * }} EventFormat
+ */
+
+/**
+ * @typedef {!{
+ *   __TYPE:      string,
+ *   spaceBefore: number,
+ *   spaceAfter:  number,
+ *   lineLimit:   number,
+ *   dirDepth:    number,
+ *   title:       string
+ * }} FileFormat
+ */
+
+/**
+ * @typedef {!{
+ *   __TYPE:      string,
+ *   spaceBefore: number,
+ *   spaceAfter:  number,
+ *   lineLimit:   number,
+ *   title:       string
+ * }} ModuleFormat
+ */
+
+/**
+ * @typedef {!(
+ *   RootFormat|
+ *   RowFormat|
+ *   EventFormat|
+ *   FileFormat|
+ *   ModuleFormat
+ * )} StackFormat
+ */
+
+/**
+ * @typedef {!{
+ *   __TYPE:      string,
  *   linesBefore: number,
  *   linesAfter:  number,
  *   lineLimit:   number,
@@ -278,7 +399,14 @@ var CATEGORY_PROPS = freeze({
 
 /**
  * @typedef {!{
- *   __TYPE: string
+ *   __TYPE:      string,
+ *   linesBefore: number,
+ *   linesAfter:  number,
+ *   root:        RootFormat,
+ *   row:         RowFormat,
+ *   event:       EventFormat,
+ *   file:        FileFormat,
+ *   module:      ModuleFormat
  * }} TraceFormat
  */
 
@@ -311,16 +439,17 @@ function fromTypeBase(type, props) {
 
 /**
  * @private
+ * @param {string} type
  * @param {Object=} props
  * @return {!Object}
  */
-function fromCategoryBase(props) {
+function fromCategoryBase(type, props) {
 
   /** @type {!Object} */
   var base;
 
   props = props || null;
-  base = copy(CATEGORY_BASE);
+  base = copy(CATEGORY_BASE[type], true);
   base = fuse(base, props);
   return freeze(base, true);
 }
@@ -347,8 +476,28 @@ function newTypeFormat(type, props) {
 
 /**
  * @private
+ * @param {string} type
+ * @param {Object<string, (string|number)>=} props
+ * @return {!StackFormat}
+ */
+function newStackFormat(type, props) {
+
+  /** @type {!StackFormat} */
+  var format;
+
+  props = props || null;
+  format = newEmptyObj(type + 'Format');
+  each(STACK_PROPS[type], function(obj, key) {
+    format = amend(format, key, obj.val, obj.type);
+  });
+  format = seal(format);
+  return fuse(format, props);
+}
+
+/**
+ * @private
  * @param {string} category
- * @param {Object<string, (string|number|TypeFormat)>=} props
+ * @param {Object<string, (string|number|TypeFormat|StackFormat)>=} props
  * @return {!Format}
  */
 function newCategoryFormat(category, props) {
@@ -361,7 +510,11 @@ function newCategoryFormat(category, props) {
   props = props || null;
   format = newEmptyObj('Format');
   each(CATEGORY_PROPS[category], function(obj, key) {
-    val = obj.makeType ? newTypeFormat(key) : obj.val;
+    val = obj.makeType
+      ? newTypeFormat(key)
+      : obj.makeStack
+        ? newStackFormat(key)
+        : obj.val;
     format = amend(format, key, val, obj.type);
   });
   format = seal(format);
