@@ -26,6 +26,7 @@ var copy = help.copy;
 var cut  = help.cut;
 var each = help.each;
 var fuse = help.fuse;
+var get  = help.get;
 var has  = help.has;
 
 var capFirst = require('./cap-first');
@@ -51,7 +52,7 @@ module.exports = colors;
  * @private
  * @param {!Style} style
  * @param {string} method
- * @param {!Array} keys - The keys for each changed property.
+ * @param {!Array=} keys - The keys for each changed property.
  */
 function setThemes(style, method, keys) {
 
@@ -63,6 +64,7 @@ function setThemes(style, method, keys) {
   var obj;
 
   themes = {};
+  keys = keys || get.keys(style);
   each(keys, function(key) {
     build = has(BUILD, key) ? BUILD[key] : buildThemes;
     obj = style[key];
@@ -172,7 +174,7 @@ function buildRowThemes(name, theme) {
   props.odd  = buildProps(theme);
   props.even = buildProps(theme.alternate);
   each(theme, function(val, key) {
-    if ( !is.obj(val) ) return;
+    if ( !is.obj(val) || key === 'alternate' ) return;
     val = buildProps(val, props.odd);
     val = newTheme(val);
     themes[name + 'odd.' + key] = makeTheme(val);
