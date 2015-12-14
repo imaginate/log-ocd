@@ -69,7 +69,14 @@ var PROPS = freeze({
   'trace': {
     'logger': { type: 'function', val: console.log },
     'throw':  { type: 'boolean',  val: false       },
-    'exit':   { type: 'boolean',  val: false       }
+    'exit':   { type: 'boolean',  val: false       },
+    'root':   { type: 'boolean',  val: true        },
+    'title':  { type: 'boolean',  val: true        },
+    'event':  { type: 'boolean',  val: true        },
+    'file':   { type: 'boolean',  val: false       },
+    'module': { type: 'boolean',  val: true        },
+    'line':   { type: 'boolean',  val: true        },
+    'column': { type: 'boolean',  val: true        }
   }
 }, true);
 
@@ -102,7 +109,14 @@ var PROPS = freeze({
  *   __TYPE: string,
  *   logger: function,
  *   throw:  boolean,
- *   exit:   boolean
+ *   exit:   boolean,
+ *   root:   boolean,
+ *   title:  boolean,
+ *   event:  boolean,
+ *   file:   boolean,
+ *   module: boolean,
+ *   line:   boolean,
+ *   column: boolean
  * }} TraceConfig
  */
 
