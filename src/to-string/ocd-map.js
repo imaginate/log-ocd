@@ -22,13 +22,13 @@
 
 var help = require('../helpers');
 var each  = help.each;
-var fill  = help.fill;
 var slice = help.slice;
 
 var colors = require('../helpers/colors');
 
 var getDelimiter = require('./helpers/get-delimiter');
 var getStyleKey = require('./helpers/get-style-key');
+var getSpace = require('./helpers/get-space');
 var getKeys = require('./helpers/get-keys');
 
 var toString = require('./index');
@@ -63,10 +63,7 @@ module.exports = function ocdMapToString(method, obj) {
 
   style = getStyleKey.call(this, method, 'ocdmap');
   format = this[method].format.ocdmap;
-  space  = [
-    fill(format.spaceBefore, ' '),
-    fill(format.spaceAfter,  ' ')
-  ];
+  space  = getSpace(format.spaceBefore, format.spaceAfter, style);
   delimiter = getDelimiter(format.delimiter, style);
   each(keys, function(key) {
     val = obj[key];
