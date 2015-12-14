@@ -35,8 +35,6 @@ module.exports = function divideRoot(dirpath, limit, indent) {
   /** @type {string} */
   var result;
   /** @type {number} */
-  var len;
-  /** @type {number} */
   var i;
 
   dirpath = dirpath.join('') + '/';
