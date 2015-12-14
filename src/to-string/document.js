@@ -23,6 +23,7 @@
 var getIdentifier = require('./helpers/get-identifier');
 var getDelimiter = require('./helpers/get-delimiter');
 var getBrackets = require('./helpers/get-brackets');
+var getStyleKey = require('./helpers/get-style-key');
 
 var objPropsToString = require('./object-props');
 
@@ -41,7 +42,7 @@ module.exports = function documentToString(method, val) {
   /** @type {!Object} */
   var vals;
 
-  style  = 'ocd' + this[method].__INST + method + 'document';
+  style = getStyleKey.call(this, method, 'document');
   format = this[method].format.document;
   vals = {
     identifier: getIdentifier(format.identifier, style),

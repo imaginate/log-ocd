@@ -21,6 +21,7 @@
 'use strict';
 
 var colors = require('../helpers/colors');
+var getStyleKey = require('./helpers/get-style-key');
 
 /**
  * @this {!Settings}
@@ -33,7 +34,7 @@ module.exports = function nanToString(method, val) {
   /** @type {string} */
   var style;
 
-  style = 'ocd' + this[method].__INST + method + 'nan';
+  style = getStyleKey.call(this, method, 'nan');
   val = this[method].format.nan;
   return colors[style](val);
 };

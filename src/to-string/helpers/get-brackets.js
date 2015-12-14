@@ -30,7 +30,7 @@ var colors = require('../../helpers/colors');
 module.exports = function getBrackets(brackets, style) {
   if (!brackets) return [ '','' ];
   brackets += brackets.length > 1 ? '' : brackets;
-  style += 'brackets';
+  style += '.brackets';
   return [
     colors[style]( brackets[0] ),
     colors[style]( brackets[1] )

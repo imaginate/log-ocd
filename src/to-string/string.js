@@ -30,6 +30,7 @@ var colors = require('../helpers/colors');
 
 var getDelimiter = require('./helpers/get-delimiter');
 var getBrackets = require('./helpers/get-brackets');
+var getStyleKey = require('./helpers/get-style-key');
 var divideString = require('./helpers/divide-string');
 
 /**
@@ -57,7 +58,7 @@ module.exports = function stringToString(method, val) {
   /** @type {string} */
   var style;
 
-  style = 'ocd' + this[method].__INST + method + 'string';
+  style = getStyleKey.call(this, method, 'string');
   val = remap(val, /\n/g, '\\n');
 
   if ( has(val, FILLER) ) {

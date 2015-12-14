@@ -28,5 +28,5 @@ var colors = require('../../helpers/colors');
  * @return {string}
  */
 module.exports = function getIdentifier(identifier, style) {
-  return identifier ? colors[style + 'identifier'](identifier) : '';
+  return identifier ? colors[style + '.identifier'](identifier) : '';
 };

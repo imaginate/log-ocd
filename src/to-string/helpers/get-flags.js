@@ -28,5 +28,5 @@ var colors = require('../../helpers/colors');
  * @return {string}
  */
 module.exports = function getFlags(flags, style) {
-  return flags ? colors[style + 'flags'](flags) : '';
+  return flags ? colors[style + '.flags'](flags) : '';
 };

@@ -28,6 +28,7 @@ var colors = require('../helpers/colors');
 
 var getIdentifier = require('./helpers/get-identifier');
 var getBrackets = require('./helpers/get-brackets');
+var getStyleKey = require('./helpers/get-style-key');
 var getFlags = require('./helpers/get-flags');
 
 /**
@@ -49,7 +50,7 @@ module.exports = function regexpToString(method, val) {
   /** @type {string} */
   var flags;
 
-  style = 'ocd' + this[method].__INST + method + 'regexp';
+  style = getStyleKey.call(this, method, 'regexp');
   val = val.toString();
   format = this[method].format.regexp;
   identifier = getIdentifier(format.identifier, style);

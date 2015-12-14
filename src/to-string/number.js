@@ -29,6 +29,7 @@ var colors = require('../helpers/colors');
 
 var getIdentifier = require('./helpers/get-identifier');
 var getDelimiter = require('./helpers/get-delimiter');
+var getStyleKey = require('./helpers/get-style-key');
 
 /**
  * @this {!Settings}
@@ -45,7 +46,7 @@ module.exports = function numberToString(method, val) {
   /** @type {string} */
   var style;
 
-  style = 'ocd' + this[method].__INST + method + 'number';
+  style = getStyleKey.call(this, method, 'number');
   val = String(val);
   identifier = get(val, /^[+-]/)[0] || '';
   identifier = getIdentifier(identifier, style);

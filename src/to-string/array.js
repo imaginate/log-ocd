@@ -23,6 +23,7 @@
 var getIdentifier = require('./helpers/get-identifier');
 var getDelimiter = require('./helpers/get-delimiter');
 var getBrackets = require('./helpers/get-brackets');
+var getStyleKey = require('./helpers/get-style-key');
 
 var arrPropsToString = require('./array-props');
 
@@ -41,7 +42,7 @@ module.exports = function arrayToString(method, val) {
   /** @type {!Object} */
   var vals;
 
-  style  = 'ocd' + this[method].__INST + method + 'array';
+  style = getStyleKey.call(this, method, 'array');
   format = this[method].format.array;
   vals = {
     identifier: getIdentifier(format.identifier, style),

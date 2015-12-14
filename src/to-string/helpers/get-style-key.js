@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------------------------------
- * LOG-OCD: BOOLEAN-TO-STRING
+ * LOG-OCD: GET-STYLE-KEY HELPER
  * -----------------------------------------------------------------------------
  * @version 1.0.0
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
@@ -20,21 +20,13 @@
 
 'use strict';
 
-var colors = require('../helpers/colors');
-var getStyleKey = require('./helpers/get-style-key');
-
 /**
  * @this {!Settings}
  * @param {string} method
- * @param {boolean} val
+ * @param {string=} key
  * @return {string}
  */
-module.exports = function booleanToString(method, val) {
-
-  /** @type {string} */
-  var style;
-
-  style = getStyleKey.call(this, method, 'boolean');
-  val = String(val);
-  return colors[style](val);
+module.exports = function getStyleKey(method, key) {
+  key = key ? '.' + key : '';
+  return 'ocd' + this[method].__INST + '.' + method + key;
 };

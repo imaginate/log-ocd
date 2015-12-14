@@ -28,6 +28,7 @@ var slice = help.slice;
 var colors = require('../helpers/colors');
 
 var getDelimiter = require('./helpers/get-delimiter');
+var getStyleKey = require('./helpers/get-style-key');
 var getKeys = require('./helpers/get-keys');
 
 var toString = require('./index');
@@ -60,7 +61,7 @@ module.exports = function ocdMapToString(method, obj) {
 
   if (!keys.length) return result;
 
-  style  = 'ocd' + this[method].__INST + method + 'ocdmap';
+  style = getStyleKey.call(this, method, 'ocdmap');
   format = this[method].format.ocdmap;
   space  = [
     fill(format.spaceBefore, ' '),
