@@ -23,10 +23,9 @@
 var each = require('../helpers').each;
 
 var getStyleKey = require('./helpers/get-style-key');
-var getTitle = require('./helpers/get-title');
-var getRoot = require('./helpers/get-root');
-var getRow = require('./helpers/get-row');
 var stripStyle = require('./helpers/strip-style');
+var buildTable = require('./helpers/build-table');
+var getRoot = require('./helpers/get-root');
 var noStyle = require('./helpers/no-style');
 
 /**
@@ -49,12 +48,6 @@ module.exports = function stackToString(method, stack) {
   style = getStyleKey.call(this, 'trace');
   config = this.trace.config;
   result = config.root ? getRoot.call(this, stack, style) : '';
-  result += config.title ? getTitle.call(this, stack, style) : '';
-  style += '.';
-  each(stack, function(trace, i) {
-    key = style;
-    key += i % 2 ? 'odd' : 'even';
-    result += getRow.call(this, trace, stack, key);
-  }, this);
+  result += buildTable.call(this, stack, style);
   return noStyle(config) ? stripStyle(result) : result;
 };
