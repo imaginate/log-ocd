@@ -24,25 +24,27 @@ var slice = require('../../helpers').slice;
 
 /**
  * @param {number} limit
- * @param {string} val
+ * @param {string} str
  * @return {string}
  */
-module.exports = function divideString(limit, val) {
+module.exports = function divideString(limit, str) {
 
   /** @type {string} */
   var result;
   /** @type {number} */
   var i;
 
-  if (val.length <= limit) return val;
+  if (limit < 0 || str.length <= limit) return str;
 
-  result = '';
-  while (val.length > limit) {
-    i = getLastSpace(val, limit) || val.length;
-    result += '\n' + slice(val, 0, i);
-    val = slice(val, i);
+  i = getLastSpace(str, limit);
+  result = slice(str, 0, i);
+  str = slice(str, i);
+  while (str.length > limit) {
+    i = getLastSpace(str, limit);
+    result += '\n' + slice(str, 0, i);
+    str = slice(str, i);
   }
-  result += val && '\n' + val;
+  result += str && '\n' + str;
   return result;
 };
 
@@ -61,5 +63,5 @@ function getLastSpace(str, limit) {
 
   temp = limit ? slice(str, 0, limit) : str;
   i = temp.lastIndexOf(' ') || str.indexOf(' ');
-  return ++i;
+  return ++i || str.length;
 }
