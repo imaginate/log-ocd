@@ -18,99 +18,22 @@
  * @see [Closure Compiler specific JSDoc]{@link https://developers.google.com/closure/compiler/docs/js-for-compiler}
  */
 
+'use strict';
 
-////////////////////////////////////////////////////////////////////////////////
-// REQUIRE EXTERNAL HELPERS
-////////////////////////////////////////////////////////////////////////////////
-
-// see https://github.com/imaginate/are
-var is  = require('node-are').is;
-var are = require('node-are').are;
-
-// see https://github.com/Marak/colors.js
-var colors = require('colors/safe');
-
-// see https://github.com/imaginate/vitals
-var vitals = require('node-vitals')('base', 'strict');
-var amend  = vitals.amend;
-var copy   = vitals.copy;
-var create = vitals.create;
-var cut    = vitals.cut;
-var each   = vitals.each;
-var fill   = vitals.fill;
-var freeze = vitals.freeze;
-var fuse   = vitals.fuse;
-var get    = vitals.get;
-var has    = vitals.has;
-var remap  = vitals.remap;
-var seal   = vitals.seal;
-var slice  = vitals.slice;
-var until  = vitals.until;
-
-
-////////////////////////////////////////////////////////////////////////////////
-// DEFINE GENERAL HELPERS
-////////////////////////////////////////////////////////////////////////////////
-
-/**
- * @private
- * @param {string} type
- * @return {!Object}
- */
-function newEmptyObj(type) {
-  return create(null, '__TYPE', type, {
-    configurable: false,
-    enumerable: false,
-    writable: false
-  });
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// DEFINE LOG-OCD METHODS
-////////////////////////////////////////////////////////////////////////////////
-
-/**
- * @private
- * @type {!Object}
- */
-var LogOCD = (function() {
-
-  /**
-   * @private
-   * @return {!Object}
-   */
-  function setup() {
-
-    /** @type {!Object} */
-    var LogOCD;
-
-    LogOCD = newEmptyObj('LogOCD');
-    LogOCD = add(LogOCD,  'logs',   'log, pass, error, warn, debug, fail');
-    LogOCD = add(LogOCD,  'preps',  'toString');
-    LogOCD = add(LogOCD,  'sets',   'setConfig, setFormat, setStyle, '    +
-                                    'resetConfig, resetFormat, resetStyle');
-    return freeze(LogOCD);
-  }
-
-  /**
-   * @private
-   * @param {!Object} LogOCD
-   * @param {string} section
-   * @param {string} keys
-   * @return {!Object}
-   */
-  function add(LogOCD, section, keys) {
-
-    /** @type {!Object} */
-    var obj;
-
-    obj = newEmptyObj('LogOCD.' + section);
-    obj = amend(obj, 'init', undefined, { enumerable: false }, 'function');
-    obj = amend(obj, keys, undefined, 'function');
-    obj = seal(obj);
-    return amend(LogOCD, section, obj);
-  }
-
-  return setup();
-})();
+var help = require('./helpers');
+var is     = help.is;
+var are    = help.are;
+var amend  = help.amend;
+var copy   = help.copy;
+var create = help.create;
+var cut    = help.cut;
+var each   = help.each;
+var fill   = help.fill;
+var freeze = help.freeze;
+var fuse   = help.fuse;
+var get    = help.get;
+var has    = help.has;
+var remap  = help.remap;
+var seal   = help.seal;
+var slice  = help.slice;
+var until  = help.until;
