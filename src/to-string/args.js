@@ -20,6 +20,8 @@
 
 'use strict';
 
+var slice = require('../helpers').slice;
+
 var getIdentifier = require('./helpers/get-identifier');
 var getDelimiter = require('./helpers/get-delimiter');
 var getBrackets = require('./helpers/get-brackets');
@@ -42,6 +44,7 @@ module.exports = function argumentsToString(method, val) {
   /** @type {!Object} */
   var vals;
 
+  val = slice(val);
   style = getStyleKey.call(this, method, 'args');
   format = this[method].format.args;
   vals = {
