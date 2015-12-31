@@ -31,11 +31,11 @@ var BASE = {
     'spaceBefore': { type: 'number', val: 1   },
     'spaceAfter':  { type: 'number', val: 6   },
     'accentMark':  { type: 'string', val: '`' },
-    'lineLimit':   { type: 'number', val: 50  }
+    'lineLimit':   { type: 'number', val: -1  }
   },
   'msg': {
     'accentMark': { type: 'string', val: '`' },
-    'lineLimit':  { type: 'number', val: 50  },
+    'lineLimit':  { type: 'number', val: -1  },
     'bullet':     { type: 'string', val: '-' },
     'indent':     { type: 'number', val: 2   }
   },

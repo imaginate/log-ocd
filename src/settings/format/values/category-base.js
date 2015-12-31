@@ -28,7 +28,7 @@ var freeze = require('../../../helpers').freeze;
  */
 var BASE = {
   'type': {
-    'lineLimit': { type: 'number',  val: 50          },
+    'lineLimit': { type: 'number',  val: -1          },
     'undefined': { type: 'string',  val: 'undefined' },
     'null':      { type: 'string',  val: 'null'      },
     'nan':       { type: 'string',  val: 'nan'       },

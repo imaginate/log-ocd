@@ -53,7 +53,7 @@ types = fuse(types, {
     'spaceBefore': { type: 'number', val: 0  },
     'spaceAfter':  { type: 'number', val: 0  },
     'identifier':  { type: 'string', val: '' },
-    'lineLimit':   { type: 'number', val: 60 },
+    'lineLimit':   { type: 'number', val: -1 },
     'brackets':    { type: 'string', val: '' }
   },
   'title': {
@@ -67,20 +67,20 @@ types = fuse(types, {
   'event': {
     'spaceBefore': { type: 'number', val: 0       },
     'spaceAfter':  { type: 'number', val: 0       },
-    'lineLimit':   { type: 'number', val: 25      },
+    'lineLimit':   { type: 'number', val: -1      },
     'title':       { type: 'string', val: 'event' }
   },
   'file': {
     'spaceBefore': { type: 'number', val: 0      },
     'spaceAfter':  { type: 'number', val: 0      },
-    'lineLimit':   { type: 'number', val: 25     },
+    'lineLimit':   { type: 'number', val: -1     },
     'dirDepth':    { type: 'number', val: -1     },
     'title':       { type: 'string', val: 'file' }
   },
   'module': {
     'spaceBefore': { type: 'number', val: 0        },
     'spaceAfter':  { type: 'number', val: 0        },
-    'lineLimit':   { type: 'number', val: 25       },
+    'lineLimit':   { type: 'number', val: -1       },
     'title':       { type: 'string', val: 'module' }
   }
 });
