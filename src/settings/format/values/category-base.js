@@ -28,8 +28,6 @@ var freeze = require('../../../helpers').freeze;
  */
 var BASE = {
   'type': {
-    '__maxLen':  { type: 'number',  val: -1          },
-    '__indent':  { type: 'number',  val: 0           },
     'lineLimit': { type: 'number',  val: -1          },
     'undefined': { type: 'string',  val: 'undefined' },
     'null':      { type: 'string',  val: 'null'      },
@@ -45,7 +43,6 @@ var BASE = {
     'document':  { type: '!object', make: true       }
   },
   'stack': {
-    '__maxLen':    { type: 'number',  val: -1    },
     'linesBefore': { type: 'number',  val: 1     },
     'linesAfter':  { type: 'number',  val: 1     },
     'root':        { type: '!object', make: true },
