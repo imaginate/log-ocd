@@ -170,6 +170,8 @@
 /**
  * @typedef {!{
  *   __TYPE:      string,
+ *   __maxLen:    number,
+ *   __indent:    number,
  *   linesBefore: number,
  *   linesAfter:  number,
  *   lineLimit:   number,
@@ -212,6 +214,7 @@
 /**
  * @typedef {!{
  *   __TYPE:      string,
+ *   __maxLen:    number,
  *   linesBefore: number,
  *   linesAfter:  number,
  *   root:        RootFormat,

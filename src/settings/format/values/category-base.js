@@ -43,6 +43,7 @@ var BASE = {
     'document':  { type: '!object', make: true       }
   },
   'stack': {
+    '__maxLen':    { type: 'number',  val: -1    },
     'linesBefore': { type: 'number',  val: 1     },
     'linesAfter':  { type: 'number',  val: 1     },
     'root':        { type: '!object', make: true },

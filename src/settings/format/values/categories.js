@@ -33,6 +33,8 @@ var fromCategoryBase = require('./helpers/from-category-base');
 var CATEGORIES = {
   'prep': fromCategoryBase('type'),
   'log':  fromCategoryBase('type', {
+    '__maxLen':    { type: 'number',  val: -1    },
+    '__indent':    { type: 'number',  val: 0     },
     'linesBefore': { type: 'number',  val: 1     },
     'linesAfter':  { type: 'number',  val: 1     },
     'header':      { type: '!object', make: true },
