@@ -47,6 +47,8 @@ module.exports = function newSettings(inst) {
     enumerable: false,
     writable: false
   });
+  settings = amend(settings, '__maxLen', -1, 'number');
+  settings = amend(settings, '__indent', 0,  'number');
   each(METHODS, function(method) {
     settings = amend(settings, method, newSetting(method), '!object');
   });

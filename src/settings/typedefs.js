@@ -31,6 +31,8 @@
  * @typedef {!{
  *   __TYPE:   string,
  *   __INST:   number,
+ *   __maxLen: number,
+ *   __indent: number,
  *   toString: Setting,
  *   log:      Setting,
  *   pass:     Setting,
