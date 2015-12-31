@@ -22,8 +22,11 @@
 
 var is = require('../helpers').is;
 var newStack = require('../helpers/new-stack');
-var getLines = require('./helpers/get-lines');
+
+var setupSettings = require('./helpers/setup-settings');
 var execError = require('./helpers/exec-error');
+var getLines = require('./helpers/get-lines');
+
 var stackToString = require('../to-string/stack');
 
 /**
@@ -44,6 +47,8 @@ module.exports = function logTrace(method, error) {
   var result;
 
   if ( !is('obj=', error) ) return execError.call(this, method, 'error', error);
+
+  this = setupSettings(this);
 
   config = this[method].config;
   format = this[method].format;

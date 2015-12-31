@@ -26,8 +26,11 @@ var remap = help.remap;
 var slice = help.slice;
 
 var newStack = require('../helpers/new-stack');
-var getLines = require('./helpers/get-lines');
+
+var setupSettings = require('./helpers/setup-settings');
 var execError = require('./helpers/exec-error');
+var getLines = require('./helpers/get-lines');
+
 var headerToString = require('../to-string/header');
 var stackToString = require('../to-string/stack');
 var msgToString = require('../to-string/msg');
@@ -52,6 +55,7 @@ module.exports = function log(method, vals) {
   /** @type {string} */
   var msg;
 
+  this = setupSettings(this);
   vals = slice(arguments, 1);
 
   config = this[method].config;
