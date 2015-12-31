@@ -28,6 +28,8 @@ var freeze = require('../../../helpers').freeze;
  */
 var BASE = {
   'type': {
+    '__maxLen':  { type: 'number',  val: -1          },
+    '__indent':  { type: 'number',  val: 0           },
     'lineLimit': { type: 'number',  val: -1          },
     'undefined': { type: 'string',  val: 'undefined' },
     'null':      { type: 'string',  val: 'null'      },
