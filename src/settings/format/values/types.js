@@ -21,67 +21,125 @@
 'use strict';
 
 var help = require('../../../helpers');
+var copy   = help.copy;
+var each   = help.each;
 var freeze = help.freeze;
 var fuse   = help.fuse;
 var remap  = help.remap;
 
-var fromTypeBase = require('./helpers/from-type-base');
+var newNaturalNum = require('../../../helpers/new-natural-num');
+
+var fromProps = require('./helpers/from-props');
+
+/**
+ * @private
+ * @param {!Object} types
+ * @param {!Object} base
+ * @param {!Object} newTypes
+ * @return {!Object}
+ */
+function buildNewProps(types, base, newTypes) {
+  newTypes = remap(newTypes, function(props) {
+    return fromProps(base, props);
+  });
+  return fuse(types, newTypes);
+}
 
 /** @type {!Object} */
 var types;
+/** @type {!Object} */
+var base;
 
+// PROPS FOR LOG & PREP CATEGORIES
 types = {
-  'header':   { base: 'header', props: null },
-  'msg':      { base: 'msg',    props: null },
-  'ocdmap':   { base: 'ocdmap', props: null },
-  'string':   { base: 'string', props: null },
-  'regexp':   { base: 'regexp', props: null },
-  'array':    { base: 'array',  props: null },
-  'args':     { base: 'array',  props: { identifier: '[Arguments] '   } },
-  'object':   { base: 'object', props: null },
-  'function': { base: 'object', props: { identifier: '[Function] '    } },
-  'element':  { base: 'object', props: { identifier: '[DomElement] '  } },
-  'document': { base: 'object', props: { identifier: '[DomDocument] ' } }
+  'header': {
+    'spaceBefore': { type: 'number', val: 1,  setter: newNaturalNum },
+    'spaceAfter':  { type: 'number', val: 6,  setter: newNaturalNum },
+    'accentMark':  { type: 'string', val: '`'                       },
+    'lineLimit':   { type: 'number', val: 0,  setter: newNaturalNum }
+  },
+  'msg': {
+    'accentMark':  { type: 'string', val: '`'                       },
+    'lineLimit':   { type: 'number', val: 0,  setter: newNaturalNum },
+    'bullet':      { type: 'string', val: '-'                       },
+    'indent':      { type: 'number', val: 2,  setter: newNaturalNum }
+  },
+  'ocdmap': {
+    'spaceBefore': { type: 'number', val: 0,  setter: newNaturalNum },
+    'spaceAfter':  { type: 'number', val: 0,  setter: newNaturalNum },
+    'delimiter':   { type: 'string', val: ':'                       }
+  },
+  'string': {
+    'brackets':    { type: 'string', val: '"' }
+  },
+  'regexp': {
+    'identifier':  { type: 'string', val: ''  },
+    'brackets':    { type: 'string', val: '/' }
+  },
+  'array': {
+    'identifier':  { type: 'string', val: ''   },
+    'delimiter':   { type: 'string', val: ','  },
+    'brackets':    { type: 'string', val: '[]' },
+    'indent':      { type: 'number', val: 2, setter: newNaturalNum }
+  },
+  'object': {
+    'identifier':  { type: 'string', val: ''   },
+    'delimiter':   { type: 'string', val: ','  },
+    'brackets':    { type: 'string', val: '{}' },
+    'indent':      { type: 'number', val: 2, setter: newNaturalNum }
+  }
 };
-
-types = remap(types, function(obj) {
-  return fromTypeBase(obj.base, obj.props);
+types = buildNewProps(types, types['array'], {
+  'args': {
+    'identifier':  { type: 'string', val: '[Arguments] ' }
+  }
+});
+types = buildNewProps(types, types['object'], {
+  'function': {
+    'identifier':  { type: 'string', val: '[Function] ' }
+  },
+  'element':  {
+    'identifier':  { type: 'string', val: '[DOMElement] ' }
+  },
+  'document': {
+    'identifier':  { type: 'string', val: '[DOMDocument] ' }
+  }
 });
 
-types = fuse(types, {
+// PROPS FOR TRACE CATEGORY
+base = {
+  'spaceBefore': { type: 'number', val: 1, setter: newNaturalNum },
+  'spaceAfter':  { type: 'number', val: 1, setter: newNaturalNum }
+};
+types = buildNewProps(types, base, {
+  'title': {},
+  'row':   {}
+});
+base = {
+  'spaceBefore': { type: 'number', val: 0, setter: newNaturalNum },
+  'spaceAfter':  { type: 'number', val: 0, setter: newNaturalNum },
+  'lineLimit':   { type: 'number', val: 0, setter: newNaturalNum }
+};
+types = buildNewProps(types, base, {
   'root': {
-    'spaceBefore': { type: 'number', val: 0  },
-    'spaceAfter':  { type: 'number', val: 0  },
-    'identifier':  { type: 'string', val: '' },
-    'lineLimit':   { type: 'number', val: -1 },
-    'brackets':    { type: 'string', val: '' }
-  },
-  'title': {
-    'spaceBefore': { type: 'number', val: 1 },
-    'spaceAfter':  { type: 'number', val: 1 }
-  },
-  'row': {
-    'spaceBefore': { type: 'number', val: 1 },
-    'spaceAfter':  { type: 'number', val: 1 }
+    'identifier': { type: 'string', val: '' },
+    'brackets':   { type: 'string', val: '' }
   },
   'event': {
-    'spaceBefore': { type: 'number', val: 0       },
-    'spaceAfter':  { type: 'number', val: 0       },
-    'lineLimit':   { type: 'number', val: -1      },
-    'title':       { type: 'string', val: 'event' }
+    'title':    { type: 'string', val: 'event' }
   },
   'file': {
-    'spaceBefore': { type: 'number', val: 0      },
-    'spaceAfter':  { type: 'number', val: 0      },
-    'lineLimit':   { type: 'number', val: -1     },
-    'dirDepth':    { type: 'number', val: -1     },
-    'title':       { type: 'string', val: 'file' }
+    'dirDepth': { type: 'number', val: -1, setter: newNaturalNum.build(-1) },
+    'title':    { type: 'string', val: 'file' }
   },
   'module': {
-    'spaceBefore': { type: 'number', val: 0        },
-    'spaceAfter':  { type: 'number', val: 0        },
-    'lineLimit':   { type: 'number', val: -1       },
-    'title':       { type: 'string', val: 'module' }
+    'title':    { type: 'string', val: 'module' }
+  },
+  'line': {
+    'title':    { type: 'string', val: 'line' }
+  },
+  'column': {
+    'title':    { type: 'string', val: 'column' }
   }
 });
 
