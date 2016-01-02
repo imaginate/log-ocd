@@ -43,7 +43,9 @@ module.exports = function newSubFormat(type, props) {
   props = props || null;
   format = newEmptyObj(type + 'Format');
   each(TYPES[type], function(obj, key) {
-    format = amend(format, key, obj.val, obj.type);
+    format = obj.setter
+      ? amend(format, key, obj.val, obj.type, obj.setter)
+      : amend(format, key, obj.val, obj.type);
   });
   format = seal(format);
   return fuse(format, props);
