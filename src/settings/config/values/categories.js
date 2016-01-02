@@ -49,7 +49,7 @@ var CATEGORIES = {
     'file':   { type: 'boolean',  val: false       },
     'module': { type: 'boolean',  val: true        },
     'line':   { type: 'boolean',  val: true        },
-    'column': { type: 'boolean',  val: true        }
+    'column': { type: 'boolean',  val: false       }
   }
 };
 
