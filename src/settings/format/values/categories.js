@@ -22,7 +22,8 @@
 
 var help = require('../../../helpers');
 var freeze = help.freeze;
-var remap  = help.remap;
+
+var newNaturalNum = require('../../../helpers/new-natural-num');
 
 var fromCategoryBase = require('./helpers/from-category-base');
 
@@ -33,8 +34,8 @@ var fromCategoryBase = require('./helpers/from-category-base');
 var CATEGORIES = {
   'prep': fromCategoryBase('type'),
   'log':  fromCategoryBase('type', {
-    'linesBefore': { type: 'number',  val: 1     },
-    'linesAfter':  { type: 'number',  val: 1     },
+    'linesBefore': { type: 'number', val: 1, setter: newNaturalNum },
+    'linesAfter':  { type: 'number', val: 1, setter: newNaturalNum },
     'header':      { type: '!object', make: true },
     'msg':         { type: '!object', make: true }
   }),

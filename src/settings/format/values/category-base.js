@@ -22,29 +22,31 @@
 
 var freeze = require('../../../helpers').freeze;
 
+var newNaturalNum = require('../../../helpers/new-natural-num');
+
 /**
  * @type {!Object}
  * @const
  */
-var BASE = {
+var CATEGORY_BASE = {
   'type': {
-    'lineLimit': { type: 'number',  val: -1          },
-    'undefined': { type: 'string',  val: 'undefined' },
-    'null':      { type: 'string',  val: 'null'      },
-    'nan':       { type: 'string',  val: 'nan'       },
-    'ocdmap':    { type: '!object', make: true       },
-    'string':    { type: '!object', make: true       },
-    'regexp':    { type: '!object', make: true       },
-    'object':    { type: '!object', make: true       },
-    'array':     { type: '!object', make: true       },
-    'args':      { type: '!object', make: true       },
-    'function':  { type: '!object', make: true       },
-    'element':   { type: '!object', make: true       },
-    'document':  { type: '!object', make: true       }
+    'lineLimit': { type: 'number', val: 0, setter: newNaturalNum },
+    'undefined': { type: 'string', val: 'undefined' },
+    'null':      { type: 'string', val: 'null'      },
+    'nan':       { type: 'string', val: 'nan'       },
+    'ocdmap':    { type: '!object', make: true },
+    'string':    { type: '!object', make: true },
+    'regexp':    { type: '!object', make: true },
+    'object':    { type: '!object', make: true },
+    'array':     { type: '!object', make: true },
+    'args':      { type: '!object', make: true },
+    'function':  { type: '!object', make: true },
+    'element':   { type: '!object', make: true },
+    'document':  { type: '!object', make: true }
   },
   'stack': {
-    'linesBefore': { type: 'number',  val: 1     },
-    'linesAfter':  { type: 'number',  val: 1     },
+    'linesBefore': { type: 'number', val: 1, setter: newNaturalNum },
+    'linesAfter':  { type: 'number', val: 1, setter: newNaturalNum },
     'root':        { type: '!object', make: true },
     'row':         { type: '!object', make: true },
     'event':       { type: '!object', make: true },
@@ -53,4 +55,4 @@ var BASE = {
   }
 };
 
-module.exports = freeze(BASE, true);
+module.exports = freeze(CATEGORY_BASE, true);
