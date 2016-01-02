@@ -21,12 +21,12 @@
 'use strict';
 
 var help = require('../helpers');
-var amend  = help.amend;
-var each   = help.each;
-var freeze = help.freeze;
-var seal   = help.seal;
+var amend = help.amend;
+var each  = help.each;
+var seal  = help.seal;
 
 var newEmptyObj = require('../helpers/new-empty-obj');
+var newNaturalNum = require('../helpers/new-natural-num');
 
 var METHODS = require('./values/methods');
 
@@ -40,17 +40,32 @@ module.exports = function newSettings(inst) {
 
   /** @type {!Settings} */
   var settings;
+  /** @type {function} */
+  var setter;
+  /** @type {!Object} */
+  var props;
+  /** @type {!Object} */
+  var desc;
 
   settings = newEmptyObj('Settings');
-  settings = amend(settings, '__INST', inst, {
+
+  desc = {
     configurable: false,
     enumerable: false,
     writable: false
+  };
+  settings = amend(settings, '__INST', inst, desc);
+
+  props = { '__maxLen': -1, '__indent': 0 };
+  desc = { enumerable: false };
+  each(props, function(val, key) {
+    setter = val ? newNaturalNum.build(val) : newNaturalNum;
+    settings = amend(settings, key, val, desc, 'number', setter);
   });
-  settings = amend(settings, '__maxLen', -1, 'number');
-  settings = amend(settings, '__indent', 0,  'number');
+
+  desc = { writable: false };
   each(METHODS, function(method) {
-    settings = amend(settings, method, newSetting(method), '!object');
+    settings = amend(settings, method, newSetting(method), desc);
   });
-  return freeze(settings);
+  return seal(settings);
 };
