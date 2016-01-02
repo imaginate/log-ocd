@@ -23,7 +23,8 @@
 var help = require('../../../../helpers');
 var copy   = help.copy;
 var freeze = help.freeze;
-var seal   = help.seal;
+var fuse   = help.fuse;
+var remap  = help.remap;
 
 var CATEGORY_BASE = require('../category-base');
 
@@ -37,8 +38,11 @@ module.exports = function fromCategoryBase(type, props) {
   /** @type {!Object} */
   var base;
 
+  base = CATEGORY_BASE[type];
+  base = remap(base, function(prop) {
+    return copy(prop);
+  });
   props = props || null;
-  base = copy(CATEGORY_BASE[type], true);
-  base = fuse(base, props);
-  return freeze(base, true);
+  props = fuse(base, props);
+  return freeze(props, true);
 };
