@@ -21,11 +21,11 @@
 'use strict';
 
 var help = require('../helpers');
-var cut  = help.cut;
-var each = help.each;
-var fill = help.fill;
-var fuse = help.fuse;
-var has  = help.has;
+var is    = help.is;
+var fill  = help.fill;
+var fuse  = help.fuse;
+var has   = help.has;
+var remap = help.remap;
 
 var colors = require('../helpers/colors');
 
@@ -46,60 +46,47 @@ module.exports = function propsToString(method, type, obj) {
 
   /** @type {!PropDetails} */
   var details;
-  /** @type {function} */
-  var exec;
+  /** @type {!Array<string>} */
+  var vals;
 
   details = newPropDetails(this, method, type);
 
-  if ( is.empty(obj) ) return emptyObj(details.identifier, details.brackets);
+  if ( is.empty(obj) ) return printVals(details);
 
-  if (details.indent > 0) this.__indent += details.indent;
-  exec = is.arr(obj) ? objectPropsToString : arrayPropsToString;
-  return exec.call(this, method, details, obj);
+  this.__indent += details.indent;
+  vals = is.arr(obj)
+    ? getArrVals.call(this, method, details, obj)
+    : getObjVals.call(this, method, details, obj);
+  this.__indent -= details.indent;
+  return printVals(details, vals);
 };
 
 /**
  * @private
- * @param {string} identifier
- * @param {!Array} brackets
- * @return {string}
- */
-function emptyObj(identifier, brackets) {
-  return identifier + brackets[0] + brackets[1];
-}
-
-/**
- * @private
- * @this {!Settings}
- * @param {string} method
  * @param {!PropDetails} details
- * @param {!Object} obj
+ * @param {!Array<string>=} vals
  * @return {string}
  */
-function objectPropsToString(method, details, obj) {
+function printVals(details, vals) {
 
   /** @type {string} */
   var result;
-  /** @type {!Array<string>} */
-  var vals;
-  /** @type {!Array<string>} */
-  var keys;
-  /** @type {(number|string)} */
-  var last;
-  /** @type {(number|boolean)} */
-  var len;
+  /** @type {string} */
+  var indent;
 
-  vals = getObjVals.call(this, method, details, obj);
+  if (!vals) {
+    return details.identifier + details.brackets[0] + details.brackets[1];
+  }
 
-  // CONTINUE DEV HERE
-  // MAX LEN & LIMIT
-  /*len = len < vals.limit;
-  last = len ? ' ' : '\n' + fill(vals.indent, ' ');
-  result = result.join(last);
-  result += len ? ' ' : '\n';
-  return result + vals.brackets[1];
-  if (details.indent > 0) this.__indent -= details.indent;*/
-};
+  if ( !details.limit || (vals.len > 0 && vals.len <= details.limit) ) {
+    return vals.join(' ') + ' ' + details.brackets[1];
+  }
+
+  indent = fill(details.indent + this.__indent, ' ');
+  result = vals.join('\n' + indent);
+  indent = fill(this.__indent, ' ');
+  return result + '\n' + indent + vals.brackets[1];
+}
 
 /**
  * @private
@@ -128,16 +115,53 @@ function getObjVals(method, details, obj) {
   intro = getIntro(details);
   len  = getLen(intro);
   keys = getKeys(obj);
-  last = lastIndex(keys);
+  last = getLastIndex(keys);
   vals = remap(keys, function(key, i) {
     key = color(key + ':') + ' ' + toString.call(this, method, obj[key]);
+    if (i < last) key += details.delimiter;
     len = getLen(key, len);
-    return i < last ? key + details.delimiter : key;
+    return key;
   }, this);
   vals = fuse([ intro ], vals);
-  vals.len = len;
+  vals.len = len === -1 ? len : getLen(details.brackets[1], len) + keys.length;
   return vals;
-};
+}
+
+/**
+ * @private
+ * @this {!Settings}
+ * @param {string} method
+ * @param {!PropDetails} details
+ * @param {!Array} arr
+ * @return {!Array<string>}
+ */
+function getArrVals(method, details, arr) {
+
+  /** @type {string} */
+  var intro;
+  /** @type {function} */
+  var color;
+  /** @type {!Array<string>} */
+  var vals;
+  /** @type {number} */
+  var last;
+  /** @type {number} */
+  var len;
+
+  color = colors[details.style];
+  intro = getIntro(details);
+  len  = getLen(intro);
+  last = getLastIndex(arr);
+  vals = remap(arr, function(val, i) {
+    val = toString.call(this, method, val);
+    if (i < last) val += details.delimiter;
+    len = getLen(val, len);
+    return val;
+  }, this);
+  vals = fuse([ intro ], vals);
+  vals.len = len === -1 ? len : getLen(details.brackets[1], len) + arr.length;
+  return vals;
+}
 
 /**
  * @private
@@ -166,6 +190,6 @@ function getLen(str, len) {
  * @param {!Array} arr
  * @return {number}
  */
-function lastIndex(arr) {
+function getLastIndex(arr) {
   return arr.length - 1;
 }
