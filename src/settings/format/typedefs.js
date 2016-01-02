@@ -128,7 +128,7 @@
  *   spaceAfter:  number,
  *   lineLimit:   number,
  *   title:       string
- * }} EventFormat
+ * }} ColumnFormat
  */
 
 /**
@@ -139,17 +139,7 @@
  *   lineLimit:   number,
  *   dirDepth:    number,
  *   title:       string
- * }} FileFormat
- */
-
-/**
- * @typedef {!{
- *   __TYPE:      string,
- *   spaceBefore: number,
- *   spaceAfter:  number,
- *   lineLimit:   number,
- *   title:       string
- * }} ModuleFormat
+ * }} FileColumnFormat
  */
 
 /**
@@ -157,9 +147,8 @@
  *   RootFormat|
  *   TitleFormat|
  *   RowFormat|
- *   EventFormat|
- *   FileFormat|
- *   ModuleFormat
+ *   ColumnFormat|
+ *   FileColumnFormat
  * )} StackFormat
  */
 
@@ -217,9 +206,11 @@
  *   root:        RootFormat,
  *   title:       TitleFormat,
  *   row:         RowFormat,
- *   event:       EventFormat,
- *   file:        FileFormat,
- *   module:      ModuleFormat
+ *   event:       ColumnFormat,
+ *   file:        FileColumnFormat,
+ *   module:      ColumnFormat,
+ *   line:        ColumnFormat,
+ *   column:      ColumnFormat
  * }} TraceFormat
  */
 
