@@ -20,37 +20,14 @@
 
 'use strict';
 
-var getIdentifier = require('./helpers/get-identifier');
-var getDelimiter = require('./helpers/get-delimiter');
-var getBrackets = require('./helpers/get-brackets');
-var getStyleKey = require('./helpers/get-style-key');
-
-var objPropsToString = require('./object-props');
+var propsToString = require('./props');
 
 /**
  * @this {!Settings}
  * @param {string} method
- * @param {!Object} val
+ * @param {!Object} obj
  * @return {string}
  */
-module.exports = function objectToString(method, val) {
-
-  /** @type {!ObjectFormat} */
-  var format;
-  /** @type {string} */
-  var style;
-  /** @type {!Object} */
-  var vals;
-
-  style = getStyleKey.call(this, method, 'object');
-  format = this[method].format.object;
-  vals = {
-    identifier: getIdentifier(format.identifier, style),
-    delimiter:  getDelimiter(format.delimiter, style),
-    brackets:   getBrackets(format.brackets, style),
-    indent:     format.indent,
-    style:      style
-  };
-  vals.limit = this[method].format.lineLimit;
-  return objPropsToString.call(this, method, vals, val);
+module.exports = function objectToString(method, obj) {
+  return propsToString.call(this, method, 'object', obj);
 };

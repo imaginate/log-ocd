@@ -21,39 +21,15 @@
 'use strict';
 
 var slice = require('../helpers').slice;
-
-var getIdentifier = require('./helpers/get-identifier');
-var getDelimiter = require('./helpers/get-delimiter');
-var getBrackets = require('./helpers/get-brackets');
-var getStyleKey = require('./helpers/get-style-key');
-
-var arrPropsToString = require('./array-props');
+var propsToString = require('./props');
 
 /**
  * @this {!Settings}
  * @param {string} method
- * @param {!Arguments} val
+ * @param {!Arguments} args
  * @return {string}
  */
-module.exports = function argumentsToString(method, val) {
-
-  /** @type {!ObjectFormat} */
-  var format;
-  /** @type {string} */
-  var style;
-  /** @type {!Object} */
-  var vals;
-
-  val = slice(val);
-  style = getStyleKey.call(this, method, 'args');
-  format = this[method].format.args;
-  vals = {
-    identifier: getIdentifier(format.identifier, style),
-    delimiter:  getDelimiter(format.delimiter, style),
-    brackets:   getBrackets(format.brackets, style),
-    indent:     format.indent,
-    style:      style
-  };
-  vals.limit = this[method].format.lineLimit;
-  return arrPropsToString.call(this, method, vals, val);
+module.exports = function argumentsToString(method, args) {
+  args = slice(args);
+  return propsToString.call(this, method, 'args', args);
 };
