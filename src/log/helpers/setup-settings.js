@@ -25,7 +25,12 @@
  * @return {!Settings}
  */
 module.exports = function setupSettings(settings) {
-  settings.__maxLen = !!process.stdout.columns ? process.stdout.columns : -1;
+
+  /** @type {number} */
+  var max;
+
+  max = process.stdout.columns || 0;
+  settings.__maxLen = max > 0 ? max - 1 : 0;
   settings.__indent = 0;
   return settings;
 };
