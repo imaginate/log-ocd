@@ -54,8 +54,8 @@ module.exports = function newPropDetails(settings, method, type) {
   details = {};
 
   format = settings[method].format;
-  details.limit = format.lineLimit;
-
+  details.limit = format.lineLimit || settings.__maxLen;
+  if (details.limit > settings.__maxLen) details.limit = settings.__maxLen;
   format = format[type];
   style = getStyleKey.call(settings, method, type);
   details.identifier = getIdentifier(format.identifier, style);
