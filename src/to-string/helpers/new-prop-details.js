@@ -24,6 +24,7 @@ var getIdentifier = require('./get-identifier');
 var getDelimiter = require('./get-delimiter');
 var getBrackets = require('./get-brackets');
 var getStyleKey = require('./get-style-key');
+var getLimit = require('./get-limit');
 
 /**
  * @typedef {!{
@@ -54,8 +55,7 @@ module.exports = function newPropDetails(settings, method, type) {
   details = {};
 
   format = settings[method].format;
-  details.limit = format.lineLimit || settings.__maxLen;
-  if (details.limit > settings.__maxLen) details.limit = settings.__maxLen;
+  details.limit = getLimit(format.lineLimit, settings.__maxLen);
   format = format[type];
   style = getStyleKey.call(settings, method, type);
   details.identifier = getIdentifier(format.identifier, style);
