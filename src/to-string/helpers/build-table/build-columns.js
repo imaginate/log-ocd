@@ -58,11 +58,13 @@ module.exports = function buildColumns(stack) {
   config = this.trace.config;
   format = this.trace.format;
   columns = [];
+  columns.over = false;
   each('event, file, module, line, column', function(key) {
     if ( !config[key] ) return;
     title = config.title ? format[key].title : '';
     column = buildColumn.call(this, stack, key, title);
     columns = fuse(columns, column);
+    if (column.over) columns.over = true;
   }, this);
 
   format = format.row;
@@ -91,6 +93,7 @@ function fixColumnsLen(columns, maxLen) {
   dist = slice(columns);
   dist.max = maxLen;
   while (dist) dist = distColumns(dist);
+  columns.over = true;
   return columns;
 };
 
@@ -146,6 +149,7 @@ function distColumns(columns) {
     diff = column.spread - column.len;
     column.spread = per;
     column.len = per - diff;
+    column.over = true;
   });
   return null;
 };

@@ -26,6 +26,7 @@ var fill = require('../../../helpers').fill;
  * @typedef {!{
  *   key:    string,
  *   len:    number,
+ *   over:   boolean,
  *   title:  string,
  *   align:  string,
  *   space:  !Array,
@@ -53,6 +54,7 @@ module.exports = function buildColumn(stack, key, title) {
   column = {
     key:   key,
     len:   stack[key],
+    over:  false,
     title: title,
     align: key === 'line' || key === 'column' ? 'right' : 'left',
     space: [
@@ -62,7 +64,10 @@ module.exports = function buildColumn(stack, key, title) {
   };
   if (title.length > column.len) column.len = title.length;
   limit = format.lineLimit;
-  if (limit && column.len > limit) column.len = limit;
+  if (limit && column.len > limit) {
+    column.len = limit;
+    column.over = true;
+  }
   column.spread = column.len + column.space[0].length + column.space[1].length;
   return column;
 };
