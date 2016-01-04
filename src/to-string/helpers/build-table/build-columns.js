@@ -21,8 +21,13 @@
 'use strict';
 
 var help = require('../../../helpers');
-var each = help.each;
-var fuse = help.fuse;
+var cut   = help.cut;
+var each  = help.each;
+var fuse  = help.fuse;
+var slice = help.slice;
+var until = help.until;
+
+var floor = Math.floor;
 
 var buildColumn = require('./build-column');
 
@@ -45,6 +50,8 @@ module.exports = function buildColumns(stack) {
   var config;
   /** @type {!Format} */
   var format;
+  /** @type {number} */
+  var maxLen;
   /** @type {string} */
   var title;
 
@@ -57,5 +64,84 @@ module.exports = function buildColumns(stack) {
     column = buildColumn.call(this, stack, key, title);
     columns = fuse(columns, column);
   }, this);
+
+  format = format.row;
+  maxLen = this.__maxLen - format.spaceBefore - format.spaceAfter;
+  if (maxLen < 0) maxLen = 0;
+  return fixColumnsLen(columns, maxLen);
+};
+
+/**
+ * @private
+ * @param {!Columns} columns
+ * @param {number} maxLen
+ * @return {!Columns}
+ */
+function fixColumnsLen(columns, maxLen) {
+
+  /** @type {!Columns} */
+  var dist;
+  /** @type {number} */
+  var len;
+
+  len = getColumnsLen(columns);
+
+  if (len <= maxLen) return columns;
+
+  dist = slice(columns);
+  dist.max = maxLen;
+  while (dist) dist = distColumns(dist);
   return columns;
+};
+
+/**
+ * @private
+ * @param {!Columns} columns
+ * @return {number}
+ */
+function getColumnsLen(columns) {
+
+  /** @type {number} */
+  var len;
+
+  len = 0;
+  each(columns, function(column) {
+    len += column.len;
+  });
+  return len;
+};
+
+/**
+ * @private
+ * @param {!Columns} columns
+ * @return {?Columns}
+ */
+function distColumns(columns) {
+
+  /** @type {boolean} */
+  var under;
+  /** @type {boolean} */
+  var over;
+  /** @type {number} */
+  var per;
+
+  per = columns.max / columns.length;
+  per = floor(per);
+
+  under = until(false, columns, function(column) {
+    return column.len > per;
+  });
+
+  if (under) {
+    return cut(columns, function(column) {
+      over = column.len > per;
+      if (!over) columns.max -= column.len;
+      return over;
+    };
+  }
+
+  each(columns, function(column) {
+    column.len = per;
+  });
+  return null;
 };
