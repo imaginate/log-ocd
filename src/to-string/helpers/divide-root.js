@@ -27,54 +27,33 @@ var slice = help.slice;
 /**
  * @param {!Array} dirpath
  * @param {number} limit
- * @param {number} indent
- * @param {number} end
+ * @param {number} intro
  * @return {string}
  */
-module.exports = function divideRoot(dirpath, limit, indent, end) {
+module.exports = function divideRoot(dirpath, limit, intro) {
 
   /** @type {string} */
   var result;
+  /** @type {string} */
+  var indent;
   /** @type {number} */
   var i;
 
-  dirpath = dirpath.join('') + '/';
+  dirpath = dirpath.join('');
 
-  if (limit < 0) return dirpath;
+  if (!limit) return dirpath;
 
-  limit -= indent;
-  limit -= end;
+  limit -= intro;
 
   if (dirpath.length <= limit) return dirpath;
 
-  i = getLastDir(dirpath, limit);
-  result = slice(dirpath, 0, i);
-  dirpath = slice(dirpath, i);
-  indent = fill(indent, ' ');
-  end = fill(end, ' ');
+  result = slice(dirpath, 0, ++limit);
+  dirpath = slice(dirpath, limit);
+  indent = fill(intro, ' ');
   while (dirpath.length > limit) {
-    i = getLastDir(dirpath, limit);
-    result += end + '\n' + indent + slice(dirpath, 0, i);
-    dirpath = slice(dirpath, i);
+    result += '\n' + indent + slice(dirpath, 0, limit);
+    dirpath = slice(dirpath, limit);
   }
-  result += dirpath && end + '\n' + indent + dirpath;
+  result += dirpath && '\n' + indent + dirpath;
   return result;
 };
-
-/**
- * @private
- * @param {string} dirpath
- * @param {number=} limit
- * @return {number}
- */
-function getLastDir(dirpath, limit) {
-
-  /** @type {string} */
-  var temp;
-  /** @type {number} */
-  var i;
-
-  temp = limit ? slice(dirpath, 0, limit) : dirpath;
-  i = temp.lastIndexOf('/') || dirpath.indexOf('/');
-  return ++i || dirpath.length;
-}
