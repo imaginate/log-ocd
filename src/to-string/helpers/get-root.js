@@ -24,8 +24,9 @@ var colors = require('../../helpers/colors');
 
 var getIdentifier = require('./get-identifier');
 var getBrackets = require('./get-brackets');
-var getSpace = require('./get-space');
 var divideRoot = require('./divide-root');
+var getSpace = require('./get-space');
+var getLimit = require('./get-limit');
 
 /**
  * @this {!Settings}
@@ -39,25 +40,27 @@ module.exports = function getRoot(stack, style) {
   var identifier;
   /** @type {string} */
   var brackets;
+  /** @type {string} */
+  var dirpath;
   /** @type {!RootFormat} */
   var format;
   /** @type {!Array<string>} */
   var space;
-  /** @type {string} */
-  var dirs;
+  /** @type {number} */
+  var limit;
   /** @type {number} */
   var len;
 
   style += '.root';
   format = this.trace.format.root;
-  len = format.brackets.length;
-  len += len && 1;
+  len = format.brackets.length ? 1 : 0;
   len += format.identifier.length + format.spaceBefore;
   identifier = getIdentifier(format.identifier, style);
   brackets = getBrackets(format.brackets, style);
   space = getSpace(format.spaceBefore, format.spaceAfter, style);
-  dirs = divideRoot(stack.base, format.lineLimit, len, format.spaceAfter);
-  dirs = colors[style](dirs);
+  limit = getLimit(format.lineLimit, this.__maxLen);
+  dirpath = divideRoot(stack.base, limit, len);
+  dirpath = colors[style](dirpath);
   return space[0] + identifier + brackets[0] +
-         dirs + brackets[1] + space[1] + '\n';
+         dirpath + brackets[1] + '\n';
 };
