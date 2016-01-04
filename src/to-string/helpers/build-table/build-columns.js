@@ -21,11 +21,12 @@
 'use strict';
 
 var help = require('../../../helpers');
-var cut   = help.cut;
-var each  = help.each;
-var fuse  = help.fuse;
-var slice = help.slice;
-var until = help.until;
+var cut    = help.cut;
+var each   = help.each;
+var fuse   = help.fuse;
+var freeze = help.freeze;
+var slice  = help.slice;
+var until  = help.until;
 
 var floor = Math.floor;
 
@@ -70,7 +71,11 @@ module.exports = function buildColumns(stack) {
   format = format.row;
   maxLen = this.__maxLen - format.spaceBefore - format.spaceAfter;
   if (maxLen < 0) maxLen = 0;
-  return fixColumnsLen(columns, maxLen);
+  columns = fixColumnsLen(columns, maxLen);
+  each(columns, function(column) {
+    freeze(column);
+  });
+  return freeze(columns);
 };
 
 /**
