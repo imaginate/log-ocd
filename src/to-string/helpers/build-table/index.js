@@ -38,6 +38,6 @@ module.exports = function buildTable(stack, style) {
   var title;
 
   columns = buildColumns.call(this, stack);
-  title = buildTitle.call(this, stack, columns, style);
+  title = buildTitle.call(this, columns, style);
   return title + buildRows.call(this, stack, columns, style);
 };
