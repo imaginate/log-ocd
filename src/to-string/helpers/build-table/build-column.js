@@ -24,11 +24,12 @@ var fill = require('../../../helpers').fill;
 
 /**
  * @typedef {!{
- *   key:   string,
- *   len:   number,
- *   title: string,
- *   align: string,
- *   space: !Array
+ *   key:    string,
+ *   len:    number,
+ *   title:  string,
+ *   align:  string,
+ *   space:  !Array,
+ *   spread: number
  * }} Column
  */
 
@@ -45,6 +46,8 @@ module.exports = function buildColumn(stack, key, title) {
   var column;
   /** @type {!StackFormat} */
   var format;
+  /** @type {number} */
+  var limit;
 
   format = this.trace.format[key];
   column = {
@@ -58,6 +61,8 @@ module.exports = function buildColumn(stack, key, title) {
     ]
   };
   if (title.length > column.len) column.len = title.length;
-  if (column.len > format.lineLimit) column.len = format.lineLimit;
+  limit = format.lineLimit;
+  if (limit && column.len > limit) column.len = limit;
+  column.spread = column.len + column.space[0].length + column.space[1].length;
   return column;
 };

@@ -106,7 +106,7 @@ function getColumnsLen(columns) {
 
   len = 0;
   each(columns, function(column) {
-    len += column.len;
+    len += column.spread;
   });
   return len;
 };
@@ -123,25 +123,29 @@ function distColumns(columns) {
   /** @type {boolean} */
   var over;
   /** @type {number} */
+  var diff;
+  /** @type {number} */
   var per;
 
   per = columns.max / columns.length;
   per = floor(per);
 
   under = until(false, columns, function(column) {
-    return column.len > per;
+    return column.spread > per;
   });
 
   if (under) {
     return cut(columns, function(column) {
-      over = column.len > per;
-      if (!over) columns.max -= column.len;
+      over = column.spread > per;
+      if (!over) columns.max -= column.spread;
       return over;
     };
   }
 
   each(columns, function(column) {
-    column.len = per;
+    diff = column.spread - column.len;
+    column.spread = per;
+    column.len = per - diff;
   });
   return null;
 };
