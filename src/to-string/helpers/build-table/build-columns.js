@@ -86,7 +86,7 @@ function fixColumnsLen(columns, maxLen) {
 
   len = getColumnsLen(columns);
 
-  if (len <= maxLen) return columns;
+  if (maxLen && len <= maxLen) return columns;
 
   dist = slice(columns);
   dist.max = maxLen;
