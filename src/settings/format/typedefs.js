@@ -110,14 +110,6 @@
  *   __TYPE:      string,
  *   spaceBefore: number,
  *   spaceAfter:  number
- * }} TitleFormat
- */
-
-/**
- * @typedef {!{
- *   __TYPE:      string,
- *   spaceBefore: number,
- *   spaceAfter:  number
  * }} RowFormat
  */
 
@@ -145,7 +137,6 @@
 /**
  * @typedef {!(
  *   RootFormat|
- *   TitleFormat|
  *   RowFormat|
  *   ColumnFormat|
  *   FileColumnFormat
@@ -204,7 +195,6 @@
  *   linesBefore: number,
  *   linesAfter:  number,
  *   root:        RootFormat,
- *   title:       TitleFormat,
  *   row:         RowFormat,
  *   event:       ColumnFormat,
  *   file:        FileColumnFormat,

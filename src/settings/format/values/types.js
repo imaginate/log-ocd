@@ -107,13 +107,11 @@ types = buildNewProps(types, types['object'], {
 });
 
 // PROPS FOR TRACE CATEGORY
-base = {
-  'spaceBefore': { type: 'number', val: 1, setter: newNaturalNum },
-  'spaceAfter':  { type: 'number', val: 1, setter: newNaturalNum }
-};
-types = buildNewProps(types, base, {
-  'title': {},
-  'row':   {}
+types = fuse(types, {
+  'row': {
+    'spaceBefore': { type: 'number', val: 1, setter: newNaturalNum },
+    'spaceAfter':  { type: 'number', val: 1, setter: newNaturalNum }
+  }
 });
 base = {
   'spaceBefore': { type: 'number', val: 0, setter: newNaturalNum },
