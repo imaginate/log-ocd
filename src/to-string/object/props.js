@@ -20,20 +20,21 @@
 
 'use strict';
 
-var help = require('../helpers');
+var help = require('../../helpers');
 var is    = help.is;
 var fill  = help.fill;
 var fuse  = help.fuse;
 var has   = help.has;
 var remap = help.remap;
 
-var colors = require('../helpers/colors');
+var colors = require('../../helpers/colors');
 
-var getKeys = require('./helpers/get-keys');
-var stripStyle = require('./helpers/strip-style');
+var getKeys = require('../helpers/get-keys');
+var stripStyle = require('../helpers/strip-style');
+
 var newPropDetails = require('./helpers/new-prop-details');
 
-var toString = require('./index');
+var toString = require('../index');
 
 /**
  * @this {!Settings}

@@ -20,18 +20,18 @@
 
 'use strict';
 
-var help = require('../helpers');
+var help = require('../../helpers');
 var each  = help.each;
 var slice = help.slice;
 
-var colors = require('../helpers/colors');
+var colors = require('../../helpers/colors');
 
-var getDelimiter = require('./helpers/get-delimiter');
-var getStyleKey = require('./helpers/get-style-key');
-var getSpace = require('./helpers/get-space');
-var getKeys = require('./helpers/get-keys');
+var getDelimiter = require('../helpers/get-delimiter');
+var getStyleKey = require('../helpers/get-style-key');
+var getSpace = require('../helpers/get-space');
+var getKeys = require('../helpers/get-keys');
 
-var toString = require('./index');
+var toString = require('../index');
 
 /**
  * @this {!Settings}

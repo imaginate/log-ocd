@@ -20,7 +20,7 @@
 
 'use strict';
 
-var slice = require('../helpers').slice;
+var slice = require('../../helpers').slice;
 var propsToString = require('./props');
 
 /**

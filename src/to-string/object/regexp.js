@@ -20,16 +20,16 @@
 
 'use strict';
 
-var help = require('../helpers');
+var help = require('../../helpers');
 var cut  = help.cut;
 var get  = help.get;
 
-var colors = require('../helpers/colors');
+var colors = require('../../helpers/colors');
 
-var getIdentifier = require('./helpers/get-identifier');
-var getBrackets = require('./helpers/get-brackets');
-var getStyleKey = require('./helpers/get-style-key');
-var getFlags = require('./helpers/get-flags');
+var getIdentifier = require('../helpers/get-identifier');
+var getBrackets = require('../helpers/get-brackets');
+var getStyleKey = require('../helpers/get-style-key');
+var getFlags = require('../helpers/get-flags');
 
 /**
  * @this {!Settings}
