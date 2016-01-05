@@ -27,7 +27,7 @@ var until = help.until;
 var stripStyle = require('../helpers/strip-style');
 var noStyle = require('../helpers/no-style');
 
-var isOcdmap = require('./helpers/ocd-map');
+var isOcdmap = require('./helpers/is-ocdmap');
 
 /**
  * @private
