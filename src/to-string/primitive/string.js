@@ -21,17 +21,18 @@
 'use strict';
 
 var help = require('../../helpers');
-var cut    = help.cut;
-var freeze = help.freeze;
-var has    = help.has;
-var remap  = help.remap;
-var slice  = help.slice;
+var cut   = help.cut;
+var fill  = help.fill;
+var has   = help.has;
+var remap = help.remap;
+var slice = help.slice;
 
 var colors = require('../../helpers/colors');
 
 var getDelimiter = require('../helpers/get-delimiter');
 var getBrackets = require('../helpers/get-brackets');
 var getStyleKey = require('../helpers/get-style-key');
+var getLimit = require('../helpers/get-limit');
 
 /**
  * Checks whether a string is a type filler instead of a string (e.g. <type>).
@@ -39,15 +40,15 @@ var getStyleKey = require('../helpers/get-style-key');
  * @type {!RegExp}
  * @const
  */
-var FILLER = freeze(/^<[\s\S]+>$/);
+var FILLER = /^<[\s\S]+>$/;
 
 /**
  * @this {!Settings}
  * @param {string} method
- * @param {string} val
+ * @param {string} str
  * @return {string}
  */
-module.exports = function stringToString(method, val) {
+module.exports = function stringToString(method, str) {
 
   /** @type {string} */
   var delimiter;
@@ -56,70 +57,57 @@ module.exports = function stringToString(method, val) {
   /** @type {!StringFormat} */
   var format;
   /** @type {string} */
+  var result;
+  /** @type {string} */
+  var indent;
+  /** @type {string} */
   var style;
+  /** @type {number} */
+  var limit;
 
   style = getStyleKey.call(this, method, 'string');
-  val = remap(val, /\n/g, '\\n');
+  str = remap(str, /\n/g, '\\n');
 
-  if ( has(val, FILLER) ) {
-    val = cut(val, /^<<|>>$/g);
-    return colors[style](val);
+  if ( has(str, FILLER) ) {
+    str = cut(str, /^<<|>>$/g);
+    return colors[style](str);
   }
 
-  val = divideString(this[method].format.lineLimit, val);
   format = this[method].format.string;
   brackets = getBrackets(format.brackets, style);
 
-  if ( !has(val, '\n') ) return brackets[0] + colors[style](val) + brackets[1];
+  limit = getLimit(this[method].format.lineLimit, this.__maxLen);
+  limit -= this.__indent;
+  limit -= 2;
+
+  if (limit <= 0 || str.length <= limit) {
+    return brackets[0] + colors[style](str) + brackets[1];
+  }
 
   delimiter = getDelimiter(' +', style);
-  return remap(val, /(.+)(\n)?/g, function(match, line, eol) {
-    eol = eol ? delimiter + eol : '';
-    return brackets[0] + colors[style](line) + brackets[1] + eol;
-  });
+  indent = fill(this.__indent + 2, ' ');
+  result = getLine(str, limit, brackets, delimiter, style);
+  str = slice(str, limit);
+  while (str.length > limit) {
+    result += getLine(str, limit, brackets, delimiter, style, indent);
+    str = slice(str, limit);
+  }
+  return result + indent + brackets[0] + colors[style](str) + brackets[1];
 };
 
 /**
  * @private
- * @param {number} limit
  * @param {string} str
+ * @param {number} end
+ * @param {!Array} brackets
+ * @param {string} delimiter
+ * @param {string} style
+ * @param {string=} indent
  * @return {string}
  */
-function divideString(limit, str) {
-
-  /** @type {string} */
-  var result;
-  /** @type {number} */
-  var i;
-
-  if (limit < 0 || str.length <= limit) return str;
-
-  i = getLastSpace(str, limit);
-  result = slice(str, 0, i);
-  str = slice(str, i);
-  while (str.length > limit) {
-    i = getLastSpace(str, limit);
-    result += '\n' + slice(str, 0, i);
-    str = slice(str, i);
-  }
-  result += str && '\n' + str;
-  return result;
-}
-
-/**
- * @private
- * @param {string} str
- * @param {number=} limit
- * @return {number}
- */
-function getLastSpace(str, limit) {
-
-  /** @type {string} */
-  var temp;
-  /** @type {number} */
-  var i;
-
-  temp = limit ? slice(str, 0, limit) : str;
-  i = temp.lastIndexOf(' ') || str.indexOf(' ');
-  return ++i || str.length;
+function getLine(str, end, brackets, delimiter, style, indent) {
+  str = slice(str, 0, end);
+  str = colors[style](str);
+  indent = indent || '';
+  return indent + brackets[0] + str + brackets[1] + delimiter + '\n';
 }
