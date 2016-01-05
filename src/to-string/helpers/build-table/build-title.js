@@ -29,6 +29,7 @@ var colors = require('../../../helpers/colors');
 
 var getSpace = require('../get-space');
 
+var buildVals = require('./build-vals');
 var buildItems = require('./build-items');
 
 /**
@@ -45,6 +46,8 @@ module.exports = function buildTitle(columns, style) {
   var space;
   /** @type {Items} */
   var items;
+  /** @type {!Array<string>} */
+  var vals;
   /** @type {boolean} */
   var over;
 
@@ -59,7 +62,8 @@ module.exports = function buildTitle(columns, style) {
 
   if (!over) return printTitle(columns, space, style);
 
-  items = buildItems(columns);
+  vals = buildVals(columns);
+  items = buildItems(columns, vals);
   return printTitleItems(columns, items, space, style);
 };
 

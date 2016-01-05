@@ -26,8 +26,6 @@ var remap = help.remap;
 var slice = help.slice;
 var until = help.until;
 
-var buildVals = require('./build-vals');
-
 /**
  * @typedef {!Array<string>} Item
  * @typedef {!Array<Item>} Items
@@ -35,17 +33,15 @@ var buildVals = require('./build-vals');
 
 /**
  * @param {Columns} columns
- * @param {Trace=} trace
+ * @param {!Array<string>} vals
  * @return {Items}
  */
-module.exports = function buildItems(columns, trace) {
+module.exports = function buildItems(columns, vals) {
 
   /** @type {number} */
   var remain;
   /** @type {Items} */
   var items;
-  /** @type {!Array<string>} */
-  var vals;
   /** @type {!Array<boolean>} */
   var done;
 
@@ -53,7 +49,6 @@ module.exports = function buildItems(columns, trace) {
   items = [];
   done = new Array(remain);
   done = fill(done, false);
-  vals = buildVals(columns, trace);
   vals = remap(vals, function(val, i) {
     if (val.length) return val;
     --remain;
