@@ -20,17 +20,16 @@
 
 'use strict';
 
-var help = require('../../../helpers');
-var each  = help.each;
-var fill  = help.fill;
-var until = help.until;
+var until = require('../../../helpers').until;
 
 var colors = require('../../../helpers/colors');
 
 var getSpace = require('../get-space');
 
 var buildVals = require('./build-vals');
+var printVals = require('./print-vals');
 var buildItems = require('./build-items');
+var printItems = require('./print-items');
 
 /**
  * @this {!Settings}
@@ -56,86 +55,15 @@ module.exports = function buildTitle(columns, style) {
   style += '.title';
   format = this.trace.format.row;
   space = getSpace(format.spaceBefore, format.spaceAfter, style);
-  over = columns.over && until(true, columns, function(column) {
-    return column.title.length > column.len;
-  });
 
-  if (!over) return printTitle(columns, space, style);
-
+  style += '.';
   vals = buildVals(columns);
+  over = columns.over && until(true, columns, function(column, i) {
+    return val[i].length > column.len;
+  });
+
+  if (!over) return printVals(vals, columns, space, style);
+
   items = buildItems(columns, vals);
-  return printTitleItems(columns, items, space, style);
+  return printItems(items, columns, space, style);
 };
-
-/**
- * @private
- * @param {!Columns} columns
- * @param {!Array} mainSpace
- * @param {string} style
- * @return {string}
- */
-function printTitle(columns, mainSpace, style) {
-
-  /** @type {string} */
-  var result;
-  /** @type {string} */
-  var title;
-  /** @type {string} */
-  var space;
-
-  style += '.';
-  result = mainSpace[0];
-  each(columns, function(column) {
-    title = column.title;
-    space = fill(column.len - title.length, ' ');
-    title = column.align === 'left' ? title + space : space + title;
-    title = column.space[0] + title + column.space[1];
-    result += colors[style + column.key](title);
-  });
-  return result + mainSpace[1] + '\n';
-}
-
-/**
- * @private
- * @param {Columns} columns
- * @param {Items} items
- * @param {!Array} space
- * @param {string} style
- * @return {string}
- */
-function printItems(columns, items, space, style) {
-
-  /** @type {string} */
-  var result;
-
-  style += '.';
-  result = '';
-  each(items, function(item) {
-    result += printItem(columns, item, space, style);
-  });
-  return result;
-}
-
-/**
- * @private
- * @param {Columns} columns
- * @param {Item} item
- * @param {!Array} space
- * @param {string} style
- * @return {string}
- */
-function printItem(columns, item, space, style) {
-
-  /** @type {string} */
-  var result;
-  /** @type {string} */
-  var title;
-
-  result = space[0];
-  each(columns, function(column, i) {
-    title = item[i];
-    title = column.space[0] + title + column.space[1];
-    result += colors[style + column.key](title);
-  });
-  return result + space[1] + '\n';
-}
