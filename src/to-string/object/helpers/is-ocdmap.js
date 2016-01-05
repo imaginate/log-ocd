@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------------------------------
- * LOG-OCD: OCD-MAP HELPER
+ * LOG-OCD: IS-OCDMAP HELPER
  * -----------------------------------------------------------------------------
  * @version 1.0.0
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
@@ -20,41 +20,35 @@
 
 'use strict';
 
-var help = require('../../helpers');
-var is     = help.is;
-var has    = help.has;
-var freeze = help.freeze;
-var until  = help.until;
+var help = require('../../../helpers');
+var has   = help.has;
+var until = help.until;
 
 /**
  * @private
- * @type {!Array<string>}
+ * @type {string}
  * @const
  */
-var KEYS = freeze(
-  'ocdmap, _ocdmap, __ocdmap, ocdMap, _ocdMap, __ocdMap'.split(', ')
-);
+var KEYS = 'ocdmap, _ocdmap, __ocdmap, ocdMap, _ocdMap, __ocdMap';
 
 /**
  * @param {!Object} config
  * @param {string} type
- * @param {*} val
+ * @param {(!Object|function)} obj
  * @return {boolean}
  */
-module.exports = function ocdMap(config, type, val) {
-
-  if ( !is._obj(val) ) return false;
+module.exports = function isOcdmap(config, type, obj) {
 
   if ( type === 'object' && check(config, 'ocdmap') ) return true;
 
   return until(true, KEYS, function(key) {
-    return check(val, key);
+    return check(obj, key);
   });
 };
 
 /**
  * @private
- * @param {!Object} obj
+ * @param {(!Object|function)} obj
  * @param {string} key
  * @return {boolean}
  */
