@@ -63,6 +63,7 @@ module.exports = function buildColumn(stack, key, title) {
       fill(format.spaceAfter,  ' ')
     ]
   };
+  if (key === 'file') column.dirs = format.dirDepth;
   if (title.length > column.len) column.len = title.length;
   limit = format.lineLimit;
   if (limit && column.len > limit) {

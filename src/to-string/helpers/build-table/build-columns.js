@@ -65,7 +65,6 @@ module.exports = function buildColumns(stack) {
     title = config.title ? format[key].title : '';
     column = buildColumn.call(this, stack, key, title);
     columns = fuse(columns, column);
-    if (key === 'file') column.dirs = format[key].dirDepth;
     if (column.over) columns.over = true;
   }, this);
 
