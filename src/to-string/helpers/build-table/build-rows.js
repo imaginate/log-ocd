@@ -20,7 +20,11 @@
 
 'use strict';
 
-var colors = require('../../../helpers/colors');
+var each = require('../../../helpers').each;
+
+var getSpace = require('../get-space');
+
+var buildRow = require('./build-row');
 
 /**
  * @this {!Settings}
@@ -31,4 +35,25 @@ var colors = require('../../../helpers/colors');
  */
 module.exports = function buildRows(stack, columns, style) {
 
+  /** @type {!StackFormat} */
+  var format;
+  /** @type {string} */
+  var result;
+  /** @type {!{ odd: !Array<string>, even: !Array<string> }} */
+  var space;
+  /** @type {string} */
+  var nth;
+
+  format = this.trace.format.row;
+  style += '.row.';
+  space = {
+    even: getSpace(format.spaceBefore, format.spaceAfter, style + 'even'),
+    odd:  getSpace(format.spaceBefore, format.spaceAfter, style + 'odd')
+  };
+  result = '';
+  each(stack, function(trace, i) {
+    nth = i % 2 ? 'odd' : 'even';
+    result += buildRow(trace, columns, space[nth], style + nth);
+  });
+  return result;
 };
