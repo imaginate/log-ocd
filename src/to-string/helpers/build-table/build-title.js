@@ -23,14 +23,13 @@
 var help = require('../../../helpers');
 var each  = help.each;
 var fill  = help.fill;
-var fuse  = help.fuse;
-var remap = help.remap;
-var slice = help.slice;
 var until = help.until;
 
 var colors = require('../../../helpers/colors');
 
 var getSpace = require('../get-space');
+
+var buildItems = require('./build-items');
 
 /**
  * @this {!Settings}
@@ -40,12 +39,12 @@ var getSpace = require('../get-space');
  */
 module.exports = function buildTitle(columns, style) {
 
-  /** @type {!TitleFormat} */
+  /** @type {TitleFormat} */
   var format;
   /** @type {!Array<string>} */
   var space;
-  /** @type {!Array<string>} */
-  var rows;
+  /** @type {Items} */
+  var items;
   /** @type {boolean} */
   var over;
 
@@ -60,8 +59,8 @@ module.exports = function buildTitle(columns, style) {
 
   if (!over) return printTitle(columns, space, style);
 
-  rows = getTitleRows(columns);
-  return printTitleRows(columns, rows, space, style);
+  items = buildItems(columns);
+  return printTitleItems(columns, items, space, style);
 };
 
 /**
@@ -93,115 +92,22 @@ function printTitle(columns, mainSpace, style) {
 }
 
 /**
- * @typedef {!Array<string>} TitleRow
- * @typedef {!Array<TitleRow>} TitleRows
- * @typedef {!{ title: string, done: boolean }} TitleItem
- * @typedef {!Array<TitleItem>} RowManager
- */
-
-/**
  * @private
  * @param {Columns} columns
- * @return {TitleRows}
- */
-function getTitleRows(columns) {
-
-  /** @type {RowManager} */
-  var manager;
-  /** @type {TitleRows} */
-  var rows;
-
-  manager = getRowManager(columns);
-  manager.rows = [];
-  until(0, 100, function() {
-    manager = addTitleRow(columns, manager);
-    return manager.leftover;
-  });
-  return manager.rows;
-}
-
-/**
- * @private
- * @param {Columns} columns
- * @return {RowManager}
- */
-function getRowManager(columns) {
-
-  /** @type {number} */
-  var leftover;
-  /** @type {RowManager} */
-  var manager;
-  /** @type {TitleItem} */
-  var item;
-
-  leftover = 0;
-  manager = remap(columns, function(column) {
-    item = {};
-    item.done = !column.title.length;
-    item.title = item.done ? fill(column.len, ' ') : column.title;
-    if (!item.done) ++leftover;
-    return item;
-  });
-  manager.leftover = leftover;
-  return manager;
-}
-
-/**
- * @private
- * @param {Columns} columns
- * @param {RowManager} manager
- * @return {RowManager}
- */
-function addTitleRow(columns, manager) {
-
-  /** @type {Column} */
-  var column;
-  /** @type {string} */
-  var title;
-  /** @type {string} */
-  var space;
-  /** @type {TitleRow} */
-  var row;
-
-  row = remap(manager, function(item, i) {
-    column = columns[i];
-    title = item.title;
-
-    if (title.length > column.len) {
-      i = column.len + 1;
-      item.title = slice(title, i);
-      return slice(title, 0, i);
-    }
-
-    if (item.done) return title;
-
-    --manager.leftover;
-    item.done = true;
-    item.title = fill(column.len, ' ');
-    space = fill(column.len - title.length, ' ');
-    return column.align === 'left' ? title + space : space + title;
-  });
-  manager.rows.push(row);
-  return manager;
-}
-
-/**
- * @private
- * @param {Columns} columns
- * @param {TitleRows} rows
+ * @param {Items} items
  * @param {!Array} space
  * @param {string} style
  * @return {string}
  */
-function printTitleRows(columns, rows, space, style) {
+function printItems(columns, items, space, style) {
 
   /** @type {string} */
   var result;
 
   style += '.';
   result = '';
-  each(rows, function(row) {
-    result += printTitleRow(columns, row, space, style);
+  each(items, function(item) {
+    result += printItem(columns, item, space, style);
   });
   return result;
 }
@@ -209,12 +115,12 @@ function printTitleRows(columns, rows, space, style) {
 /**
  * @private
  * @param {Columns} columns
- * @param {TitleRow} row
+ * @param {Item} item
  * @param {!Array} space
  * @param {string} style
  * @return {string}
  */
-function printTitleRow(columns, row, space, style) {
+function printItem(columns, item, space, style) {
 
   /** @type {string} */
   var result;
@@ -223,7 +129,7 @@ function printTitleRow(columns, row, space, style) {
 
   result = space[0];
   each(columns, function(column, i) {
-    title = row[i];
+    title = item[i];
     title = column.space[0] + title + column.space[1];
     result += colors[style + column.key](title);
   });
