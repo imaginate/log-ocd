@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------------------------------
- * LOG-OCD: BUILD-ROWS HELPER
+ * LOG-OCD: STACK-TO-STRING
  * -----------------------------------------------------------------------------
  * @version 1.0.0
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
@@ -20,40 +20,37 @@
 
 'use strict';
 
-var each = require('../../../helpers').each;
+var each = require('../../helpers').each;
 
-var getSpace = require('../get-space');
+var getStyleKey = require('../helpers/get-style-key');
+var stripStyle = require('../helpers/strip-style');
+var noStyle = require('../helpers/no-style');
 
-var buildRow = require('./build-row');
+var buildColumns = require('./helpers/build-columns');
+
+var rootToString = require('./root');
+var rowsToString = require('./rows');
+var titleToString = require('./title');
 
 /**
  * @this {!Settings}
+ * @param {string} method
  * @param {!Stack} stack
- * @param {!Columns} columns
- * @param {string} style
  * @return {string}
  */
-module.exports = function buildRows(stack, columns, style) {
+module.exports = function stackToString(method, stack) {
 
-  /** @type {!StackFormat} */
-  var format;
+  /** @type {!Columns} */
+  var columns;
   /** @type {string} */
   var result;
-  /** @type {!{ odd: !Array<string>, even: !Array<string> }} */
-  var space;
   /** @type {string} */
-  var nth;
+  var style;
 
-  format = this.trace.format.row;
-  style += '.row.';
-  space = {
-    even: getSpace(format.spaceBefore, format.spaceAfter, style + 'even'),
-    odd:  getSpace(format.spaceBefore, format.spaceAfter, style + 'odd')
-  };
-  result = '';
-  each(stack, function(trace, i) {
-    nth = i % 2 ? 'odd' : 'even';
-    result += buildRow(trace, columns, space[nth], style + nth);
-  });
-  return result;
+  style = getStyleKey.call(this, 'trace');
+  columns = buildColumns.call(this, stack);
+  result = rootToString.call(this, stack, style);
+  result += titleToString.call(this, columns, style);
+  result += rowsToString.call(this, stack, columns, style);
+  return noStyle(this.trace.config) ? stripStyle(result) : result;
 };

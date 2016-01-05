@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------------------------------
- * LOG-OCD: DIVIDE-ROOT HELPER
+ * LOG-OCD: ROOT-TO-STRING
  * -----------------------------------------------------------------------------
  * @version 1.0.0
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
@@ -24,13 +24,60 @@ var help = require('../../helpers');
 var fill  = help.fill;
 var slice = help.slice;
 
+var colors = require('../../helpers/colors');
+
+var getIdentifier = require('../helpers/get-identifier');
+var getBrackets = require('../helpers/get-brackets');
+var getSpace = require('../helpers/get-space');
+var getLimit = require('../helpers/get-limit');
+
 /**
+ * @this {!Settings}
+ * @param {!Stack} stack
+ * @param {string} style
+ * @return {string}
+ */
+module.exports = function rootToString(stack, style) {
+
+  /** @type {string} */
+  var identifier;
+  /** @type {string} */
+  var brackets;
+  /** @type {string} */
+  var dirpath;
+  /** @type {!RootFormat} */
+  var format;
+  /** @type {!Array<string>} */
+  var space;
+  /** @type {number} */
+  var limit;
+  /** @type {number} */
+  var len;
+
+  if (!this.trace.config.root) return '';
+
+  style += '.root';
+  format = this.trace.format.root;
+  len = format.brackets.length ? 1 : 0;
+  len += format.identifier.length + format.spaceBefore;
+  identifier = getIdentifier(format.identifier, style);
+  brackets = getBrackets(format.brackets, style);
+  space = getSpace(format.spaceBefore, format.spaceAfter, style);
+  limit = getLimit(format.lineLimit, this.__maxLen);
+  dirpath = divideRoot(stack.base, limit, len);
+  dirpath = colors[style](dirpath);
+  return space[0] + identifier + brackets[0] +
+         dirpath + brackets[1] + '\n';
+};
+
+/**
+ * @private
  * @param {!Array} dirpath
  * @param {number} limit
  * @param {number} intro
  * @return {string}
  */
-module.exports = function divideRoot(dirpath, limit, intro) {
+function divideRoot(dirpath, limit, intro) {
 
   /** @type {string} */
   var result;
@@ -56,4 +103,4 @@ module.exports = function divideRoot(dirpath, limit, intro) {
   }
   result += dirpath && '\n' + indent + dirpath;
   return result;
-};
+}

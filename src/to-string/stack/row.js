@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------------------------------
- * LOG-OCD: BUILD-ROW HELPER
+ * LOG-OCD: ROW-TO-STRING
  * -----------------------------------------------------------------------------
  * @version 1.0.0
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
@@ -20,14 +20,14 @@
 
 'use strict';
 
-var until = require('../../../helpers').until;
+var until = require('../../helpers').until;
 
-var colors = require('../../../helpers/colors');
+var colors = require('../../helpers/colors');
 
-var buildVals = require('./build-vals');
-var printVals = require('./print-vals');
-var buildItems = require('./build-items');
-var printItems = require('./print-items');
+var buildVals = require('./helpers/build-vals');
+var printVals = require('./helpers/print-vals');
+var buildItems = require('./helpers/build-items');
+var printItems = require('./helpers/print-items');
 
 /**
  * @param {Trace} trace
@@ -36,7 +36,7 @@ var printItems = require('./print-items');
  * @param {string} style
  * @return {string}
  */
-module.exports = function buildRow(trace, columns, space, style) {
+module.exports = function rowToString(trace, columns, space, style) {
 
   /** @type {Items} */
   var items;
