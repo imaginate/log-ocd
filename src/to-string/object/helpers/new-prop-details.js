@@ -20,11 +20,11 @@
 
 'use strict';
 
-var getIdentifier = require('./get-identifier');
-var getDelimiter = require('./get-delimiter');
-var getBrackets = require('./get-brackets');
-var getStyleKey = require('./get-style-key');
-var getLimit = require('./get-limit');
+var getIdentifier = require('../../helpers/get-identifier');
+var getDelimiter = require('../../helpers/get-delimiter');
+var getBrackets = require('../../helpers/get-brackets');
+var getStyleKey = require('../../helpers/get-style-key');
+var getLimit = require('../../helpers/get-limit');
 
 /**
  * @typedef {!{
