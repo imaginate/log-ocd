@@ -20,19 +20,18 @@
 
 'use strict';
 
-var help = require('../../../helpers');
+var help = require('../../helpers');
 var cut    = help.cut;
 var freeze = help.freeze;
 var has    = help.has;
 var remap  = help.remap;
+var slice  = help.slice;
 
-var colors = require('../../../helpers/colors');
+var colors = require('../../helpers/colors');
 
-var getDelimiter = require('../../helpers/get-delimiter');
-var getBrackets = require('../../helpers/get-brackets');
-var getStyleKey = require('../../helpers/get-style-key');
-
-var divideString = require('./divide');
+var getDelimiter = require('../helpers/get-delimiter');
+var getBrackets = require('../helpers/get-brackets');
+var getStyleKey = require('../helpers/get-style-key');
 
 /**
  * Checks whether a string is a type filler instead of a string (e.g. <type>).
@@ -79,3 +78,48 @@ module.exports = function stringToString(method, val) {
     return brackets[0] + colors[style](line) + brackets[1] + eol;
   });
 };
+
+/**
+ * @private
+ * @param {number} limit
+ * @param {string} str
+ * @return {string}
+ */
+function divideString(limit, str) {
+
+  /** @type {string} */
+  var result;
+  /** @type {number} */
+  var i;
+
+  if (limit < 0 || str.length <= limit) return str;
+
+  i = getLastSpace(str, limit);
+  result = slice(str, 0, i);
+  str = slice(str, i);
+  while (str.length > limit) {
+    i = getLastSpace(str, limit);
+    result += '\n' + slice(str, 0, i);
+    str = slice(str, i);
+  }
+  result += str && '\n' + str;
+  return result;
+}
+
+/**
+ * @private
+ * @param {string} str
+ * @param {number=} limit
+ * @return {number}
+ */
+function getLastSpace(str, limit) {
+
+  /** @type {string} */
+  var temp;
+  /** @type {number} */
+  var i;
+
+  temp = limit ? slice(str, 0, limit) : str;
+  i = temp.lastIndexOf(' ') || str.indexOf(' ');
+  return ++i || str.length;
+}
