@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------------------------------
- * LOG-OCD: OCD-MAP-TO-STRING
+ * LOG-OCD: OCDMAP-TO-STRING
  * -----------------------------------------------------------------------------
  * @version 1.0.0
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
@@ -39,7 +39,7 @@ var toString = require('./index');
  * @param {!Object} obj
  * @return {string}
  */
-module.exports = function ocdMapToString(method, obj) {
+module.exports = function ocdmapToString(method, obj) {
 
   /** @type {string} */
   var delimiter;

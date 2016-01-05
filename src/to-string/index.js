@@ -65,7 +65,7 @@ module.exports = function toString(method, val) {
   });
   type = type || 'object';
   config = this[method].config;
-  type = ocdMap(config, type, val) ? 'ocd-map' : type;
+  type = ocdMap(config, type, val) ? 'ocdmap' : type;
   result = require('./' + type).call(this, method, val);
   return noStyle(config) ? stripStyle(result) : result;
 };
