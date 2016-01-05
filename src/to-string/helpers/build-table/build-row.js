@@ -20,15 +20,40 @@
 
 'use strict';
 
+var until = require('../../../helpers').until;
+
 var colors = require('../../../helpers/colors');
 
+var buildVals = require('./build-vals');
+var printVals = require('./print-vals');
+var buildItems = require('./build-items');
+var printItems = require('./print-items');
+
 /**
- * @this {!Settings}
- * @param {!Stack} stack
- * @param {!Columns} columns
+ * @param {Trace} trace
+ * @param {Columns} columns
+ * @param {!Array<string>} space
  * @param {string} style
  * @return {string}
  */
-module.exports = function buildRow(stack, columns, style) {
+module.exports = function buildRow(trace, columns, space, style) {
 
+  /** @type {Items} */
+  var items;
+  /** @type {!Array<string>} */
+  var vals;
+  /** @type {boolean} */
+  var over;
+
+  style += '.';
+  vals = buildVals(columns, trace);
+  over = until(true, columns, function(column, i) {
+    if (!column.over && column.key !== 'file') return false;
+    return vals[i].length > column.len;
+  });
+
+  if (!over) return printVals(vals, columns, space, style);
+
+  items = buildItems(columns, vals);
+  return printItems(items, columns, space, style);
 };
