@@ -28,5 +28,5 @@ var colors = require('../../helpers/colors');
  * @return {string}
  */
 module.exports = function getDelimiter(delimiter, style) {
-  return delimiter ? colors[style + '.delimiter'](delimiter) : '';
+  return delimiter && colors[style + '.delimiter'](delimiter);
 };
