@@ -20,25 +20,10 @@
 
 'use strict';
 
-var help = require('../helpers');
-var is     = help.is;
-var freeze = help.freeze;
-var has    = help.has;
-var until  = help.until;
+var is = require('../helpers').is;
 
-var stripStyle = require('./helpers/strip-style');
-var noStyle = require('./helpers/no-style');
-var ocdMap = require('./helpers/ocd-map');
-
-/**
- * @private
- * @type {!Object<string, string>}
- * @const
- */
-var TYPES = freeze({
-  primitives: 'string, number, boolean, undefined, null, nan',
-  objects: 'func, regexp, array, args, element, document'
-});
+var objectToString = require('./object');
+var primitiveToString = require('./primitive');
 
 /**
  * @this {!Settings}
@@ -47,25 +32,7 @@ var TYPES = freeze({
  * @return {string}
  */
 module.exports = function toString(method, val) {
-
-  /** @type {!Config} */
-  var config;
-  /** @type {string} */
-  var result;
-  /** @type {string} */
-  var types;
-  /** @type {string} */
-  var type;
-
-  types = is._obj(val) ? 'objects' : 'primitives';
-  types = TYPES[types];
-  until(true, types, function(_type) {
-    if ( is[_type](val) ) type = _type;
-    return !!type;
-  });
-  type = type || 'object';
-  config = this[method].config;
-  type = ocdMap(config, type, val) ? 'ocdmap' : type;
-  result = require('./' + type).call(this, method, val);
-  return noStyle(config) ? stripStyle(result) : result;
+  return is._obj(val)
+    ? objectToString.call(this, method, val)
+    : primitiveToString.call(this, method, val);
 };
