@@ -20,18 +20,19 @@
 
 'use strict';
 
-var help = require('../helpers');
+var help = require('../../../helpers');
 var cut    = help.cut;
 var freeze = help.freeze;
 var has    = help.has;
 var remap  = help.remap;
 
-var colors = require('../helpers/colors');
+var colors = require('../../../helpers/colors');
 
-var getDelimiter = require('./helpers/get-delimiter');
-var getBrackets = require('./helpers/get-brackets');
-var getStyleKey = require('./helpers/get-style-key');
-var divideString = require('./helpers/divide-string');
+var getDelimiter = require('../../helpers/get-delimiter');
+var getBrackets = require('../../helpers/get-brackets');
+var getStyleKey = require('../../helpers/get-style-key');
+
+var divideString = require('./divide');
 
 /**
  * Checks whether a string is a type filler instead of a string (e.g. <type>).

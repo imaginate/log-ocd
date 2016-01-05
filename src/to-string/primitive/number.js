@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------------------------------
- * LOG-OCD: NAN-TO-STRING
+ * LOG-OCD: NUMBER-TO-STRING
  * -----------------------------------------------------------------------------
  * @version 1.0.0
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
@@ -20,8 +20,16 @@
 
 'use strict';
 
-var colors = require('../helpers/colors');
-var getStyleKey = require('./helpers/get-style-key');
+var help = require('../../helpers');
+var cut  = help.cut;
+var get  = help.get;
+var has  = help.has;
+
+var colors = require('../../helpers/colors');
+
+var getIdentifier = require('../helpers/get-identifier');
+var getDelimiter = require('../helpers/get-delimiter');
+var getStyleKey = require('../helpers/get-style-key');
 
 /**
  * @this {!Settings}
@@ -29,12 +37,25 @@ var getStyleKey = require('./helpers/get-style-key');
  * @param {number} val
  * @return {string}
  */
-module.exports = function nanToString(method, val) {
+module.exports = function numberToString(method, val) {
 
+  /** @type {string} */
+  var identifier;
+  /** @type {string} */
+  var delimiter;
   /** @type {string} */
   var style;
 
-  style = getStyleKey.call(this, method, 'nan');
-  val = this[method].format.nan;
-  return colors[style](val);
+  style = getStyleKey.call(this, method, 'number');
+  val = String(val);
+  identifier = get(val, /^[+-]/)[0] || '';
+  identifier = getIdentifier(identifier, style);
+  val = cut(val, /^[+-]/);
+
+  if ( !has(val, '\.') ) return identifier + colors[style](val);
+
+  delimiter = getDelimiter('.', style);
+  val = val.split('.');
+  return identifier + colors[style]( val[0] ) +
+         delimiter  + colors[style]( val[1] );
 };

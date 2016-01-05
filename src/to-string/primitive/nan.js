@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------------------------------
- * LOG-OCD: BOOLEAN-TO-STRING
+ * LOG-OCD: NAN-TO-STRING
  * -----------------------------------------------------------------------------
  * @version 1.0.0
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
@@ -20,21 +20,21 @@
 
 'use strict';
 
-var colors = require('../helpers/colors');
-var getStyleKey = require('./helpers/get-style-key');
+var colors = require('../../helpers/colors');
+var getStyleKey = require('../helpers/get-style-key');
 
 /**
  * @this {!Settings}
  * @param {string} method
- * @param {boolean} val
+ * @param {number} val
  * @return {string}
  */
-module.exports = function booleanToString(method, val) {
+module.exports = function nanToString(method, val) {
 
   /** @type {string} */
   var style;
 
-  style = getStyleKey.call(this, method, 'boolean');
-  val = String(val);
+  style = getStyleKey.call(this, method, 'nan');
+  val = this[method].format.nan;
   return colors[style](val);
 };

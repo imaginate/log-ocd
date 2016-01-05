@@ -20,8 +20,8 @@
 
 'use strict';
 
-var colors = require('../helpers/colors');
-var getStyleKey = require('./helpers/get-style-key');
+var colors = require('../../helpers/colors');
+var getStyleKey = require('../helpers/get-style-key');
 
 /**
  * @this {!Settings}

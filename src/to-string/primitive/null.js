@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------------------------------
- * LOG-OCD: DIVIDE-STRING HELPER
+ * LOG-OCD: NULL-TO-STRING
  * -----------------------------------------------------------------------------
  * @version 1.0.0
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
@@ -20,48 +20,21 @@
 
 'use strict';
 
-var slice = require('../../helpers').slice;
+var colors = require('../../helpers/colors');
+var getStyleKey = require('../helpers/get-style-key');
 
 /**
- * @param {number} limit
- * @param {string} str
+ * @this {!Settings}
+ * @param {string} method
+ * @param {null} val
  * @return {string}
  */
-module.exports = function divideString(limit, str) {
+module.exports = function nullToString(method, val) {
 
   /** @type {string} */
-  var result;
-  /** @type {number} */
-  var i;
+  var style;
 
-  if (limit < 0 || str.length <= limit) return str;
-
-  i = getLastSpace(str, limit);
-  result = slice(str, 0, i);
-  str = slice(str, i);
-  while (str.length > limit) {
-    i = getLastSpace(str, limit);
-    result += '\n' + slice(str, 0, i);
-    str = slice(str, i);
-  }
-  result += str && '\n' + str;
-  return result;
+  style = getStyleKey.call(this, method, 'null');
+  val = this[method].format['null'];
+  return colors[style](val);
 };
-
-/**
- * @private
- * @param {string} str
- * @param {number=} limit
- * @return {number}
- */
-function getLastSpace(str, limit) {
-
-  /** @type {string} */
-  var temp;
-  /** @type {number} */
-  var i;
-
-  temp = limit ? slice(str, 0, limit) : str;
-  i = temp.lastIndexOf(' ') || str.indexOf(' ');
-  return ++i || str.length;
-}
