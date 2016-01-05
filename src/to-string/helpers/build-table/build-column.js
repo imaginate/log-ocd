@@ -26,6 +26,7 @@ var fill = require('../../../helpers').fill;
  * @typedef {!{
  *   key:    string,
  *   len:    number,
+ *   dirs:   (number|undefined),
  *   over:   boolean,
  *   title:  string,
  *   align:  string,
