@@ -24,16 +24,11 @@ var fill = require('../../helpers').fill;
 var colors = require('../../helpers/colors');
 
 /**
- * @param {string} spaceBefore
- * @param {string} spaceAfter
- * @param {string} style
- * @return {!Array}
+ * @param {string} space
+ * @param {string=} style
+ * @return {string}
  */
-module.exports = function getSpace(spaceBefore, spaceAfter, style) {
-  spaceBefore = fill(spaceBefore, ' ');
-  spaceAfter  = fill(spaceAfter, ' ');
-  return [
-    spaceBefore && colors[style](spaceBefore),
-    spaceAfter  && colors[style](spaceAfter)
-  ];
+module.exports = function getSpace(space, style) {
+  space = fill(space, ' ');
+  return style ? space && colors[style](space) : space;
 };
