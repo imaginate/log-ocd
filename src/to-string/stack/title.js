@@ -24,7 +24,7 @@ var until = require('../../helpers').until;
 
 var colors = require('../../helpers/colors');
 
-var getSpace = require('../helpers/get-space');
+var getSpaces = require('../helpers/get-spaces');
 
 var buildVals = require('./helpers/build-vals');
 var printVals = require('./helpers/print-vals');
@@ -42,7 +42,7 @@ module.exports = function titleToString(columns, style) {
   /** @type {TitleFormat} */
   var format;
   /** @type {!Array<string>} */
-  var space;
+  var spaces;
   /** @type {Items} */
   var items;
   /** @type {!Array<string>} */
@@ -54,7 +54,7 @@ module.exports = function titleToString(columns, style) {
 
   style += '.title';
   format = this.trace.format.row;
-  space = getSpace(format.spaceBefore, format.spaceAfter, style);
+  spaces = getSpaces(format.spacesBefore, format.spacesAfter, style);
 
   style += '.';
   vals = buildVals(columns);
@@ -62,8 +62,8 @@ module.exports = function titleToString(columns, style) {
     return val[i].length > column.len;
   });
 
-  if (!over) return printVals(vals, columns, space, style);
+  if (!over) return printVals(vals, columns, spaces, style);
 
   items = buildItems(columns, vals);
-  return printItems(items, columns, space, style);
+  return printItems(items, columns, spaces, style);
 };

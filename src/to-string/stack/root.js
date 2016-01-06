@@ -47,7 +47,7 @@ module.exports = function rootToString(stack, style) {
   var dirpath;
   /** @type {!RootFormat} */
   var format;
-  /** @type {!Array<string>} */
+  /** @type {string} */
   var space;
   /** @type {number} */
   var limit;
@@ -62,12 +62,11 @@ module.exports = function rootToString(stack, style) {
   len += format.identifier.length + format.spaceBefore;
   identifier = getIdentifier(format.identifier, style);
   brackets = getBrackets(format.brackets, style);
-  space = getSpace(format.spaceBefore, format.spaceAfter, style);
+  space = getSpace(format.spaceBefore, style);
   limit = getLimit(format.lineLimit, this.__maxLen);
   dirpath = divideRoot(stack.base, limit, len);
   dirpath = colors[style](dirpath);
-  return space[0] + identifier + brackets[0] +
-         dirpath + brackets[1] + '\n';
+  return space + identifier + brackets[0] + dirpath + brackets[1] + '\n';
 };
 
 /**

@@ -28,7 +28,7 @@ var colors = require('../../helpers/colors');
 
 var getDelimiter = require('../helpers/get-delimiter');
 var getStyleKey = require('../helpers/get-style-key');
-var getSpace = require('../helpers/get-space');
+var getSpaces = require('../helpers/get-spaces');
 var getKeys = require('../helpers/get-keys');
 
 var toString = require('../index');
@@ -47,10 +47,10 @@ module.exports = function ocdmapToString(method, obj) {
   var result;
   /** @type {!OcdMapFormat} */
   var format;
+  /** @type {!Array<string>} */
+  var spaces;
   /** @type {string} */
   var style;
-  /** @type {!Array<string>} */
-  var space;
   /** @type {!Array<string>} */
   var keys;
   /** @type {*} */
@@ -63,11 +63,11 @@ module.exports = function ocdmapToString(method, obj) {
 
   style = getStyleKey.call(this, method, 'ocdmap');
   format = this[method].format.ocdmap;
-  space  = getSpace(format.spaceBefore, format.spaceAfter, style);
+  spaces = getSpaces(format.spaceBefore, format.spaceAfter, style);
   delimiter = getDelimiter(format.delimiter, style);
   each(keys, function(key) {
     val = obj[key];
-    key = space[0] + colors[style](key) + space[1] + delimiter + ' ';
+    key = spaces[0] + colors[style](key) + spaces[1] + delimiter + ' ';
     result += key + toString.call(this, method, val) + '\n';
   }, this);
   return slice(result, -1);
