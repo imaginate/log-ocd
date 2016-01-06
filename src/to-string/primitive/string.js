@@ -78,7 +78,7 @@ module.exports = function stringToString(method, str) {
 
   limit = getLimit(this[method].format.lineLimit, this.__maxLen);
   limit -= this.__indent;
-  limit -= 2;
+  limit -= 6;
 
   if (limit <= 0 || str.length <= limit) {
     return brackets[0] + colors[style](str) + brackets[1];
@@ -86,8 +86,7 @@ module.exports = function stringToString(method, str) {
 
   delimiter = getDelimiter(' +', style);
   indent = fill(this.__indent + 2, ' ');
-  result = getLine(str, limit, brackets, delimiter, style);
-  str = slice(str, limit);
+  result = brackets[0] + brackets[1] + delimiter + '\n';
   while (str.length > limit) {
     result += getLine(str, limit, brackets, delimiter, style, indent);
     str = slice(str, limit);
