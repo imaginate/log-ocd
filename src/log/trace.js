@@ -31,11 +31,10 @@ var stackToString = require('../to-string/stack');
 
 /**
  * @this {!Settings}
- * @param {string} method
  * @param {?Error=} error
  * @return {boolean}
  */
-module.exports = function logTrace(method, error) {
+module.exports = function logTrace(error) {
 
   /** @type {!Config} */
   var config;
@@ -46,16 +45,17 @@ module.exports = function logTrace(method, error) {
   /** @type {string} */
   var result;
 
-  if ( !is('err=', error) ) return execError.call(this, method, 'error', error);
+  if ( !is('error=', error) ) {
+    return execError.call(this, 'trace', 'error', error);
+  }
 
   this = setupSettings(this);
-
-  config = this[method].config;
-  format = this[method].format;
+  config = this.trace.config;
+  format = this.trace.format;
 
   stack = newStack(error);
   result = getLines(format.linesBefore);
-  result += stackToString.call(this, method, stack);
+  result += stackToString.call(this, 'trace', stack);
   result += getLines(format.linesAfter);
   config.logger(result);
 
