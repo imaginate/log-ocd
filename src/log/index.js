@@ -28,6 +28,7 @@ var slice = help.slice;
 var newStack = require('../helpers/new-stack');
 
 var setupSettings = require('./helpers/setup-settings');
+var getErrorType = require('./helpers/get-error-type');
 var execError = require('./helpers/exec-error');
 var getLines = require('./helpers/get-lines');
 
@@ -62,11 +63,11 @@ module.exports = function log(method, vals) {
   header = config.header ? vals.shift() : '';
   msg    = config.msg    ? vals.shift() : '';
 
-  if ( is.error(header, true) ) {
+  if ( is.error(header) ) {
     error = header;
     header = getErrorType(error);
   }
-  else if ( is.error(msg, true) ) {
+  else if ( is.error(msg) ) {
     error = msg;
     msg = getErrorType(error);
   }
@@ -74,7 +75,7 @@ module.exports = function log(method, vals) {
   if ( !is.str(header) ) return execError.call(this, method, 'header', header);
   if ( !is.str(msg)    ) return execError.call(this, method, 'msg',    msg);
 
-  error = !error && is.error(vals[0], true) ? vals.shift() : error;
+  error = !error && is.error(vals[0]) ? vals.shift() : error;
   if (!error && config['throw']) {
     error = header ? header + ': ' : '';
     error += msg || '';

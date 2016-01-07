@@ -46,7 +46,7 @@ module.exports = function logTrace(method, error) {
   /** @type {string} */
   var result;
 
-  if ( !is('obj=', error) ) return execError.call(this, method, 'error', error);
+  if ( !is('err=', error) ) return execError.call(this, method, 'error', error);
 
   this = setupSettings(this);
 
