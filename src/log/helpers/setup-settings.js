@@ -30,7 +30,8 @@ module.exports = function setupSettings(settings) {
   var max;
 
   max = process.stdout.columns || 0;
-  settings.__maxLen = max > 0 ? max - 1 : 0;
+  if (max && max < 21) max = 21;
+  settings.__maxLen = max && --max;
   settings.__indent = 0;
   return settings;
 };
