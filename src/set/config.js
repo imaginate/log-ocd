@@ -26,32 +26,90 @@ var has   = help.has;
 
 var execTypeError = require('./helpers/exec-type-error');
 var execRangeError = require('./helpers/exec-range-error');
+var execPropTypeError = require('./helpers/exec-prop-type-error');
+var execPropRangeError = require('./helpers/exec-prop-range-error');
 
 /**
  * @this {!Settings}
  * @param {string=} method - [default= "all"]
- * @param {!Object} val
- * @return {string}
+ * @param {!Object} props
+ * @return {boolean}
  */
-module.exports = function setConfig(method, val) {
+module.exports = function setConfig(method, props) {
 
-  /** @type {string} */
-  var ;
+  /** @type {!Config} */
+  var config;
 
   if (arguments.length === 1) {
-    val = method;
+    props = method;
     method = 'all';
   }
 
   if ( !is.str(method) ) {
     return execTypeError.call(this, 'setConfig', 'method', method);
   }
-  if ( !is.obj(val) ) {
-    return execTypeError.call(this, 'setConfig', 'val', val);
+  if ( !is.obj(props) ) {
+    return execTypeError.call(this, 'setConfig', 'props', props);
   }
 
-  if ( method !== 'all' && !has(this, method) ) {
+  if (method === 'all') return setAll(this, props);
+
+  if ( !has(this, method) ) {
     return execRangeError.call(this, 'setConfig', 'method', method);
   }
 
+  return setOne(this, method, props);
 };
+
+/**
+ * @private
+ * @param {!Settings} settings
+ * @param {!Object} props
+ * @return {boolean}
+ */
+function setAll(settings, props) {
+
+  /** @type {!Config} */
+  var config;
+
+  return !until(true, settings, function(setting, method) {
+    config = setting.config;
+    return until(false, props, function(val, key) {
+      if ( !has(config, key) ) return;
+      try {
+        config[key] = val;
+      }
+      catch (error) {
+        if (!error.__setter || !error.__type) throw error;
+        return execPropTypeError.call(settings, 'setConfig', key, val);
+      }
+    });
+  });
+}
+
+/**
+ * @private
+ * @param {!Settings} settings
+ * @param {string} method
+ * @param {!Object} props
+ * @return {boolean}
+ */
+function setOne(settings, method, props) {
+
+  /** @type {!Config} */
+  var config;
+
+  config = settings[method].config;
+  return !until(false, props, function(val, key) {
+    if ( !has(config, key) ) {
+      return execPropRangeError.call(settings, 'setConfig', key);
+    }
+    try {
+      config[key] = val;
+    }
+    catch (error) {
+      if (!error.__setter || !error.__type) throw error;
+      return execPropTypeError.call(settings, 'setConfig', key, val);
+    }
+  });
+}
