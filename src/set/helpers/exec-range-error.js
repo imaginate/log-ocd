@@ -38,7 +38,7 @@ module.exports = function execRangeError(method, param, val) {
   var ocdmap;
   /** @type {string} */
   var header;
-  /** @type {!TypeError} */
+  /** @type {!RangeError} */
   var error;
   /** @type {!Array} */
   var args;
@@ -48,7 +48,7 @@ module.exports = function execRangeError(method, param, val) {
   config = this.error.config;
   header = 'Invalid `log-ocd.' + method + '` Call';
   msg    = '`' + param + '` does not exist';
-  error  = new TypeError(header + ': ' + msg);
+  error  = new RangeError(header + ': ' + msg);
   ocdmap = { ocdmap: true };
   ocdmap[param] = val;
 
