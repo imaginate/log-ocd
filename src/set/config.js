@@ -23,6 +23,7 @@
 var help = require('../helpers');
 var is    = help.is;
 var has   = help.has;
+var until = help.until;
 
 var execTypeError = require('./helpers/exec-type-error');
 var execRangeError = require('./helpers/exec-range-error');
