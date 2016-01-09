@@ -38,9 +38,6 @@ var execPropRangeError = require('./helpers/exec-prop-range-error');
  */
 module.exports = function setConfig(method, props) {
 
-  /** @type {!Config} */
-  var config;
-
   if (arguments.length === 1) {
     props = method;
     method = 'all';
