@@ -22,14 +22,16 @@
 
 var help = require('../../helpers');
 var is    = help.is;
-var remap = help.remap;
+var fuse  = help.fuse;
+var roll  = help.roll;
 var slice = help.slice;
 
 var newStack = require('../../helpers/new-stack');
 
+var typeError = require('../helpers/type-error');
+
 var setupSettings = require('./helpers/setup-settings');
 var getErrorType = require('./helpers/get-error-type');
-var execError = require('./helpers/exec-error');
 var getLines = require('./helpers/get-lines');
 
 var headerToString = require('../../to-string/header');
@@ -72,21 +74,21 @@ module.exports = function log(method, vals) {
     msg = getErrorType(error);
   }
 
-  if ( !is.str(header) ) return execError.call(this, method, 'header', header);
-  if ( !is.str(msg)    ) return execError.call(this, method, 'msg',    msg);
+  if ( !is.str(header) ) return typeError(this, method, 'header', header);
+  if ( !is.str(msg)    ) return typeError(this, method, 'msg',    msg);
 
-  error = !error && is.error(vals[0]) ? vals.shift() : error;
-  if (!error && config['throw']) {
-    error = header ? header + ': ' : '';
-    error += msg || '';
-    error = new Error(error);
+  if ( !error && is.error( vals[0] ) ) error = vals.shift();
+  if ( !error && config['throw'] ) {
+    header = header ? fuse(header, ': ') : '';
+    msg   = msg || '';
+    error = new Error( fuse(header, msg) );
   }
   stack = config.stack ? newStack(error) : null;
 
   execLog.call(this, method, header, msg, vals, stack);
 
-  if (config['throw']) throw error;
-  if (config.exit) process.exit(1);
+  if ( config['throw'] ) throw error;
+  if ( config['exit'] ) process.exit(1);
 
   return true;
 };
@@ -108,24 +110,27 @@ function execLog(method, header, msg, vals, stack) {
   var format;
   /** @type {string} */
   var result;
+  /** @type {string} */
+  var lines;
 
   config = this[method].config;
   format = this[method].format;
 
-  vals = remap(vals, function(val) {
+  vals = roll.up('', vals, function(val) {
     return toString.call(this, method, val);
   }, this);
-  vals = vals.join('');
 
-  header = config.header ? headerToString.call(this, method, header)  : '';
-  stack  = stack         ? stackToString.call(this, method, stack)    : '';
-  msg    = config.msg    ? msgToString.call(this, method, msg) + '\n' : '';
+  header = config.header ? headerToString.call(this, method, header) : '';
+  stack  = stack         ? stackToString.call(this, method, stack)   : '';
+  msg    = config.msg    ? msgToString.call(this, method, msg)       : '';
 
-  if (header && !msg) header += '\n';
-  if (vals && stack) vals += '\n';
+  if (header && !msg) header = fuse(header, '\n');
+  if (vals && stack) vals = fuse(vals, '\n');
+  if (msg) msg = fuse(msg, '\n');
 
-  result = getLines(format.linesBefore);
-  result += header + msg + vals + stack;
-  result += getLines(format.linesAfter);
+  lines  = getLines(format.linesBefore);
+  result = fuse(lines, header, msg, vals, stack);
+  lines  = getLines(format.linesAfter);
+  result = fuse(result, lines);
   config.logger(result);
 }
