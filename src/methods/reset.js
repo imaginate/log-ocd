@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------------------------------
- * LOG-OCD: RESET-STYLE
+ * LOG-OCD: RESET
  * -----------------------------------------------------------------------------
  * @version 1.0.0
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
@@ -25,40 +25,45 @@ var is   = help.is;
 var each = help.each;
 var has  = help.has;
 
-var execTypeError = require('./helpers/exec-type-error');
-var execRangeError = require('./helpers/exec-range-error');
-
-var getDefaultStyle = require('../settings/style');
+var typeError = require('./helpers/type-error');
+var rangeError = require('./helpers/range-error');
 
 /**
- * @this {!Settings}
- * @param {string=} method - [default= "all"]
- * @return {boolean}
+ * @type {!Object}
+ * @const
  */
-module.exports = function resetStyle(method) {
-
-  if ( !is.str(method) ) {
-    return execTypeError.call(this, 'resetStyle', 'method', method);
-  }
-
-  if (!method || method === 'all') return resetAll(this);
-
-  if ( !has(this, method) ) {
-    return execRangeError.call(this, 'resetStyle', method);
-  }
-
-  this[method].style = getDefaultStyle(method);
-  return true;
+var GET_DEFAULT = {
+  config: require('../settings/config'),
+  format: require('../settings/format'),
+  style:  require('../settings/style')
 };
 
 /**
- * @private
- * @param {!Settings} settings
+ * @this {Settings}
+ * @param {string} type - The reset type. Options: config, format, style
+ * @param {string=} method - [default= "all"]
  * @return {boolean}
  */
-function resetAll(settings) {
-  each(settings, function(setting, method) {
-    setting.style = getDefaultStyle(method);
-  });
+module.exports = function reset(type, method) {
+
+  /** @type {function} */
+  var getDefault;
+
+  method = method || 'all';
+
+  if ( !is.str(method) ) return typeError(this, 'reset', 'method', method);
+
+  getDefault = GET_DEFAULT[type];
+
+  if ( is.same(method, 'all') ) {
+    each(this, function(setting, method) {
+      setting[type] = getDefault(method);
+    });
+    return true;
+  }
+
+  if ( !has(this, method) ) return rangeError(this, 'reset', method);
+
+  this[method].config = getDefaultConfig(method);
   return true;
-}
+};
