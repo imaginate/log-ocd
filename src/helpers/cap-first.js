@@ -20,7 +20,9 @@
 
 'use strict';
 
-var slice = require('./index').slice;
+var help = require('./index');
+var fuse  = help.fuse;
+var slice = help.slice;
 
 /**
  * @param {string} str
@@ -32,5 +34,6 @@ module.exports = function capFirst(str) {
   var first;
 
   first = str[0].toUpperCase();
-  return first + slice(str, 1);
+  str = slice(str, 1);
+  return fuse(first, str);
 };
