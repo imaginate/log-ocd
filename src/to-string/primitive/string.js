@@ -65,7 +65,7 @@ module.exports = function stringToString(method, str) {
   /** @type {number} */
   var limit;
 
-  style = getStyleKey.call(this, method, 'string');
+  style = getStyleKey(this, method, 'string');
   str = remap(str, /\n/g, '\\n');
 
   if ( has(str, FILLER) ) {

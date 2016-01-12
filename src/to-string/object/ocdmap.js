@@ -61,7 +61,7 @@ module.exports = function ocdmapToString(method, obj) {
 
   if (!keys.length) return result;
 
-  style = getStyleKey.call(this, method, 'ocdmap');
+  style = getStyleKey(this, method, 'ocdmap');
   format = this[method].format.ocdmap;
   spaces = getSpaces(format.spaceBefore, format.spaceAfter, style);
   delimiter = getDelimiter(format.delimiter, style);

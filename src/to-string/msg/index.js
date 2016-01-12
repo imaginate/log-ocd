@@ -56,7 +56,7 @@ module.exports = function msgToString(method, msg) {
   /** @type {number} */
   var limit;
 
-  style = getStyleKey.call(this, method, 'msg');
+  style  = getStyleKey(this, method, 'msg');
   format = this[method].format.msg;
   accent = getAccent(format.accentMark);
   bullet = getBullet(format.bullet);

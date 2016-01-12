@@ -53,7 +53,7 @@ module.exports = function headerToString(method, header) {
   /** @type {number} */
   var limit;
 
-  style = getStyleKey.call(this, method, 'header');
+  style  = getStyleKey(this, method, 'header');
   format = this[method].format.header;
   accent = getAccent(format.accentMark);
   spaces = getSpaces(format.spaceBefore, format.spaceAfter, style);

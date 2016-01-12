@@ -34,7 +34,7 @@ module.exports = function undefinedToString(method, val) {
   /** @type {string} */
   var style;
 
-  style = getStyleKey.call(this, method, 'undefined');
+  style = getStyleKey(this, method, 'undefined');
   val = this[method].format.undefined;
   return colors[style](val);
 };

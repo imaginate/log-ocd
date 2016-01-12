@@ -34,7 +34,7 @@ module.exports = function booleanToString(method, val) {
   /** @type {string} */
   var style;
 
-  style = getStyleKey.call(this, method, 'boolean');
+  style = getStyleKey(this, method, 'boolean');
   val = String(val);
   return colors[style](val);
 };

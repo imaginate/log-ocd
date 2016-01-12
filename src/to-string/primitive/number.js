@@ -46,7 +46,7 @@ module.exports = function numberToString(method, val) {
   /** @type {string} */
   var style;
 
-  style = getStyleKey.call(this, method, 'number');
+  style = getStyleKey(this, method, 'number');
   val = String(val);
   identifier = get(val, /^[+-]/)[0] || '';
   identifier = getIdentifier(identifier, style);

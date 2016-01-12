@@ -20,13 +20,19 @@
 
 'use strict';
 
+var fuse = require('../../helpers').fuse;
+
 /**
- * @this {!Settings}
+ * @param {Settings} settings
  * @param {string} method
  * @param {string=} key
  * @return {string}
  */
-module.exports = function getStyleKey(method, key) {
-  key = key ? '.' + key : '';
-  return 'ocd' + this.__INST + '.' + method + key;
+module.exports = function getStyleKey(settings, method, key) {
+
+  /** @type {string} */
+  var result;
+
+  result = fuse('ocd', settings.__INST, '.', method);
+  return key ? fuse(result, '.', key) : result;
 };

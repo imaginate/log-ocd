@@ -34,7 +34,7 @@ module.exports = function nanToString(method, val) {
   /** @type {string} */
   var style;
 
-  style = getStyleKey.call(this, method, 'nan');
+  style = getStyleKey(this, method, 'nan');
   val = this[method].format.nan;
   return colors[style](val);
 };

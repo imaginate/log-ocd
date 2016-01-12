@@ -47,7 +47,7 @@ module.exports = function stackToString(method, stack) {
   /** @type {string} */
   var style;
 
-  style = getStyleKey.call(this, 'trace');
+  style = getStyleKey(this, 'trace');
   columns = buildColumns.call(this, stack);
   result = rootToString.call(this, stack, style);
   result += titleToString.call(this, columns, style);

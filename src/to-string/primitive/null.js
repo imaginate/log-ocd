@@ -34,7 +34,7 @@ module.exports = function nullToString(method, val) {
   /** @type {string} */
   var style;
 
-  style = getStyleKey.call(this, method, 'null');
+  style = getStyleKey(this, method, 'null');
   val = this[method].format['null'];
   return colors[style](val);
 };

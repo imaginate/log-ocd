@@ -50,7 +50,7 @@ module.exports = function regexpToString(method, val) {
   /** @type {string} */
   var flags;
 
-  style = getStyleKey.call(this, method, 'regexp');
+  style = getStyleKey(this, method, 'regexp');
   val = val.toString();
   format = this[method].format.regexp;
   identifier = getIdentifier(format.identifier, style);
