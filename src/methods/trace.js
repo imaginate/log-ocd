@@ -20,7 +20,10 @@
 
 'use strict';
 
-var is = require('../helpers').is;
+var help = require('../helpers');
+var is   = help.is;
+var fuse = help.fuse;
+
 var newStack = require('../helpers/new-stack');
 
 var setupSettings = require('./helpers/setup-settings');
@@ -44,6 +47,8 @@ module.exports = function logTrace(error) {
   var stack;
   /** @type {string} */
   var result;
+  /** @type {string} */
+  var lines;
 
   if ( !is('error=', error) ) return typeError(this, 'trace', 'error', error);
 
@@ -52,9 +57,11 @@ module.exports = function logTrace(error) {
   format = this.trace.format;
 
   stack = newStack(error);
-  result = getLines(format.linesBefore);
-  result += stackToString.call(this, 'trace', stack);
-  result += getLines(format.linesAfter);
+  result = stackToString.call(this, 'trace', stack);
+  lines  = getLines(format.linesBefore);
+  result = fuse(lines, result);
+  lines  = getLines(format.linesAfter);
+  result = fuse(result, lines);
   config.logger(result);
 
   if ( config['throw'] ) throw error;
