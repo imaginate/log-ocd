@@ -20,7 +20,7 @@
 
 'use strict';
 
-var fill = require('../../helpers').fill;
+var fill = require('../../../helpers').fill;
 
 /**
  * @param {number} lines

@@ -20,7 +20,7 @@
 
 'use strict';
 
-var fuse = require('../../helpers').fuse;
+var fuse = require('../../../helpers').fuse;
 var log = require('../index');
 
 /**
@@ -46,8 +46,8 @@ module.exports = function execError(method, param, val) {
   var msg;
 
   config = this.error.config;
-  header = 'Invalid `log-ocd.' + method + '` Call';
-  msg    = 'invalid type for `' + param + '` param';
+  header = fuse('Invalid `log-ocd.', method, '` Call');
+  msg    = fuse('invalid type for `', param, '` param');
   error  = new TypeError(header + ': ' + msg);
   ocdmap = { ocdmap: true };
   ocdmap[param] = val;

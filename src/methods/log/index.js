@@ -20,22 +20,22 @@
 
 'use strict';
 
-var help = require('../helpers');
+var help = require('../../helpers');
 var is    = help.is;
 var remap = help.remap;
 var slice = help.slice;
 
-var newStack = require('../helpers/new-stack');
+var newStack = require('../../helpers/new-stack');
 
 var setupSettings = require('./helpers/setup-settings');
 var getErrorType = require('./helpers/get-error-type');
 var execError = require('./helpers/exec-error');
 var getLines = require('./helpers/get-lines');
 
-var headerToString = require('../to-string/header');
-var stackToString = require('../to-string/stack');
-var msgToString = require('../to-string/msg');
-var toString = require('../to-string');
+var headerToString = require('../../to-string/header');
+var stackToString = require('../../to-string/stack');
+var msgToString = require('../../to-string/msg');
+var toString = require('../../to-string');
 
 /**
  * @this {!Settings}

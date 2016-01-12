@@ -20,14 +20,14 @@
 
 'use strict';
 
-var is = require('../helpers').is;
-var newStack = require('../helpers/new-stack');
+var is = require('../../helpers').is;
+var newStack = require('../../helpers/new-stack');
 
 var setupSettings = require('./helpers/setup-settings');
 var execError = require('./helpers/exec-error');
 var getLines = require('./helpers/get-lines');
 
-var stackToString = require('../to-string/stack');
+var stackToString = require('../../to-string/stack');
 
 /**
  * @this {!Settings}
