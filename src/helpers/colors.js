@@ -68,7 +68,7 @@ function setThemes(style, method, keys) {
   each(keys, function(key) {
     build = has(BUILD, key) ? BUILD[key] : buildThemes;
     obj = style[key];
-    key = method + '.' + key;
+    key = fuse(method, '.', key);
     obj = build(key, obj);
     themes = fuse(themes, obj);
   });
@@ -87,10 +87,16 @@ function makeTheme(theme) {
   var result;
   /** @type {string} */
   var keys;
+  /** @type {string} */
+  var bg;
 
   result = [];
   if (theme.color) result = fuse(result, theme.color);
-  if (theme.bg) result = fuse(result, 'bg' + capFirst(theme.bg));
+  if (theme.bg) {
+    bg = capFirst(theme.bg);
+    bg = fuse('bg', bg);
+    result = fuse(result, bg);
+  }
   keys = 'bold, dim, hidden, inverse, italic, reset, strikethrough, underline';
   each(keys, function(key) {
     if ( theme[key] ) result = fuse(result, key);
@@ -115,7 +121,7 @@ function buildThemes(name, obj) {
 
   each(obj, function(val, key) {
     if ( !is.obj(val) ) return;
-    key = name + '.' + key;
+    key = fuse(name, '.', key);
     val = buildThemes(key, val);
     themes = fuse(themes, val);
   });
@@ -140,10 +146,10 @@ function buildTitleThemes(name, theme) {
   themes[name] = makeTheme(theme);
 
   props = buildProps(theme);
-  name += '.';
+  name = fuse(name, '.');
   each(theme, function(val, key) {
     if ( !is.obj(val) ) return;
-    key = name + key;
+    key = fuse(name, key);
     val = buildProps(val, props);
     val = newTheme(val);
     themes[key] = makeTheme(val);
@@ -166,21 +172,21 @@ function buildRowThemes(name, theme) {
   var props;
 
   themes = {};
-  name += '.';
-  themes[name + 'odd' ] = makeTheme(theme);
-  themes[name + 'even'] = makeTheme(theme.alternate);
+  name = fuse(name, '.');
+  themes[ fuse(name, 'odd') ] = makeTheme(theme);
+  themes[ fuse(name, 'even') ] = makeTheme(theme.alternate);
 
   props = {};
   props.odd  = buildProps(theme);
   props.even = buildProps(theme.alternate);
   each(theme, function(val, key) {
-    if ( !is.obj(val) || key === 'alternate' ) return;
+    if ( !is.obj(val) || is.same(key, 'alternate') ) return;
     val = buildProps(val, props.odd);
     val = newTheme(val);
-    themes[name + 'odd.' + key] = makeTheme(val);
+    themes[ fuse(name, 'odd.', key) ] = makeTheme(val);
     val = buildProps(val, props.even);
     val = newTheme(val);
-    themes[name + 'even.' + key] = makeTheme(val);
+    themes[ fuse(name, 'even.', key) ] = makeTheme(val);
   });
 
   return themes;
