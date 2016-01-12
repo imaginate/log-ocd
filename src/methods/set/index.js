@@ -20,13 +20,43 @@
 
 'use strict';
 
-var fuse = require('../helpers').fuse;
+var help = require('../../helpers');
+var is  = help.is;
+var has = help.has;
+
+var typeError = require('../helpers/type-error');
+var rangeError = require('../helpers/range-error');
 
 /**
- * @param {string} setting
- * @return {function}
+ * @type {!Object}
+ * @const
  */
-module.exports = function set(setting) {
-  setting = fuse('./', setting);
-  return require(setting);
+var SET = {
+  config: require('./config'),
+  format: require('./format'),
+  style:  require('./style')
+};
+
+/**
+ * @this {Settings}
+ * @param {string} type - The set type. Options: config, format, style
+ * @param {string=} method - [default= "all"]
+ * @param {!Object} props
+ * @return {boolean}
+ */
+module.exports = function set(type, method, props) {
+
+  if (arguments.length < 3) {
+    props = method;
+    method = 'all';
+  }
+
+  if ( !is.str(method) ) return typeError(this, 'set', 'method', method);
+  if ( !is.obj(props)  ) return typeError(this, 'set', 'props', props);
+
+  if ( is.same(method, 'all') ) return SET[type].all(this, props);
+
+  if ( !has(this, method) ) return rangeError(this, 'set', 'method', method);
+
+  return SET[type].one(this, method, props);
 };
