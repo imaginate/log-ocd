@@ -20,16 +20,22 @@
 
 'use strict';
 
-var help = require('../helpers');
+var help = require('../../helpers');
 var is    = help.is;
 var fuse  = help.fuse;
 var has   = help.has;
 var until = help.until;
 
-var execTypeError = require('./helpers/exec-type-error');
-var execRangeError = require('./helpers/exec-range-error');
-var execPropTypeError = require('./helpers/exec-prop-type-error');
-var execPropRangeError = require('./helpers/exec-prop-range-error');
+var typeError = require('../helpers/type-error');
+var rangeError = require('../helpers/range-error');
+var propTypeError = require('../helpers/prop-type-error');
+var propRangeError = require('../helpers/prop-range-error');
+
+/**
+ * @type {string}
+ * @const
+ */
+var METHOD = 'setFormat';
 
 /**
  * @this {!Settings}
@@ -39,38 +45,32 @@ var execPropRangeError = require('./helpers/exec-prop-range-error');
  */
 module.exports = function setFormat(method, props) {
 
-  if (arguments.length === 1) {
+  if (arguments.length < 2) {
     props = method;
     method = 'all';
   }
 
-  if ( !is.str(method) ) {
-    return execTypeError.call(this, 'setFormat', 'method', method);
-  }
-  if ( !is.obj(props) ) {
-    return execTypeError.call(this, 'setFormat', 'props', props);
-  }
+  if ( !is.str(method) ) return typeError(this, METHOD, 'method', method);
+  if ( !is.obj(props)  ) return typeError(this, METHOD, 'props', props);
 
-  if (method === 'all') return setAll(this, props);
+  if ( is.same(method, 'all') ) return setAll(this, props);
 
-  if ( !has(this, method) ) {
-    return execRangeError.call(this, 'setFormat', 'method', method);
-  }
+  if ( !has(this, method) ) return rangeError(this, METHOD, 'method', method);
 
   return setOne(this, method, props);
 };
 
 /**
  * @private
- * @param {!Settings} settings
+ * @param {Settings} settings
  * @param {!Object} props
  * @return {boolean}
  */
 function setAll(settings, props) {
 
-  /** @type {!SubFormat} */
+  /** @type {SubFormat} */
   var subformat;
-  /** @type {!Format} */
+  /** @type {Format} */
   var format;
 
   return !until(true, settings, function(setting, method) {
@@ -79,9 +79,7 @@ function setAll(settings, props) {
       if ( !has(format, key) ) return true;
       if ( !is.obj(val) ) return setProp(settings, format, key, val);
       subformat = format[key];
-      if ( !is.obj(subformat) ) {
-        return execPropTypeError.call(settings, 'setFormat', key, val);
-      }
+      if ( !is.obj(subformat) ) return propTypeError(settings, METHOD, key, val);
       return !until(false, val, function(subval, subkey) {
         if ( !has(subformat, subkey) ) return true;
         return setProp(settings, subformat, key, subkey, subval);
@@ -92,32 +90,28 @@ function setAll(settings, props) {
 
 /**
  * @private
- * @param {!Settings} settings
+ * @param {Settings} settings
  * @param {string} method
  * @param {!Object} props
  * @return {boolean}
  */
 function setOne(settings, method, props) {
 
-  /** @type {!SubFormat} */
+  /** @type {SubFormat} */
   var subformat;
-  /** @type {!Format} */
+  /** @type {Format} */
   var format;
 
   format = settings[method].format;
   return !until(false, props, function(val, key) {
-    if ( !has(format, key) ) {
-      return execPropRangeError.call(settings, 'setFormat', key);
-    }
+    if ( !has(format, key) ) return propRangeError(settings, METHOD, key);
     if ( !is.obj(val) ) return setProp(settings, format, key, val);
     subformat = format[key];
-    if ( !is.obj(subformat) ) {
-      return execPropTypeError.call(settings, 'setFormat', key, val);
-    }
+    if ( !is.obj(subformat) ) return propTypeError(settings, METHOD, key, val);
     return !until(false, val, function(subval, subkey) {
       if ( !has(subformat, subkey) ) {
         subkey = fuse(key, '.', subkey);
-        return execPropRangeError.call(settings, 'setFormat', subkey);
+        return propRangeError(settings, METHOD, subkey);
       }
       return setProp(settings, subformat, key, subkey, subval);
     });
@@ -126,26 +120,29 @@ function setOne(settings, method, props) {
 
 /**
  * @private
- * @param {!Settings} settings
- * @param {!(Format|SubFormat)} format
+ * @param {Settings} settings
+ * @param {(Format|SubFormat)} format
  * @param {string=} parent
  * @param {string} key
  * @param {*} val
  * @return {boolean}
  */
 function setProp(settings, format, parent, key, val) {
-  if (arguments.length === 4) {
+
+  if (arguments.length < 5) {
     val = key;
     key = parent;
     parent = '';
   }
+
   try {
     format[key] = val;
   }
   catch (error) {
     if (!error.__setter || !error.__type) throw error;
     if (parent) key = fuse(parent, '.', key);
-    return execPropTypeError.call(settings, 'setFormat', key, val);
+    return propTypeError(settings, METHOD, key, val);
   }
+
   return true;
 }
