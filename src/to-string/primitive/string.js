@@ -23,6 +23,7 @@
 var help = require('../../helpers');
 var cut   = help.cut;
 var fill  = help.fill;
+var fuse  = help.fuse;
 var has   = help.has;
 var remap = help.remap;
 var slice = help.slice;
@@ -64,6 +65,8 @@ module.exports = function stringToString(method, str) {
   var style;
   /** @type {number} */
   var limit;
+  /** @type {string} */
+  var line;
 
   style = getStyleKey(this, method, 'string');
   str = remap(str, /\n/g, '\\n');
@@ -81,17 +84,19 @@ module.exports = function stringToString(method, str) {
   limit -= 6;
 
   if (limit <= 0 || str.length <= limit) {
-    return brackets[0] + colors[style](str) + brackets[1];
+    return fuse(brackets[0], colors[style](str), brackets[1]);
   }
 
   delimiter = getDelimiter(' +', style);
   indent = fill(this.__indent + 2, ' ');
-  result = brackets[0] + brackets[1] + delimiter + '\n';
+  result = fuse(brackets[0], brackets[1], delimiter, '\n');
   while (str.length > limit) {
-    result += getLine(str, limit, brackets, delimiter, style, indent);
+    line = getLine(str, limit, brackets, delimiter, style, indent);
+    result = fuse(result, line);
     str = slice(str, limit);
   }
-  return result + indent + brackets[0] + colors[style](str) + brackets[1];
+  line = fuse(indent, brackets[0], colors[style](str), brackets[1]);
+  return fuse(result, line);
 };
 
 /**
@@ -108,5 +113,5 @@ function getLine(str, end, brackets, delimiter, style, indent) {
   str = slice(str, 0, end);
   str = colors[style](str);
   indent = indent || '';
-  return indent + brackets[0] + str + brackets[1] + delimiter + '\n';
+  return fuse(indent, brackets[0], str, brackets[1], delimiter, '\n');
 }
