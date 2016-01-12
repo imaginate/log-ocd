@@ -21,8 +21,8 @@
 'use strict';
 
 var help = require('../../helpers');
-var each  = help.each;
-var slice = help.slice;
+var fuse = help.fuse;
+var roll = help.roll;
 
 var colors = require('../../helpers/colors');
 
@@ -43,8 +43,6 @@ module.exports = function ocdmapToString(method, obj) {
 
   /** @type {string} */
   var delimiter;
-  /** @type {string} */
-  var result;
   /** @type {!OcdMapFormat} */
   var format;
   /** @type {!Array<string>} */
@@ -53,22 +51,24 @@ module.exports = function ocdmapToString(method, obj) {
   var style;
   /** @type {!Array<string>} */
   var keys;
-  /** @type {*} */
+  /** @type {number} */
+  var last;
+  /** @type {string} */
   var val;
 
-  result = '';
   keys = getKeys(obj);
 
-  if (!keys.length) return result;
+  if (!keys.length) return '';
 
   style = getStyleKey(this, method, 'ocdmap');
   format = this[method].format.ocdmap;
   spaces = getSpaces(format.spaceBefore, format.spaceAfter, style);
   delimiter = getDelimiter(format.delimiter, style);
-  each(keys, function(key) {
-    val = obj[key];
-    key = spaces[0] + colors[style](key) + spaces[1] + delimiter + ' ';
-    result += key + toString.call(this, method, val) + '\n';
+  last = keys.length - 1;
+  return roll.up(keys, function(key, i) {
+    val = toString.call(this, method, obj[key]);
+    val = i < last ? fuse(val, '\n') : val;
+    key = colors[style](key);
+    return fuse(spaces[0], key, spaces[1], delimiter, val);
   }, this);
-  return slice(result, -1);
 };
