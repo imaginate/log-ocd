@@ -22,6 +22,7 @@
 
 var help = require('../../helpers');
 var cut  = help.cut;
+var fuse = help.fuse;
 var get  = help.get;
 
 var colors = require('../../helpers/colors');
@@ -59,5 +60,5 @@ module.exports = function regexpToString(method, val) {
   flags = getFlags(flags, style);
   val = cut(val, /^\/|\/[a-z]*$/g);
   val = colors[style](val);
-  return identifier + brackets[0] + val + brackets[1] + flags;
+  return fuse(identifier, brackets[0], val, brackets[1], flags);
 };
