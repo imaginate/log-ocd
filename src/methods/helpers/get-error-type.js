@@ -20,7 +20,7 @@
 
 'use strict';
 
-var get = require('../../../helpers').get;
+var get = require('../../helpers').get;
 
 /**
  * @param {!Object} error
