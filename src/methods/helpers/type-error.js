@@ -32,6 +32,8 @@ var log = require('../log');
  */
 module.exports = function typeError(settings, method, param, val) {
 
+  /** @type {string} */
+  var errorMsg;
   /** @type {!Config} */
   var config;
   /** @type {!Object} */
@@ -46,16 +48,20 @@ module.exports = function typeError(settings, method, param, val) {
   var msg;
 
   config = settings.error.config;
+
   header = fuse('Invalid `log-ocd.', method, '` Call');
-  msg    = fuse('invalid type for `', param, '` param');
-  error  = new TypeError(header + ': ' + msg);
+  msg = fuse('invalid type for `', param, '` param');
+
+  errorMsg = fuse(header, ': ', msg);
+  error = new TypeError(errorMsg);
+
   ocdmap = { ocdmap: true };
   ocdmap[param] = val;
 
   args = [ 'error' ];
-  config.header && fuse(args, header);
-  config.msg && fuse(args, msg);
-  fuse(args, error, ocdmap);
+  if (config.header) args = fuse(args, header);
+  if (config.msg) args = fuse(args, msg);
+  args = fuse(args, error, ocdmap);
   log.apply(settings, args);
 
   return false;
