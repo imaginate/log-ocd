@@ -26,8 +26,6 @@ var fuse  = help.fuse;
 var has   = help.has;
 var until = help.until;
 
-var typeError = require('../helpers/type-error');
-var rangeError = require('../helpers/range-error');
 var propTypeError = require('../helpers/prop-type-error');
 var propRangeError = require('../helpers/prop-range-error');
 
@@ -37,37 +35,12 @@ var propRangeError = require('../helpers/prop-range-error');
  */
 var METHOD = 'setStyle';
 
-
 /**
- * @this {Settings}
- * @param {string=} method - [default= "all"]
- * @param {!Object} props
- * @return {boolean}
- */
-module.exports = function setStyle(method, props) {
-
-  if (arguments.length < 2) {
-    props = method;
-    method = 'all';
-  }
-
-  if ( !is.str(method) ) return typeError(this, METHOD, 'method', method);
-  if ( !is.obj(props)  ) return typeError(this, METHOD, 'props', props);
-
-  if ( is.same(method, 'all') ) return setAll(this, props);
-
-  if ( !has(this, method) ) return rangeError(this, METHOD, 'method', method);
-
-  return setOne(this, method, props);
-};
-
-/**
- * @private
  * @param {Settings} settings
  * @param {!Object} props
  * @return {boolean}
  */
-function setAll(settings, props) {
+exports.all = function setAllStyle(settings, props) {
 
   /** @type {!MainTheme} */
   var maintheme;
@@ -103,16 +76,15 @@ function setAll(settings, props) {
       });
     });
   });
-}
+};
 
 /**
- * @private
  * @param {Settings} settings
  * @param {string} method
  * @param {!Object} props
  * @return {boolean}
  */
-function setOne(settings, method, props) {
+exports.one = function setOneStyle(settings, method, props) {
 
   /** @type {!MainTheme} */
   var maintheme;
@@ -149,7 +121,7 @@ function setOne(settings, method, props) {
       });
     });
   });
-}
+};
 
 /**
  * @private
