@@ -67,7 +67,7 @@ module.exports = function rangeError(settings, method, name, val) {
   if (config.header) args = fuse(args, header);
   if (config.msg) args = fuse(args, msg);
   args = fuse(args, error, ocdmap);
-  log.apply(this, args);
+  log.apply(settings, args);
 
   return false;
 };
