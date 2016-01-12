@@ -24,17 +24,17 @@ var help = require('./helpers');
 var each = help.each;
 var fuse = help.fuse;
 
-var capFirst = require('./helpers/cap-first');
+var newSettings = require('./settings');
 
-var getDefaultSettings = require('./settings');
-var log = require('./log');
-var logTrace = require('./log/trace');
-var toString = require('./to-string');
-var set = require('./set');
-var reset = require('./reset');
+var LOG   = require('./methods/log');
+var SET   = require('./methods/set');
+var RESET = require('./methods/reset');
 
-/** @type {number} */
-var instCount = 0;
+var SETTERS = {
+  'config': 'setConfig',
+  'format': 'setFormat',
+  'style':  'setStyle'
+};
 
 /**
  * @typedef {!{
@@ -55,30 +55,40 @@ var instCount = 0;
  * }} LogOCD
  */
 
+var METHODS = {
+  'toString': require('./methods/to-string'),
+  'log':      LOG,
+  'pass':     LOG,
+  'error':    LOG,
+  'warn':     LOG,
+  'debug':    LOG,
+  'fail':     LOG,
+  'trace':    require('./methods/trace')
+};
+
+/** @type {number} */
+var instCount = 0;
+
 /**
- * @return {!LogOCD}
+ * Creates a new log-ocd instance.
+ * @return {LogOCD}
  */
 module.exports = function setupLogOCD() {
 
-  /** @type {!Settings} */
+  /** @type {Settings} */
   var settings;
-  /** @type {!LogOCD} */
+  /** @type {LogOCD} */
   var logocd;
   /** @type {function} */
   var setter;
 
-  settings = getDefaultSettings(++instCount);
-  logocd = bind(log, settings, 'log');
-  logocd.log = logocd;
-  each('pass, error, warn, debug, fail', function(method) {
-    logocd[method] = bind(log, settings, method);
+  settings = newSettings( ++instCount );
+  logocd = bind(LOG, settings, 'log');
+  logocd = addSetters(logocd, settings);
+  each(METHODS, function(func, method) {
+    func = bind(func, settings, method);
+    logocd[method] = addSetters(func, settings, method);
   });
-  logocd.trace = bind(logTrace, settings, 'trace');
-  logocd.toString = bind(toString, settings, 'toString');
-  each(logocd, function(method) {
-    method = appendSet(method, settings, method);
-  });
-  logocd = appendSet(logocd, settings);
   return logocd;
 };
 
@@ -97,24 +107,27 @@ function bind(func, settings, method) {
  * @private
  * @param {function} func
  * @param {Settings} settings
+ * @param {string} type
  * @param {string=} method
  * @return {function}
  */
-function appendSet(func, settings, method) {
+function bindType(func, settings, type, method) {
+  return method ? func.bind(settings, type, method) : func.bind(settings, type);
+}
 
-  /** @type {function} */
-  var resetter;
-  /** @type {function} */
-  var setter;
+/**
+ * @private
+ * @param {function} func
+ * @param {Settings} settings
+ * @param {string=} method
+ * @return {function}
+ */
+function addSetters(func, settings, method) {
 
-  each('config, format, style', function(setting) {
-    setter = set(setting);
-    resetter = reset(setting);
-    setting = capFirst(setting);
-    setting = fuse('set', setting);
-    func[setting] = bind(setter, settings, method);
-    setting = fuse('re', setting);
-    func[setting] = bind(resetter. settings, method);
+  each(SETTERS, function(key, type) {
+    func[key] = bindType(SET, settings, type, method);
+    key = fuse('re', key);
+    func[key] = bindType(RESET, settings, type, method);
   });
   return func;
 }
