@@ -38,6 +38,7 @@ exports.fuse   = vitals.fuse;
 exports.get    = vitals.get;
 exports.has    = vitals.has;
 exports.remap  = vitals.remap;
+exports.roll   = vitals.roll;
 exports.seal   = vitals.seal;
 exports.slice  = vitals.slice;
 exports.until  = vitals.until;
