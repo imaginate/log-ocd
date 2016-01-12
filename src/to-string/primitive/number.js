@@ -21,9 +21,11 @@
 'use strict';
 
 var help = require('../../helpers');
-var cut  = help.cut;
-var get  = help.get;
-var has  = help.has;
+var cut   = help.cut;
+var fuse  = help.fuse;
+var get   = help.get;
+var has   = help.has;
+var remap = help.remap;
 
 var colors = require('../../helpers/colors');
 
@@ -52,10 +54,15 @@ module.exports = function numberToString(method, val) {
   identifier = getIdentifier(identifier, style);
   val = cut(val, /^[+-]/);
 
-  if ( !has(val, '\.') ) return identifier + colors[style](val);
+  if ( !has(val, '.') ) {
+    val = colors[style](val);
+    return fuse(identifier, val);
+  }
 
   delimiter = getDelimiter('.', style);
   val = val.split('.');
-  return identifier + colors[style]( val[0] ) +
-         delimiter  + colors[style]( val[1] );
+  val = remap(val, function(subval) {
+    return colors[style](subval);
+  });
+  return fuse(identifier, val[0], delimiter, val[1]);
 };
