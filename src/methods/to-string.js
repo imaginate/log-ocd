@@ -21,13 +21,14 @@
 'use strict';
 
 var help = require('../helpers');
-var remap = help.remap;
+var fuse  = help.fuse;
+var roll  = help.roll;
 var slice = help.slice;
 
 var valToString = require('../to-string');
 
 /**
- * @this {!Settings}
+ * @this {Settings}
  * @param {...*} vals
  * @return {string}
  */
@@ -35,12 +36,15 @@ module.exports = function toString(vals) {
 
   /** @type {string} */
   var result;
+  /** @type {number} */
+  var last;
 
   this.__maxLen = 0;
   this.__indent = 0;
   vals = slice(arguments);
-  vals = remap(vals, function(val) {
-    return valToString.call(this, 'toString', val);
+  last = vals.length - 1;
+  return roll.up('', vals, function(val, i) {
+    val = valToString.call(this, 'toString', val);
+    return i && i < last ? fuse(val, '\n') : val;
   }, this);
-  return vals.join('\n');
 };
