@@ -20,4 +20,22 @@
 
 'use strict';
 
+var newLogOCD = require('./src/setup');
 
+/**
+ * @public
+ * @param {string=} globalKey - If globalKey is defined the new log-ocd instance
+ *   is appended to the global object using globalKey's value as the key.
+ * @return {LogOCD} A new log-ocd instance.
+ */
+module.exports = function initLogOCD(globalKey) {
+
+  /** @type {LogOCD} */
+  var logocd;
+
+  logocd = newLogOCD();
+
+  if (globalKey) global[globalKey] = logocd;
+
+  return logocd;
+};
