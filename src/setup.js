@@ -90,7 +90,7 @@ module.exports = function setupLogOCD() {
   each(METHODS, function(func, method) {
     func = bind(func, settings, method);
     logocd[method] = addSetters(func, settings, method);
-    setColors(settings[method].style, method);
+    setColors(instCount, settings[method].style, method);
   });
   return logocd;
 };

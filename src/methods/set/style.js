@@ -89,7 +89,7 @@ exports.all = function setAllStyle(settings, props) {
         });
       });
     });
-    setColors(style, method, keys);
+    setColors(settings.__INST, style, method, keys);
     return result;
   });
 };
@@ -147,7 +147,7 @@ exports.one = function setOneStyle(settings, method, props) {
       return has(style, key);
     });
   }
-  setColors(style, method, keys);
+  setColors(settings.__INST, style, method, keys);
   return result;
 };
 

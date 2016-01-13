@@ -50,11 +50,12 @@ module.exports = colors;
 
 /**
  * @private
+ * @param {number} inst
  * @param {!Style} style
  * @param {string} method
  * @param {!Array=} keys - The keys for each changed property.
  */
-function setThemes(style, method, keys) {
+function setThemes(inst, style, method, keys) {
 
   /** @type {!Object} */
   var themes;
@@ -68,7 +69,7 @@ function setThemes(style, method, keys) {
   each(keys, function(key) {
     build = has(BUILD, key) ? BUILD[key] : buildThemes;
     obj = style[key];
-    key = fuse(method, '.', key);
+    key = fuse('ocd', inst, '.', method, '.', key);
     obj = build(key, obj);
     themes = fuse(themes, obj);
   });

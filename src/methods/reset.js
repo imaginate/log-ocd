@@ -63,8 +63,8 @@ module.exports = function reset(type, method) {
     });
     if ( is.same(type, 'style') ) {
       each(this, function(setting, method) {
-        setColors(setting.style, method);
-      });
+        setColors(this.__INST, setting.style, method);
+      }, this);
     }
     return true;
   }
@@ -72,6 +72,6 @@ module.exports = function reset(type, method) {
   if ( !has(this, method) ) return rangeError(this, 'reset', method);
 
   this[method][type] = getDefault(method);
-  if ( is.same(type, 'style') ) setColors(this[method].style, method);
+  if ( is.same(type, 'style') ) setColors(this.__INST, this[method].style, method);
   return true;
 };
