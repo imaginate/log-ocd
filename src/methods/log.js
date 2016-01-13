@@ -121,7 +121,7 @@ function execLog(method, header, msg, vals, stack) {
   last = vals.length - 1;
   vals = roll.up('', vals, function(val, i) {
     val = toString.call(this, method, val);
-    return i && i < last ? fuse(val, '\n') : val;
+    return i < last ? fuse(val, '\n') : val;
   }, this);
 
   header = config.header ? headerToString.call(this, method, header) : '';

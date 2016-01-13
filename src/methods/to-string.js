@@ -45,6 +45,6 @@ module.exports = function toString(vals) {
   last = vals.length - 1;
   return roll.up('', vals, function(val, i) {
     val = valToString.call(this, 'toString', val);
-    return i && i < last ? fuse(val, '\n') : val;
+    return i < last ? fuse(val, '\n') : val;
   }, this);
 };
