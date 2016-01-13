@@ -43,7 +43,7 @@ module.exports = function newConfig(category, trueKeys) {
   each(CATEGORIES[category], function(obj, key) {
     config = amend(config, key, obj.val, obj.type);
   });
-  format = seal(format);
+  config = seal(config);
   trueKeys && each(trueKeys, function(key) {
     config[key] = true;
   });
