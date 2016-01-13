@@ -80,7 +80,8 @@ module.exports = function log(method, vals) {
   if ( !error && config['throw'] ) {
     header = header ? fuse(header, ': ') : '';
     msg   = msg || '';
-    error = new Error( fuse(header, msg) );
+    error = fuse(header, msg);
+    error = new Error(error);
   }
   stack = config.stack ? newStack(error) : null;
 
@@ -111,12 +112,16 @@ function execLog(method, header, msg, vals, stack) {
   var result;
   /** @type {string} */
   var lines;
+  /** @type {number} */
+  var last;
 
   config = this[method].config;
   format = this[method].format;
 
-  vals = roll.up('', vals, function(val) {
-    return toString.call(this, method, val);
+  last = vals.length - 1;
+  vals = roll.up('', vals, function(val, i) {
+    val = toString.call(this, method, val);
+    return i && i < last ? fuse(val, '\n') : val;
   }, this);
 
   header = config.header ? headerToString.call(this, method, header) : '';
