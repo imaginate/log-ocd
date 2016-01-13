@@ -28,5 +28,5 @@ var colors = require('../../helpers/colors');
  * @return {string}
  */
 module.exports = function getBullet(bullet, style) {
-  return bullet && colors[style + '.bullet'](bullet);
+  return bullet && colors[style](bullet);
 };
