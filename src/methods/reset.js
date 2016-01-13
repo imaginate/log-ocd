@@ -71,7 +71,7 @@ module.exports = function reset(type, method) {
 
   if ( !has(this, method) ) return rangeError(this, 'reset', method);
 
-  this[method].config = getDefaultConfig(method);
+  this[method][type] = getDefault(method);
   if ( is.same(type, 'style') ) setColors(this[method].style, method);
   return true;
 };
