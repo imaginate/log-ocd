@@ -21,8 +21,9 @@
 'use strict';
 
 var help = require('../../helpers');
-var each  = help.each;
-var remap = help.remap;
+var is   = help.is;
+var fuse = help.fuse;
+var roll = help.roll;
 
 var colors = require('../../helpers/colors');
 
@@ -52,6 +53,8 @@ module.exports = function headerToString(method, header) {
   var style;
   /** @type {number} */
   var limit;
+  /** @type {string} */
+  var key;
 
   style  = getStyleKey(this, method, 'header');
   format = this[method].format.header;
@@ -66,10 +69,11 @@ module.exports = function headerToString(method, header) {
     return linesToString(header, ++limit, spaces, style);
   }
 
-  header = remap(header, function(part, i) {
-    return colors[ i % 2 ? style + '.accent' : style ](part);
+  header = roll.up('', header, function(part, i) {
+    key = is.odd(i) ? style : fuse(style, '.accent');
+    return colors[key](part);
   });
-  return spaces[0] + header.join('') + spaces[1];
+  return fuse(spaces[0], header, spaces[1]);
 };
 
 /**
@@ -78,13 +82,7 @@ module.exports = function headerToString(method, header) {
  * @return {number}
  */
 function getLen(header) {
-
-  /** @type {number} */
-  var len;
-
-  len = 0;
-  each(header, function(part) {
-    len += part.length;
+  return roll.up(0, header, function(part) {
+    return part.length;
   });
-  return len;
 }
