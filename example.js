@@ -40,7 +40,7 @@ log.resetStyle('fail');
 Error.stackTraceLimit = 6;
 
 log('a quick message');
-log.pass('A `Success` Story', { argMap: true, easily: 'view', given: 'values' }, 'plus', { endless: 'superfluous', extra: 'details' });
-log.error('A `Failure`', 'with some `guidance`', { andAnArgMap: 'with', easy: 'titling', of: 'any value' });
+log.pass('A `Success` Story', { ocdmap: true, easily: 'view', given: 'values' }, 'plus', { endless: 'superfluous', extra: 'details' });
+log.error('A `Failure`', 'with some `guidance`', { andAnOCDMap: 'with', easy: 'titling', of: 'any value' });
 log.warn('A Word of `Caution`', 'with a tale of `adventure`');
 log.debug('A Beacon of `Hope`', [ 'with', 'all', 'the', 'juicy', 'details' ], /you want to know/g);
