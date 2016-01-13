@@ -21,9 +21,10 @@
 'use strict';
 
 var help = require('../../helpers');
-var each  = help.each;
-var fill  = help.fill;
-var remap = help.remap;
+var is   = help.is;
+var fill = help.fill;
+var fuse = help.fuse;
+var roll = help.roll;
 
 var colors = require('../../helpers/colors');
 
@@ -55,6 +56,8 @@ module.exports = function msgToString(method, msg) {
   var style;
   /** @type {number} */
   var limit;
+  /** @type {string} */
+  var key;
 
   style  = getStyleKey(this, method, 'msg');
   format = this[method].format.msg;
@@ -70,11 +73,12 @@ module.exports = function msgToString(method, msg) {
     return linesToString(msg, ++limit, bullet, indent, style);
   }
 
-  if (format.bullet) bullet += ' ';
-  msg = remap(msg, function(part, i) {
-    return colors[ i % 2 ? style + '.accent' : style ](part);
+  if (format.bullet) bullet = fuse(bullet, ' ');
+  msg = roll.up('', msg, function(part, i) {
+    key = is.odd(i) ? style : fuse(style, '.accent');
+    return colors[key](part);
   });
-  return indent + bullet + msg.join('');
+  return fuse(indent, bullet, msg);
 };
 
 /**
@@ -83,13 +87,7 @@ module.exports = function msgToString(method, msg) {
  * @return {number}
  */
 function getLen(msg) {
-
-  /** @type {number} */
-  var len;
-
-  len = 0;
-  each(msg, function(part) {
-    len += part.length;
+  return roll.up(0, msg, function(part) {
+    return part.length;
   });
-  return len;
 }
