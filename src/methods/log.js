@@ -57,7 +57,7 @@ module.exports = function log(method, vals) {
   /** @type {string} */
   var msg;
 
-  this = setupSettings(this);
+  setupSettings(this);
   vals = slice(arguments, 1);
 
   config = this[method].config;
