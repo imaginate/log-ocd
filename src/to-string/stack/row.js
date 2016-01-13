@@ -20,7 +20,10 @@
 
 'use strict';
 
-var until = require('../../helpers').until;
+var help = require('../../helpers');
+var is    = help.is;
+var fuse  = help.fuse;
+var until = help.until;
 
 var colors = require('../../helpers/colors');
 
@@ -45,10 +48,10 @@ module.exports = function rowToString(trace, columns, space, style) {
   /** @type {boolean} */
   var over;
 
-  style += '.';
+  style = fuse(style, '.');
   vals = buildVals(columns, trace);
   over = until(true, columns, function(column, i) {
-    if (!column.over && column.key !== 'file') return false;
+    if ( !column.over && !is.same(column.key, 'file') ) return false;
     return vals[i].length > column.len;
   });
 
