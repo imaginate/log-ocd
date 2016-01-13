@@ -72,7 +72,7 @@ module.exports = function ocdmapToString(method, obj) {
   spaces = getSpaces(format.spaceBefore, format.spaceAfter, style);
   delimiter = getDelimiter(format.delimiter, style);
   last = keys.length - 1;
-  return roll.up(keys, function(key, i) {
+  return roll.up('', keys, function(key, i) {
     val = toString.call(this, method, obj[key]);
     val = i < last ? fuse(val, '\n') : val;
     key = colors[style](key);
