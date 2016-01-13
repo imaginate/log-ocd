@@ -128,9 +128,10 @@ function execLog(method, header, msg, vals, stack) {
   stack  = stack         ? stackToString.call(this, method, stack)   : '';
   msg    = config.msg    ? msgToString.call(this, method, msg)       : '';
 
-  if (header && !msg) header = fuse(header, '\n');
-  if (vals && stack) vals = fuse(vals, '\n');
-  if (msg) msg = fuse(msg, '\n');
+  if (header) header = fuse(header, '\n');
+  if ( msg && (vals || stack) ) msg = fuse(msg, '\n\n');
+  if ( header && !msg && (vals || stack) ) header = fuse(header, '\n');
+  if (vals && stack) vals = fuse(vals, '\n\n');
 
   lines  = getLines(format.linesBefore);
   result = fuse(lines, header, msg, vals, stack);
