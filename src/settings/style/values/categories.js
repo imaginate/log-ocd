@@ -42,9 +42,9 @@ var DATA_TYPES = 'ocdmap, null, undefined, boolean, nan, string, number, ' +
  * @const
  */
 var CATEGORIES = {
-  'log':   { section: 'type',  keys: 'header, msg' + DATA_TYPES },
-  'prep':  { section: 'type',  keys: DATA_TYPES                 },
-  'trace': { section: 'stack', keys: 'root, title, row'         }
+  'log':   { section: 'type',  keys: 'header, msg, ' + DATA_TYPES },
+  'prep':  { section: 'type',  keys: DATA_TYPES                   },
+  'trace': { section: 'stack', keys: 'root, title, row'           }
 };
 
 module.exports = freeze(CATEGORIES, true);
