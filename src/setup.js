@@ -24,6 +24,8 @@ var help = require('./helpers');
 var each = help.each;
 var fuse = help.fuse;
 
+var setColors = require('./helpers/colors').setThemes;
+
 var newSettings = require('./settings');
 
 var LOG   = require('./methods/log');
@@ -88,6 +90,7 @@ module.exports = function setupLogOCD() {
   each(METHODS, function(func, method) {
     func = bind(func, settings, method);
     logocd[method] = addSetters(func, settings, method);
+    setColors(settings[method].style, method);
   });
   return logocd;
 };
