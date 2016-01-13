@@ -75,7 +75,7 @@ module.exports = function msgToString(method, msg) {
 
   if (format.bullet) bullet = fuse(bullet, ' ');
   msg = roll.up('', msg, function(part, i) {
-    key = is.odd(i) ? style : fuse(style, '.accent');
+    key = is.odd(i) ? fuse(style, '.accent') : style;
     return colors[key](part);
   });
   return fuse(indent, bullet, msg);

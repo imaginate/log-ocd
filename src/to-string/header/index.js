@@ -70,7 +70,7 @@ module.exports = function headerToString(method, header) {
   }
 
   header = roll.up('', header, function(part, i) {
-    key = is.odd(i) ? style : fuse(style, '.accent');
+    key = is.odd(i) ? fuse(style, '.accent') : style;
     return colors[key](part);
   });
   return fuse(spaces[0], header, spaces[1]);
