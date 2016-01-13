@@ -22,9 +22,9 @@ log.setConfig('all', { ocdmap: true });
 log.setConfig({ ocdmap: true });
 
 // update config for one method
-log.setConfig('error', { exit: false });
+log.setConfig('error', { 'throw': false });
 // or
-log.error.setConfig({ exit: false });
+log.error.setConfig({ 'throw': false });
 
 // reset config for one method
 log.resetConfig('pass');
