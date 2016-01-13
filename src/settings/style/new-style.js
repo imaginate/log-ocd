@@ -26,7 +26,7 @@ var each  = help.each;
 var fuse  = help.fuse;
 var seal  = help.seal;
 
-var newEmptyObj = require('../helpers/new-empty-obj');
+var newEmptyObj = require('../../helpers/new-empty-obj');
 
 var CATEGORIES = require('./values/categories');
 
