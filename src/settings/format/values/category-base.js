@@ -51,7 +51,9 @@ var CATEGORY_BASE = {
     'row':         { type: '!object', make: true },
     'event':       { type: '!object', make: true },
     'file':        { type: '!object', make: true },
-    'module':      { type: '!object', make: true }
+    'module':      { type: '!object', make: true },
+    'line':        { type: '!object', make: true },
+    'column':      { type: '!object', make: true }
   }
 };
 
