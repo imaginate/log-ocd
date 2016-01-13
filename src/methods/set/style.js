@@ -22,9 +22,13 @@
 
 var help = require('../../helpers');
 var is    = help.is;
+var cut   = help.cut;
 var fuse  = help.fuse;
+var get   = help.get;
 var has   = help.has;
 var until = help.until;
+
+var setColors = require('../../helpers/colors').setThemes;
 
 var propTypeError = require('../helpers/prop-type-error');
 var propRangeError = require('../helpers/prop-range-error');
@@ -42,17 +46,27 @@ var METHOD = 'setStyle';
  */
 exports.all = function setAllStyle(settings, props) {
 
-  /** @type {!MainTheme} */
+  /** @type {MainTheme} */
   var maintheme;
-  /** @type {!Theme} */
+  /** @type {boolean} */
+  var result;
+  /** @type {Theme} */
   var theme;
-  /** @type {!Style} */
+  /** @type {Style} */
   var style;
+  /** @type {!Array} */
+  var keys;
+  /** @type {*} */
+  var val;
 
   return !until(true, settings, function(setting, method) {
     style = setting.style;
-    return until(false, props, function(val, key) {
-      if ( !has(style, key) ) return true;
+    keys = get.keys(props);
+    keys = cut(keys, function(key) {
+      return has(style, key);
+    });
+    result = until(false, keys, function(key) {
+      val = props[key];
       if ( !is.obj(val) ) return setProp(settings, style, key, val);
       maintheme = style[key];
       if ( !is.obj(maintheme) ) return propTypeError(settings, METHOD, key, val);
@@ -75,6 +89,8 @@ exports.all = function setAllStyle(settings, props) {
         });
       });
     });
+    setColors(style, method, keys);
+    return result;
   });
 };
 
@@ -88,13 +104,17 @@ exports.one = function setOneStyle(settings, method, props) {
 
   /** @type {!MainTheme} */
   var maintheme;
-  /** @type {!Theme} */
+  /** @type {boolean} */
+  var result;
+  /** @type {Theme} */
   var theme;
   /** @type {!Style} */
   var style;
+  /** @type {!Array} */
+  var keys;
 
   style = settings[method].style;
-  return !until(false, props, function(val, key) {
+  result = !until(false, props, function(val, key) {
     if ( !has(style, key) ) return propRangeError(settings, METHOD, key);
     if ( !is.obj(val) ) return setProp(settings, style, key, val);
     maintheme = style[key];
@@ -121,6 +141,14 @@ exports.one = function setOneStyle(settings, method, props) {
       });
     });
   });
+  keys = get.keys(props);
+  if (!result) {
+    keys = cut(keys, function(key) {
+      return has(style, key);
+    });
+  }
+  setColors(style, method, keys);
+  return result;
 };
 
 /**
