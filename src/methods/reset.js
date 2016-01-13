@@ -25,6 +25,8 @@ var is   = help.is;
 var each = help.each;
 var has  = help.has;
 
+var setColors = require('../helpers/colors').setThemes;
+
 var typeError = require('./helpers/type-error');
 var rangeError = require('./helpers/range-error');
 
@@ -59,11 +61,17 @@ module.exports = function reset(type, method) {
     each(this, function(setting, method) {
       setting[type] = getDefault(method);
     });
+    if ( is.same(type, 'style') ) {
+      each(this, function(setting, method) {
+        setColors(setting.style, method);
+      });
+    }
     return true;
   }
 
   if ( !has(this, method) ) return rangeError(this, 'reset', method);
 
   this[method].config = getDefaultConfig(method);
+  if ( is.same(type, 'style') ) setColors(this[method].style, method);
   return true;
 };
