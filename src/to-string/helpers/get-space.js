@@ -24,7 +24,7 @@ var fill = require('../../helpers').fill;
 var colors = require('../../helpers/colors');
 
 /**
- * @param {string} space
+ * @param {number} space
  * @param {string=} style
  * @return {string}
  */

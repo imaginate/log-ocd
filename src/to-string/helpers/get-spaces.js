@@ -23,8 +23,8 @@
 var getSpace = require('./get-space');
 
 /**
- * @param {string} spaceBefore
- * @param {string} spaceAfter
+ * @param {number} spaceBefore
+ * @param {number} spaceAfter
  * @param {string=} style
  * @return {!Array<string>}
  */
