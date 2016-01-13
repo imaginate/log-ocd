@@ -14,15 +14,27 @@
 
 'use strict';
 
-// You can set the config for each or all methods with the constructor or
-var log = require('./src/log-ocd')({
-  all:   { argMap: true },
-  error: { exit: false }
-});
-// with the setConfig and resetConfig methods
-log.setConfig('fail.spaceBefore', 0);
-log.setConfig('pass.spaceAfter', 0);
+var log = require('./log-ocd')();
+
+// update config for all methods
+log.setConfig('all', { ocdmap: true });
+// or
+log.setConfig({ ocdmap: true });
+
+// update config for one method
+log.setConfig('error', { exit: false });
+// or
+log.error.setConfig({ exit: false });
+
+// reset config for one method
 log.resetConfig('pass');
+// or
+log.pass.resetConfig();
+
+// set or reset format and style the same as config
+log.setFormat('fail', { linesBefore: 0 });
+log.fail.setStyle({ msg: { color: 'blue' } });
+log.resetStyle('fail');
 
 // note: log-ocd uses two traces so add two to any limit change you make
 Error.stackTraceLimit = 6;
