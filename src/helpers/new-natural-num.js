@@ -26,9 +26,9 @@ var round = Math.round;
  * @param {number=} val
  * @return {number}
  */
-module.exports = function newNaturalNum(val) {
+function newNaturalNum(val) {
   return val && val > 0 ? round(val) : 0;
-};
+}
 
 /**
  * @param {number} base
@@ -41,3 +41,9 @@ newNaturalNum.build = function buildNewNaturalNum(base) {
     return val < base ? base : round(val);
   };
 };
+
+/**
+ * @param {number=} val
+ * @return {number}
+ */
+module.exports = newNaturalNum;
