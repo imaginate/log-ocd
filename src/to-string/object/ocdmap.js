@@ -21,7 +21,9 @@
 'use strict';
 
 var help = require('../../helpers');
+var cut  = help.cut;
 var fuse = help.fuse;
+var has  = help.has;
 var roll = help.roll;
 
 var colors = require('../../helpers/colors');
@@ -32,6 +34,8 @@ var getSpaces = require('../helpers/get-spaces');
 var getKeys = require('../helpers/get-keys');
 
 var toString = require('../index');
+
+var OCDMAP = /^_*ocdmap$/i;
 
 /**
  * @this {!Settings}
@@ -57,6 +61,9 @@ module.exports = function ocdmapToString(method, obj) {
   var val;
 
   keys = getKeys(obj);
+  keys = cut(keys, function(key) {
+    return !has(key, OCDMAP);
+  });
 
   if (!keys.length) return '';
 
