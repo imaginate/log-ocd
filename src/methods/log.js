@@ -78,9 +78,8 @@ module.exports = function log(method, vals) {
 
   if ( !error && is.error( vals[0] ) ) error = vals.shift();
   if ( !error && config['throw'] ) {
-    header = header ? fuse(header, ': ') : '';
-    msg   = msg || '';
-    error = fuse(header, msg);
+    error = header ? fuse(header, ': ') : '';
+    error = fuse(error, msg || '');
     error = new Error(error);
   }
   stack = config.stack ? newStack(error) : null;
