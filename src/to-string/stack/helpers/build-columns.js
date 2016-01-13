@@ -100,7 +100,7 @@ function fixColumnsLen(columns, maxLen) {
   while (dist) dist = distColumns(dist);
   columns.over = true;
   return columns;
-};
+}
 
 /**
  * @private
@@ -117,7 +117,7 @@ function getColumnsLen(columns) {
     len += column.spread;
   });
   return len;
-};
+}
 
 /**
  * @private
@@ -147,7 +147,7 @@ function distColumns(columns) {
       over = column.spread > per;
       if (!over) columns.max -= column.spread;
       return over;
-    };
+    });
   }
 
   each(columns, function(column) {
@@ -157,4 +157,4 @@ function distColumns(columns) {
     column.over = true;
   });
   return null;
-};
+}
