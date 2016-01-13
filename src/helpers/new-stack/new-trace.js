@@ -69,7 +69,7 @@ module.exports = function newTrace(traceStr, base) {
 
   if ( isNative(traceStr) ) return nativeTrace(trace);
 
-  each(PARTS, function(obj, key) {
+  each(KEYS, function(obj, key) {
     trace = amend(trace, key, obj.make(traceStr), obj.type);
   });
   trace.module = getModule(traceStr, base, trace);
@@ -82,7 +82,7 @@ module.exports = function newTrace(traceStr, base) {
  * @return {!Trace}
  */
 function nativeTrace(trace) {
-  each(PARTS, function(obj, key) {
+  each(KEYS, function(obj, key) {
     trace = amend(trace, key, slice(obj.nat), obj.type);
   });
   return freeze(trace, true);
