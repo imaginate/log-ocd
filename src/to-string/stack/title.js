@@ -54,7 +54,7 @@ module.exports = function titleToString(columns, style) {
 
   style += '.title';
   format = this.trace.format.row;
-  spaces = getSpaces(format.spacesBefore, format.spacesAfter, style);
+  spaces = getSpaces(format.spaceBefore, format.spaceAfter, style);
 
   style += '.';
   vals = buildVals(columns);

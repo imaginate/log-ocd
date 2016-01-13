@@ -47,8 +47,8 @@ module.exports = function rowsToString(stack, columns, style) {
   format = this.trace.format.row;
   style += '.row.';
   spaces = {
-    even: getSpaces(format.spacesBefore, format.spacesAfter, style + 'even'),
-    odd:  getSpaces(format.spacesBefore, format.spacesAfter, style + 'odd')
+    even: getSpaces(format.spaceBefore, format.spaceAfter, style + 'even'),
+    odd:  getSpaces(format.spaceBefore, format.spaceAfter, style + 'odd')
   };
   result = '';
   each(stack, function(trace, i) {
