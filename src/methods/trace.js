@@ -52,7 +52,7 @@ module.exports = function logTrace(error) {
 
   if ( !is('error=', error) ) return typeError(this, 'trace', 'error', error);
 
-  this = setupSettings(this);
+  setupSettings(this);
   config = this.trace.config;
   format = this.trace.format;
 
