@@ -20,7 +20,10 @@
 
 'use strict';
 
-var each = require('../../helpers').each;
+var help = require('../../helpers');
+var is   = help.is;
+var fuse = help.fuse;
+var roll = help.roll;
 
 var getSpaces = require('../helpers/get-spaces');
 
@@ -37,23 +40,23 @@ module.exports = function rowsToString(stack, columns, style) {
 
   /** @type {!StackFormat} */
   var format;
-  /** @type {string} */
-  var result;
   /** @type {!{ odd: !Array<string>, even: !Array<string> }} */
   var spaces;
+  /** @type {number} */
+  var last;
   /** @type {string} */
   var nth;
 
   format = this.trace.format.row;
-  style += '.row.';
+  style = fuse(style, '.row.');
   spaces = {
-    even: getSpaces(format.spaceBefore, format.spaceAfter, style + 'even'),
-    odd:  getSpaces(format.spaceBefore, format.spaceAfter, style + 'odd')
+    even: getSpaces(format.spaceBefore, format.spaceAfter, fuse(style, 'even')),
+    odd:  getSpaces(format.spaceBefore, format.spaceAfter, fuse(style, 'odd'))
   };
-  result = '';
-  each(stack, function(trace, i) {
-    nth = i % 2 ? 'odd' : 'even';
-    result += rowToString(trace, columns, spaces[nth], style + nth);
+  last = stack.length - 1;
+  return roll.up('', stack, function(trace, i) {
+    nth = is.odd(i) ? 'odd' : 'even';
+    trace = rowToString(trace, columns, spaces[nth], fuse(style, nth));
+    return i < last ? fuse(trace, '\n') : trace;
   });
-  return result;
 };
