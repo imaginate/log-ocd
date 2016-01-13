@@ -27,7 +27,7 @@ var cut = require('../index').cut;
  * @type {!RegExp}
  * @const
  */
-var OPEN_SLASH = freeze( /^\// );
+var OPEN_SLASH = /^\//;
 
 /**
  * @param {string} dir
