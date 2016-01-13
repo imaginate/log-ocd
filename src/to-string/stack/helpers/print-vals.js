@@ -20,7 +20,9 @@
 
 'use strict';
 
-var each = require('../../../helpers').each;
+var help = require('../../../helpers');
+var fuse = help.fuse;
+var roll = help.roll;
 
 var colors = require('../../../helpers/colors');
 
@@ -38,10 +40,10 @@ module.exports = function printVals(vals, columns, space, style) {
   /** @type {string} */
   var val;
 
-  result = space[0];
-  each(columns, function(column, i) {
-    val = column.space[0] + vals[i] + column.space[1];
-    result += colors[style + column.key](val);
+  result = roll.up(space[0], columns, function(column, i) {
+    val = fuse(column.space[0], vals[i], column.space[1]);
+    i = fuse(style, column.key);
+    return colors[i](val);
   });
-  return result + space[1] + '\n';
+  return fuse(result, space[1]);
 };
