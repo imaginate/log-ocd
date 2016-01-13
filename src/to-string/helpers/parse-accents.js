@@ -20,6 +20,7 @@
 
 'use strict';
 
+var has = require('../../helpers').has;
 var escape = require('../../helpers/escape');
 
 /**
