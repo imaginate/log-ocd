@@ -71,6 +71,7 @@ module.exports = function ocdmapToString(method, obj) {
   format = this[method].format.ocdmap;
   spaces = getSpaces(format.spaceBefore, format.spaceAfter, style);
   delimiter = getDelimiter(format.delimiter, style);
+  delimiter = fuse(delimiter, ' ');
   last = keys.length - 1;
   return roll.up('', keys, function(key, i) {
     val = toString.call(this, method, obj[key]);
