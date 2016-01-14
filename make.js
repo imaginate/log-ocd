@@ -23,6 +23,7 @@
 'use strict';
 
 // append global helpers for tasks
+require('node-are')();
 require('node-vitals')(2, 'all');
 global.newTask = require('./_tasks/_helpers/new-task.js');
 
@@ -43,16 +44,20 @@ var taskDir = './_tasks';
 var shortcuts;
 /** @type {!Array<string>} */
 var tasks;
+/** @type {string} */
+var key;
 
 shortcuts = {
-  dev: 'compile'
+  v: 'version'
 };
-
-tasks = process.argv;
-tasks = tasks.length > 2 ? slice(tasks, 2) : shortcuts.dev.split(' ');
+tasks = slice(process.argv, 2);
+if (!tasks.length) throw new Error('A makefile task must be entered.');
 tasks = remap(tasks, function(task){
-  task = task.replace(/^--/, '');
-  return has(shortcuts, task) ? shortcuts[task] : task;
+  task = cut(task, /^--/);
+  key = cut(task, /[^a-z].*$/i);
+  return has(shortcuts, key)
+    ? fuse(shortcuts[key], cut(task, /^[a-z]+/i))
+    : task;
 });
 
 
@@ -60,7 +65,7 @@ tasks = remap(tasks, function(task){
 // PREP THE TASK DIRECTORY
 ////////////////////////////////////////////////////////////////////////////////
 
-taskDir = taskDir ? taskDir.replace(/([^\/])$/, '$1/') : './_tasks/';
+taskDir = taskDir ? remap(taskDir, /[^\/]$/, '$&/') : './_tasks/';
 
 if ( !is.dir(taskDir) ) {
   throw new RangeError('The makefile tasks directory does not exist.');
@@ -87,7 +92,7 @@ each(tasks, function(taskStr) {
   var val;
 
   name = getName(taskStr);
-  file = taskDir + name + '.js';
+  file = fuse(taskDir, name, '.js');
   methods = taskStr.split('-');
   defaultVal = getVal( methods.shift() );
 
