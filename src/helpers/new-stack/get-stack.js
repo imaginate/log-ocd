@@ -24,6 +24,8 @@ var help = require('../index');
 var cut   = help.cut;
 var has   = help.has;
 var remap = help.remap;
+var slice = help.slice;
+var until = help.until;
 
 /**
  * @param {!Error=} error
@@ -64,7 +66,13 @@ function cleanStack(stack) {
  * @return {!Array}
  */
 function stripTraces(stack) {
-  return cut(stack, function(trace) {
-    return !has(trace, 'log-ocd.js');
+
+  /** @type {number} */
+  var index;
+
+  until(false, stack, function(trace, i) {
+    index = i;
+    return has(trace, 'log-ocd/src');
   });
+  return index ? slice(stack, index) : stack;
 }
