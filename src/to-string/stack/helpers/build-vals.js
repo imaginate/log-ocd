@@ -21,22 +21,24 @@
 'use strict';
 
 var help = require('../../../helpers');
+var is    = help.is;
+var fuse  = help.fuse;
 var remap = help.remap;
 var slice = help.slice;
 
 /**
  * @param {Columns} columns
  * @param {Trace=} trace
- * @return {string}
+ * @return {!Array<string>}
  */
 module.exports = function buildVals(columns, trace) {
 
   if (!trace) return buildTitleVals(columns);
 
   return remap(columns, function(column) {
-    return column.key !== 'file' || !column.dirs
-      ? trace[column.key]
-      : buildFileVal(column.dirs, trace.dir, trace.file);
+    return is.same(column.key, 'file') && column.dirs
+      ? buildFileVal(column.dirs, trace.dir, trace.file)
+      : trace[column.key];
   });
 };
 
@@ -60,10 +62,13 @@ function buildTitleVals(columns) {
  */
 function buildFileVal(len, dirpath, file) {
 
-  /** @type {number} */
-  var i;
+  /** @type {string} */
+  var result;
 
-  i = len === -1 ? 0 : 0 - len;
-  dirpath = slice(dirpath, i);
-  return dirpath.join('/') + '/' + file;
+  if (len > -1) {
+    len = 0 - len;
+    dirpath = slice(dirpath, len);
+  }
+  result = dirpath.join('/');
+  return fuse(result, '/', file);
 }
