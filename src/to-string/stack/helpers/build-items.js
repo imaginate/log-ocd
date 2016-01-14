@@ -21,7 +21,9 @@
 'use strict';
 
 var help = require('../../../helpers');
+var is    = help.is;
 var fill  = help.fill;
+var fuse  = help.fuse;
 var remap = help.remap;
 var slice = help.slice;
 var until = help.until;
@@ -42,6 +44,8 @@ module.exports = function buildItems(columns, vals) {
   var remain;
   /** @type {Items} */
   var items;
+  /** @type {Item} */
+  var item;
   /** @type {!Array<boolean>} */
   var done;
 
@@ -55,31 +59,30 @@ module.exports = function buildItems(columns, vals) {
     done[i] = true;
     return fill(column[i].len, ' ');
   });
+  done.remain = remain;
   until(0, 100, function() {
-    return addItem(remain, items, columns, vals, done);
+    item = newItem(columns, vals, done);
+    items = fuse.val(items, item);
+    return done.remain;
   });
   return items;
 };
 
 /**
  * @private
- * @param {number} remain
- * @param {Items} items
  * @param {Columns} columns
  * @param {!Array<string>} vals
  * @param {!Array<boolean>} done
- * @return {number}
+ * @return {Item}
  */
-function addItem(remain, items, columns, vals, done) {
+function newItem(columns, vals, done) {
 
   /** @type {Column} */
   var column;
   /** @type {string} */
   var space;
-  /** @type {Item} */
-  var item;
 
-  item = remap(vals, function(val, i) {
+  return remap(vals, function(val, i) {
 
     if ( done[i] ) return val;
 
@@ -91,13 +94,12 @@ function addItem(remain, items, columns, vals, done) {
       return slice(val, 0, i);
     }
 
-    --remain;
+    --done.remain;
     done[i] = true;
     vals[i] = fill(column.len, ' ');
     space = fill(column.len - val.length, ' ');
-    return column.align === 'left' ? val + space : space + val;
+    return is.same(column.align, 'left')
+      ? fuse(val, space)
+      : fuse(space, val);
   });
-
-  items.push(item);
-  return remain;
 }
