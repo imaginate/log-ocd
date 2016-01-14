@@ -20,7 +20,9 @@
 
 'use strict';
 
-var fill = require('../../../helpers').fill;
+var help = require('../../../helpers');
+var is   = help.is;
+var fill = help.fill;
 
 /**
  * @typedef {!{
@@ -35,35 +37,43 @@ var fill = require('../../../helpers').fill;
  * }} Column
  */
 
+var ALIGN = {
+  'event':  'left',
+  'file':   'left',
+  'module': 'left',
+  'line':   'right',
+  'column': 'right'
+};
+
 /**
- * @this {!Settings}
- * @param {!Stack} stack
+ * @param {Settings} settings
+ * @param {Stack} stack
  * @param {string} key
  * @param {string} title
- * @return {!Column}
+ * @return {Column}
  */
-module.exports = function buildColumn(stack, key, title) {
+module.exports = function buildColumn(settings, stack, key, title) {
 
-  /** @type {!Column} */
+  /** @type {Column} */
   var column;
-  /** @type {!StackFormat} */
+  /** @type {StackFormat} */
   var format;
   /** @type {number} */
   var limit;
 
-  format = this.trace.format[key];
+  format = settings.trace.format[key];
   column = {
     key:   key,
     len:   stack[key],
     over:  false,
     title: title,
-    align: key === 'line' || key === 'column' ? 'right' : 'left',
+    align: ALIGN[key],
     space: [
       fill(format.spaceBefore, ' '),
       fill(format.spaceAfter,  ' ')
     ]
   };
-  if (key === 'file') column.dirs = format.dirDepth;
+  if ( is.same(key, 'file') ) column.dirs = format.dirDepth;
   if (title.length > column.len) column.len = title.length;
   limit = format.lineLimit;
   if (limit && column.len > limit) {
