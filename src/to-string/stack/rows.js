@@ -30,33 +30,66 @@ var getSpaces = require('../helpers/get-spaces');
 var rowToString = require('./row');
 
 /**
- * @this {!Settings}
- * @param {!Stack} stack
- * @param {!Columns} columns
+ * @typedef {!{
+ *   odd:  !Array<string>,
+ *   even: !Array<string>
+ * }} AltSpaces
+ */
+
+/**
+ * @param {Settings} settings
+ * @param {Stack} stack
+ * @param {Columns} columns
  * @param {string} style
  * @return {string}
  */
-module.exports = function rowsToString(stack, columns, style) {
+module.exports = function rowsToString(settings, stack, columns, style) {
 
-  /** @type {!StackFormat} */
+  /** @type {StackFormat} */
   var format;
-  /** @type {!{ odd: !Array<string>, even: !Array<string> }} */
+  /** @type {AltSpaces} */
   var spaces;
+  /** @type {string} */
+  var space;
   /** @type {number} */
   var last;
   /** @type {string} */
   var nth;
 
-  format = this.trace.format.row;
+  format = settings.trace.format.row;
   style = fuse(style, '.row.');
-  spaces = {
-    even: getSpaces(format.spaceBefore, format.spaceAfter, fuse(style, 'even')),
-    odd:  getSpaces(format.spaceBefore, format.spaceAfter, fuse(style, 'odd'))
-  };
+  spaces = newAltSpaces(format, style);
   last = stack.length - 1;
   return roll.up('', stack, function(trace, i) {
     nth = is.odd(i) ? 'odd' : 'even';
-    trace = rowToString(trace, columns, spaces[nth], fuse(style, nth));
+    space = spaces[nth];
+    nth = fuse(style, nth);
+    trace = rowToString(trace, columns, space, nth);
     return i < last ? fuse(trace, '\n') : trace;
   });
 };
+
+/**
+ * @private
+ * @param {StackFormat} format
+ * @param {string} style
+ * @return {AltSpaces}
+ */
+function newAltSpaces(format, style) {
+  return {
+    even: newAltSpace(format, style, 'even'),
+    odd:  newAltSpace(format, style, 'odd')
+  };
+}
+
+/**
+ * @private
+ * @param {StackFormat} format
+ * @param {string} style
+ * @param {string} nth
+ * @return {!Array<string>}
+ */
+function newAltSpace(format, style, nth) {
+  style = fuse(style, nth);
+  return getSpaces(format.spaceBefore, format.spaceAfter, style);
+}
