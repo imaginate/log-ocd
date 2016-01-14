@@ -55,7 +55,7 @@ module.exports = function rootToString(settings, stack, style) {
   /** @type {number} */
   var intro;
 
-  if (!settings.trace.config.root) return '';
+  if (!settings.trace.config.root || !stack.base) return '';
 
   style = fuse(style, '.root');
   format = settings.trace.format.root;
