@@ -89,10 +89,10 @@ type['nan'] = {
 };
 
 type['regexp'] = {
-  'color':      'white',
+  'color':      'green',
   'identifier': { color: 'yellow' },
-  'brackets':   { color: 'yellow' },
-  'flags':      { color: 'yellow' }
+  'brackets':   { color: 'white'  },
+  'flags':      { color: 'white'  }
 };
 
 type['array'] = {
