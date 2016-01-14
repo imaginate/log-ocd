@@ -114,30 +114,35 @@ types = fuse(types, {
   }
 });
 base = {
-  'spaceBefore': { type: 'number', val: 0, setter: newNaturalNum },
-  'spaceAfter':  { type: 'number', val: 0, setter: newNaturalNum },
-  'lineLimit':   { type: 'number', val: 0, setter: newNaturalNum }
+  'spaceAfter': { type: 'number', val: 0, setter: newNaturalNum },
+  'lineLimit':  { type: 'number', val: 0, setter: newNaturalNum }
 };
 types = buildNewProps(types, base, {
   'root': {
-    'identifier': { type: 'string', val: '' },
-    'brackets':   { type: 'string', val: '' }
+    'spaceBefore': { type: 'number', val: 0, setter: newNaturalNum },
+    'identifier':  { type: 'string', val: '' },
+    'brackets':    { type: 'string', val: '' }
   },
   'event': {
-    'title':    { type: 'string', val: 'event' }
+    'spaceBefore': { type: 'number', val: 0, setter: newNaturalNum },
+    'title':       { type: 'string', val: 'event' }
   },
   'file': {
-    'dirDepth': { type: 'number', val: -1, setter: newNaturalNum.build(-1) },
-    'title':    { type: 'string', val: 'file' }
+    'spaceBefore': { type: 'number', val: 1,  setter: newNaturalNum },
+    'dirDepth':    { type: 'number', val: -1, setter: newNaturalNum.build(-1) },
+    'title':       { type: 'string', val: 'file' }
   },
   'module': {
-    'title':    { type: 'string', val: 'module' }
+    'spaceBefore': { type: 'number', val: 1, setter: newNaturalNum },
+    'title':       { type: 'string', val: 'module' }
   },
   'line': {
-    'title':    { type: 'string', val: 'line' }
+    'spaceBefore': { type: 'number', val: 1, setter: newNaturalNum },
+    'title':       { type: 'string', val: 'line' }
   },
   'column': {
-    'title':    { type: 'string', val: 'column' }
+    'spaceBefore': { type: 'number', val: 1, setter: newNaturalNum },
+    'title':       { type: 'string', val: 'column' }
   }
 });
 
