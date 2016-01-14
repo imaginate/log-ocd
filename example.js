@@ -24,7 +24,7 @@ log.setConfig({ ocdmap: true });
 // update config for one method
 log.setConfig('error', { 'throw': false });
 // or
-log.error.setConfig({ 'throw': false });
+log.trace.setConfig({ 'root': false });
 
 // reset config for one method
 log.resetConfig('pass');
@@ -35,9 +35,6 @@ log.pass.resetConfig();
 log.setFormat('fail', { linesBefore: 0 });
 log.fail.setStyle({ msg: { color: 'blue' } });
 log.resetStyle('fail');
-
-// note: log-ocd uses two traces so add two to any limit change you make
-Error.stackTraceLimit = 6;
 
 log('a quick message');
 log.pass('A `Success` Story', { ocdmap: true, easily: 'view', given: 'values' }, 'plus', { endless: 'superfluous', extra: 'details' });
