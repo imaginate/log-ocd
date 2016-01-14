@@ -1,6 +1,8 @@
-### Simply, Awesome Logging for Node.js
-[_log-ocd_](https://github.com/imaginate/log-ocd) is the best way to handle logging for Node.js. It is easy to use and makes all logs more legible. Forget ``` console.log ``` and start using [_log-ocd_](https://github.com/imaginate/log-ocd) today!
+# log-ocd [![npm version](https://badge.fury.io/js/log-ocd.svg)](https://badge.fury.io/js/log-ocd)
+### A New Logging Level
+[_log-ocd_](https://github.com/imaginate/log-ocd) is the best way to handle [node.js](https://nodejs.org) logging. It will increase your efficiency with **beyond legible logs** and simple architecture. For the ocd among us, you can **easily customize an insane number of details** from error handling to font colors to type bullets and brackets and delimiters, oh my! Quite simply, your logs will never be the same.
 
+## Example
 ```javascript
 // make a local log-ocd instance
 var log = require('log-ocd')();
@@ -53,23 +55,20 @@ log.debug('A Beacon of `Hope`', [
 <img src="http://www.algorithmiv.com/images/log-ocd/example-c9783b9285f4f7f1abfd.png" alt="log-ocd Example" />
 
 
-## Getting Started
+## Install
 ```bash
 $ npm install log-ocd
 ```
-```javascript
-var log = require('log-ocd')([options]);
-```
 
 
-## API Documentation
-- [log-ocd config methods](https://github.com/imaginate/log-ocd/blob/master/docs/config-methods.md)
-- [log-ocd logging methods](https://github.com/imaginate/log-ocd/blob/master/docs/logging-methods.md)
+## Documentation
+The docs for version 1.0.0 will be ready with the live launch (i.e. currently in beta).
 
 
-## Contact Us
-- [Open an issue](https://github.com/imaginate/log-ocd/issues) on this GitHub repository
-- Send an email to [learn@algorithmiv.com](mailto:learn@algorithmiv.com)
+## Other Details
+**contributing:** [see contributing guideline](https://github.com/imaginate/log-ocd/blob/master/CONTRIBUTING.md)<br>
+**bugs/improvements:** [open an issue](https://github.com/imaginate/log-ocd/issues)<br>
+**questions:** learn@algorithmiv.com
 
 
 --
