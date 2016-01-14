@@ -22,6 +22,7 @@
 
 var help = require('../../helpers');
 var fill  = help.fill;
+var fuse  = help.fuse;
 var slice = help.slice;
 
 var colors = require('../../helpers/colors');
@@ -32,12 +33,12 @@ var getSpace = require('../helpers/get-space');
 var getLimit = require('../helpers/get-limit');
 
 /**
- * @this {!Settings}
- * @param {!Stack} stack
+ * @param {Settings} settings
+ * @param {Stack} stack
  * @param {string} style
  * @return {string}
  */
-module.exports = function rootToString(stack, style) {
+module.exports = function rootToString(settings, stack, style) {
 
   /** @type {string} */
   var identifier;
@@ -52,21 +53,21 @@ module.exports = function rootToString(stack, style) {
   /** @type {number} */
   var limit;
   /** @type {number} */
-  var len;
+  var intro;
 
-  if (!this.trace.config.root) return '';
+  if (!settings.trace.config.root) return '';
 
-  style += '.root';
-  format = this.trace.format.root;
-  len = format.brackets.length ? 1 : 0;
-  len += format.identifier.length + format.spaceBefore;
+  style = fuse(style, '.root');
+  format = settings.trace.format.root;
+  intro = format.brackets.length && 1;
+  intro = intro + format.identifier.length + format.spaceBefore;
   identifier = getIdentifier(format.identifier, style);
   brackets = getBrackets(format.brackets, style);
   space = getSpace(format.spaceBefore, style);
-  limit = getLimit(format.lineLimit, this.__maxLen);
-  dirpath = divideRoot(stack.base, limit, len);
+  limit = getLimit(format.lineLimit, settings.__maxLen);
+  dirpath = divideRoot(stack.base, limit, intro);
   dirpath = colors[style](dirpath);
-  return space + identifier + brackets[0] + dirpath + brackets[1] + '\n';
+  return fuse(space, identifier, brackets[0], dirpath, brackets[1], '\n');
 };
 
 /**
@@ -82,6 +83,8 @@ function divideRoot(dirpath, limit, intro) {
   var result;
   /** @type {string} */
   var indent;
+  /** @type {string} */
+  var part;
   /** @type {number} */
   var i;
 
@@ -97,9 +100,9 @@ function divideRoot(dirpath, limit, intro) {
   dirpath = slice(dirpath, limit);
   indent = fill(intro, ' ');
   while (dirpath.length > limit) {
-    result += '\n' + indent + slice(dirpath, 0, limit);
+    part = slice(dirpath, 0, limit);
+    result = fuse(result, '\n', indent, part);
     dirpath = slice(dirpath, limit);
   }
-  result += dirpath && '\n' + indent + dirpath;
-  return result;
+  return fuse(result, '\n', indent, dirpath);
 }
