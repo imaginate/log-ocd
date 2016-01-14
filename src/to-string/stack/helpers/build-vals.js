@@ -65,10 +65,12 @@ function buildFileVal(len, dirpath, file) {
   /** @type {string} */
   var result;
 
+  if (!dirpath.length) return file;
+
   if (len > -1) {
     len = 0 - len;
     dirpath = slice(dirpath, len);
   }
-  result = dirpath.join('/');
+  result = dirpath.join('');
   return fuse(result, '/', file);
 }
