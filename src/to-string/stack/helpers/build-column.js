@@ -21,14 +21,18 @@
 'use strict';
 
 var help = require('../../../helpers');
-var is   = help.is;
-var fill = help.fill;
+var is    = help.is;
+var fill  = help.fill;
+var fuse  = help.fuse;
+var remap = help.remap;
+var roll  = help.roll;
+var slice = help.slice;
 
 /**
  * @typedef {!{
  *   key:    string,
  *   len:    number,
- *   dirs:   (number|undefined),
+ *   dirs:   Array<string>,
  *   over:   boolean,
  *   title:  string,
  *   align:  string,
@@ -65,6 +69,7 @@ module.exports = function buildColumn(settings, stack, key, title) {
   column = {
     key:   key,
     len:   stack[key],
+    dirs:  null,
     over:  false,
     title: title,
     align: ALIGN[key],
@@ -73,7 +78,10 @@ module.exports = function buildColumn(settings, stack, key, title) {
       fill(format.spaceAfter,  ' ')
     ]
   };
-  if ( is.same(key, 'file') ) column.dirs = format.dirDepth;
+  if ( is.same(key, 'file') ) {
+    column.dirs = getDirs(format.dirDepth, stack);
+    column.len = getLen(column.len, column.dirs);
+  }
   if (title.length > column.len) column.len = title.length;
   limit = format.lineLimit;
   if (limit && column.len > limit) {
@@ -83,3 +91,49 @@ module.exports = function buildColumn(settings, stack, key, title) {
   column.spread = column.len + column.space[0].length + column.space[1].length;
   return column;
 };
+
+/**
+ * @private
+ * @param {number} dirDepth
+ * @param {Stack} stack
+ * @return {!Array<string>}
+ */
+function getDirs(dirDepth, stack) {
+  return remap(stack, function(trace) {
+    return getDir(dirDepth, trace.dir, trace.file);
+  });
+}
+
+/**
+ * @private
+ * @param {number} dirDepth
+ * @param {!Array<string>} dirpath
+ * @param {string} file
+ * @return {string}
+ */
+function getDir(dirDepth, dirpath, file) {
+
+  /** @type {number} */
+  var index;
+
+  if (!dirpath.length) return file;
+
+  if (dirDepth > -1) {
+    index = 0 - dirDepth;
+    dirpath = slice(dirpath, index);
+  }
+  dirpath = dirpath.join('');
+  return fuse(dirpath, '/', file);
+}
+
+/**
+ * @private
+ * @param {number} len
+ * @param {!Array<string>} dirs
+ * @return {number}
+ */
+function getLen(len, dirs) {
+  return roll(len, dirs, function(len, dir) {
+    return dir.length > len ? dir.length : len;
+  });
+}
