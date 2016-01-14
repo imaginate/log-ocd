@@ -81,6 +81,8 @@ function newItem(columns, vals, done) {
   var column;
   /** @type {string} */
   var space;
+  /** @type {number} */
+  var index;
 
   return remap(vals, function(val, i) {
 
@@ -89,9 +91,9 @@ function newItem(columns, vals, done) {
     column = columns[i];
 
     if (val.length > column.len) {
-      i = column.len + 1;
-      vals[i] = slice(val, i);
-      return slice(val, 0, i);
+      index = column.len + 1;
+      vals[i] = slice(val, index);
+      return slice(val, 0, index);
     }
 
     --done.remain;
