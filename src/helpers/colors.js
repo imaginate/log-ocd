@@ -162,7 +162,7 @@ function buildTitleThemes(name, theme) {
 /**
  * @private
  * @param {string} name
- * @param {!StackRowTheme} theme
+ * @param {StackRowTheme} theme
  * @return {!Object}
  */
 function buildRowThemes(name, theme) {
@@ -174,20 +174,22 @@ function buildRowThemes(name, theme) {
 
   themes = {};
   name = fuse(name, '.');
-  themes[ fuse(name, 'odd') ] = makeTheme(theme);
-  themes[ fuse(name, 'even') ] = makeTheme(theme.alternate);
+  themes[ fuse(name, 'even') ] = makeTheme(theme);
+  themes[ fuse(name, 'odd')  ] = makeTheme(theme.alternate);
 
-  props = {};
-  props.odd  = buildProps(theme);
-  props.even = buildProps(theme.alternate);
+  props = {
+    'even': buildProps(theme),
+    'odd':  buildProps(theme.alternate)
+  };
+
   each(theme, function(val, key) {
     if ( !is.obj(val) || is.same(key, 'alternate') ) return;
-    val = buildProps(val, props.odd);
-    val = newTheme(val);
-    themes[ fuse(name, 'odd.', key) ] = makeTheme(val);
     val = buildProps(val, props.even);
     val = newTheme(val);
     themes[ fuse(name, 'even.', key) ] = makeTheme(val);
+    val = buildProps(val, props.odd);
+    val = newTheme(val);
+    themes[ fuse(name, 'odd.', key) ] = makeTheme(val);
   });
 
   return themes;
@@ -195,7 +197,7 @@ function buildRowThemes(name, theme) {
 
 /**
  * @private
- * @param {!Theme} theme
+ * @param {Theme} theme
  * @param {!Object=} props
  * @return {!Object}
  */
