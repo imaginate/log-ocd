@@ -25,8 +25,6 @@ var is    = help.is;
 var fuse  = help.fuse;
 var until = help.until;
 
-var colors = require('../../helpers/colors');
-
 var buildVals = require('./helpers/build-vals');
 var printVals = require('./helpers/print-vals');
 var buildItems = require('./helpers/build-items');
