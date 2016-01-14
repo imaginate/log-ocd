@@ -61,7 +61,7 @@ module.exports = function buildColumns(settings, stack) {
   format = settings.trace.format;
   columns = [];
   columns.over = false;
-  each('event, file, module, line, column', function(key) {
+  each('event, module, file, line, column', function(key) {
     if ( !config[key] ) return;
     title = config.title ? format[key].title : '';
     column = buildColumn(settings, stack, key, title);
