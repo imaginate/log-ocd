@@ -1,30 +1,31 @@
-### Support OCD Logging for Node.js
-All contributions are appreciated! Please follow the below directions for contributing to [log-ocd](https://github.com/imaginate/log-ocd).
-
+# Contributing Guide
+### Show Some Logging Love
+All OCD contributions for _[log-ocd](https://github.com/imaginate/log-ocd)_ are appreciated! Please follow the below directions.
 
 ## Directions
 - Fork and clone this repository
 - Create a new branch for your additions
-- Add your contribution to [the parts directory](https://github.com/imaginate/log-ocd/tree/master/parts)
-- Add your tests to [the tests directory](https://github.com/imaginate/log-ocd/tree/master/tests)
-- Run ```$ node make ``` to compile the source
-- Run ```$ npm test ``` to run the tests
+- Add your contributions
+- Add tests for your contributions
+- Run ```$ npm test ```
 - Debug your additions
 - Submit a pull request
 
 
 ## Pointers
-- Follow the coding conventions you see in the existing code (see [Google's style guide](https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml?showone=Code_formatting#Code_formatting) for similar conventions)
+- Ensure all additions are [ES5 compliant](http://www.ecma-international.org/publications/files/ECMA-ST-ARCH/ECMA-262%205th%20edition%20December%202009.pdf)
+- Follow the coding conventions you see in the existing code
 - Know and use [JSDoc3](http://usejsdoc.org/) with [Closure Compiler specific syntax](https://developers.google.com/closure/compiler/docs/js-for-compiler)
-- Include tests for all new functionality (new functionality without tests will not be accepted)
+- Include unit tests for all new functionality
+- Ensure all unit tests are passing before submitting a pull request
 
 
 ## Contact
-- [Open an issue](https://github.com/imaginate/log-ocd/issues) on this GitHub repository
-- Send an email to [learn@algorithmiv.com](mailto:learn@algorithmiv.com)
+- **bugs and improvements:** [open an issue](https://github.com/imaginate/log-ocd/issues)
+- **all other questions:** adam@imaginate.life
 
 
 --
-**Thanks for contributing,**
+**Live OCD,**
 
 <a href="http://www.algorithmiv.com/log-ocd"><img src="http://www.algorithmiv.com/images/aIV-logo.png" alt="Algorithm IV Logo" /></a>
