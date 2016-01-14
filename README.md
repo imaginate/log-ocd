@@ -15,41 +15,41 @@ log.setConfig({ 'exit': false });
 
 // set the config for one method
 log.setConfig('error', { 'ocdmap': true });
-log.trace.setConfig({ 'root': false });
+log.toString.setConfig({ 'style': false });
 
 // reset the config for one method
 log.resetConfig('warn');
 log.debug.resetConfig();
 
 // set and reset the format and style settings
-log.setFormat('fail', { 'linesBefore': 0 });
-log.warn.setFormat({ 'msg': { 'accentMark': '!' } });
+log.setFormat('log', { 'linesAfter': 0 });
+log.error.setFormat({ 'msg': { 'accentMark': '!' } });
 log.debug.setFormat({ 'lineLimit': 35 });
+log.trace.setFormat({ 'root': { 'identifier': 'stacktrace-root-dir: ' } });
 log.fail.setStyle({ 'msg': { 'color': 'blue' } });
 log.resetStyle('fail');
 
 log('a quick message');
 
-log.pass('A `Success` Story', 'and easy arg mapping via the ocdmap property', {
+log.pass('A Success Story', 'with easy arg mapping via ocdmap', {
   'ocdmap': true,
   'a': 1.2,
   'b': null,
   'c': 'yum'
 });
 
-log.error('A `Failure`', 'with some `guidance`', {
+var errorInst = require('log-ocd/example/error');
+log.error(errorInst, 'some !guidance! and a tale of !accented adventure!', {
   'plus': 'easier',
   'arg': 'mapping',
   'via': 'config.ocdmap',
   '===': true
 }, 'and the best (and most flexible) stacktrace printing');
 
-log.warn('A Word of `Caution`', 'with a tale of !accented adventure!');
-
 log.debug('A Beacon of `Hope`', [
   'that', 'AUTOMAGICALLY', 'adjusts'
 ], [
-  'to', 'the', 'line', 'limit'
+  'to', 'the', 'set', 'limit'
 ], /_or your max terminal width_/i);
 ```
 <img src="http://www.algorithmiv.com/images/log-ocd/example-c9783b9285f4f7f1abfd.png" alt="log-ocd Example" />
