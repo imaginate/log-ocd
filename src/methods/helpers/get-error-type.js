@@ -28,5 +28,5 @@ var get = require('../../helpers').get;
  */
 module.exports = function getErrorType(error) {
   error = error.toString();
-  return get(error, /^ *[a-z]+/)[0] || 'Error';
+  return get(error, /^ *[a-z]+/i)[0] || 'Error';
 };
