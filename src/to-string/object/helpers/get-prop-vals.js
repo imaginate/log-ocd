@@ -89,7 +89,7 @@ function getObjVals(settings, method, details, obj, color, intro) {
     len = getLen(val, len);
     return val;
   });
-  vals = fuse.top(vals, intro);
+  vals = fuse.val.top(vals, intro);
   vals.len = len < 0 ? len : getLen(details.brackets[1], len) + keys.length;
   return vals;
 }
@@ -121,7 +121,7 @@ function getArrVals(settings, method, details, arr, color, intro) {
     len = getLen(val, len);
     return val;
   });
-  vals = fuse.top(vals, intro);
+  vals = fuse.val.top(vals, intro);
   vals.len = len < 0 ? len : getLen(details.brackets[1], len) + arr.length;
   return vals;
 }
