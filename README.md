@@ -52,7 +52,7 @@ log.debug('A Beacon of `Hope`', [
   'to', 'the', 'set', 'limit'
 ], /_or your max terminal width_/i);
 ```
-<img src="http://www.algorithmiv.com/images/log-ocd/example-c9783b9285f4f7f1abfd.png" alt="log-ocd Example" />
+<img src="http://www.algorithmiv.com/images/log-ocd/example-4b4b357ffd482a1713ed.png" alt="log-ocd Example" />
 
 
 ## Install
