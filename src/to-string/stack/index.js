@@ -20,7 +20,7 @@
 
 'use strict';
 
-var each = require('../../helpers').each;
+var fuse = require('../../helpers').fuse;
 
 var getStyleKey = require('../helpers/get-style-key');
 var stripStyle = require('../helpers/strip-style');
@@ -33,9 +33,9 @@ var rowsToString = require('./rows');
 var titleToString = require('./title');
 
 /**
- * @this {!Settings}
+ * @this {Settings}
  * @param {string} method
- * @param {!Stack} stack
+ * @param {Stack} stack
  * @return {string}
  */
 module.exports = function stackToString(method, stack) {
@@ -46,11 +46,18 @@ module.exports = function stackToString(method, stack) {
   var result;
   /** @type {string} */
   var style;
+  /** @type {string} */
+  var title;
+  /** @type {string} */
+  var root;
+  /** @type {string} */
+  var rows;
 
   style = getStyleKey(this, 'trace');
-  columns = buildColumns.call(this, stack);
-  result = rootToString.call(this, stack, style);
-  result += titleToString.call(this, columns, style);
-  result += rowsToString.call(this, stack, columns, style);
+  columns = buildColumns(this, stack);
+  root = rootToString(this, stack, style);
+  title = titleToString(this, columns, style);
+  rows = rowsToString(this, stack, columns, style);
+  result = fuse(root, title, rows);
   return noStyle(this.trace.config) ? stripStyle(result) : result;
 };
