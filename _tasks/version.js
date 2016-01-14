@@ -24,7 +24,7 @@ var fs = require('fs');
 ////////////////////////////////////////////////////////////////////////////////
 
 /** @type {!Task} */
-module.exports = newTask('version', 'all', {
+module.exports = newTask('all', {
 
   /**
    * @param {string} version
@@ -34,24 +34,23 @@ module.exports = newTask('version', 'all', {
     /** @type {!Array<string>} */
     var filepaths;
 
-    isSemVersion(version) || log.error(
-      'Invalid `version.all` Task Call',
-      'a new semantic version was not provided',
-      { argMap: true, version: version }
-    );
+    if ( !isSemVersion(version) ) {
+      throw new RangeError('invalid semantic version for version.all task');
+    }
 
-    filepaths = retrieve.filepaths('.', {
+    filepaths = get.filepaths('.', {
+      deep: true,
       validExts: '.js',
       validDirs: 'parts|src',
       invalidFiles: 'make.js'
-    }, true);
-    filepaths.push('package.json');
+    });
+    fuse(filepaths, 'package.json');
 
-    each(filepaths, function(/** string */ filepath) {
+    each(filepaths, function(filepath) {
       insertVersion(filepath, version);
     });
 
-    log.pass('Completed `version.all` Task');
+    console.log('Completed version.all task');
   },
 
   /**
@@ -61,16 +60,19 @@ module.exports = newTask('version', 'all', {
 
     /** @type {!Array<string>} */
     var filepaths;
+    /** @type {!Array<string>} */
+    var newpath;
 
-    filepaths = retrieve.filepaths('.', {
+    filepaths = get.filepaths('.', {
       validExts: 'jpg|png|gif|jpeg'
-    }, false);
-
-    each(filepaths, function(/** string */ filepath) {
-      copy.file( filepath, hashFile(filepath) );
     });
 
-    log.pass('Completed `version.hash` Task');
+    each(filepaths, function(filepath) {
+      newpath = hashFile(filepath);
+      copy.file(filepath, newpath);
+    });
+
+    console.log('Completed version.hash task');
   }
 });
 
@@ -89,7 +91,7 @@ function isSemVersion(version) {
   var regex;
 
   regex = /^[0-9][0-9]?\.[0-9][0-9]?\.[0-9][0-9]?$/;
-  return is._str(version) && regex.test(version);
+  return is._str(version) && has(version, regex);
 }
 
 /**
@@ -98,16 +100,21 @@ function isSemVersion(version) {
  */
 function insertVersion(filepath, version) {
 
+  /** @type {string} */
+  var content;
   /** @type {!RegExp} */
   var regex;
 
-  regex = /^.*\.json$/.test(filepath) ?
-    /("version": ")[0-9][0-9]?\.[0-9][0-9]?\.[0-9][0-9]?/
-    : /\b(v?)[0-9][0-9]?\.[0-9][0-9]?\.[0-9][0-9]?\b/g;
+  if ( has(filepath, /^.*\.json$/) ) {
+    regex = /("version": ")[0-9][0-9]?\.[0-9][0-9]?\.[0-9][0-9]?/;
+  }
+  else {
+    regex = /\b(v?)[0-9][0-9]?\.[0-9][0-9]?\.[0-9][0-9]?\b/g;
+  }
 
-  retrieve.file(filepath)
-    .replace(regex, '$1' + version)
-    .to(filepath);
+  content = get.file(filepath);
+  content = remap(content, regex, fuse('$1', version));
+  to.file(filepath);
 }
 
 /**
@@ -121,11 +128,10 @@ function hashFile(filepath) {
   /** @type {string} */
   var hash;
 
-  content = retrieve.file(filepath, null);
+  content = get.file(filepath, true);
   hash = crypto.createHash('sha1')
     .update(content)
     .digest('hex')
     .slice(0, 20);
-
-  return filepath.replace(/^(.*)(\.[a-z]{2,5})$/i, '$1-' + hash + '$2');
+  return remap(filepath, /^(.*)(\.[a-z]{2,5})$/i, fuse('$1-', hash, '$2'));
 }
