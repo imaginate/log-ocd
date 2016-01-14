@@ -25,6 +25,7 @@ var cut    = help.cut;
 var each   = help.each;
 var fuse   = help.fuse;
 var freeze = help.freeze;
+var roll   = help.roll;
 var slice  = help.slice;
 var until  = help.until;
 
@@ -37,39 +38,39 @@ var buildColumn = require('./build-column');
  */
 
 /**
- * @this {!Settings}
- * @param {!Stack} stack
- * @return {!Columns}
+ * @param {Settings} settings
+ * @param {Stack} stack
+ * @return {Columns}
  */
-module.exports = function buildColumns(stack) {
+module.exports = function buildColumns(settings, stack) {
 
-  /** @type {!Columns} */
+  /** @type {Columns} */
   var columns;
-  /** @type {!Column} */
+  /** @type {Column} */
   var column;
-  /** @type {!Config} */
+  /** @type {Config} */
   var config;
-  /** @type {!Format} */
+  /** @type {Format} */
   var format;
   /** @type {number} */
   var maxLen;
   /** @type {string} */
   var title;
 
-  config = this.trace.config;
-  format = this.trace.format;
+  config = settings.trace.config;
+  format = settings.trace.format;
   columns = [];
   columns.over = false;
   each('event, file, module, line, column', function(key) {
     if ( !config[key] ) return;
     title = config.title ? format[key].title : '';
-    column = buildColumn.call(this, stack, key, title);
-    columns = fuse(columns, column);
+    column = buildColumn(settings, stack, key, title);
+    columns = fuse.val(columns, column);
     if (column.over) columns.over = true;
-  }, this);
+  });
 
   format = format.row;
-  maxLen = this.__maxLen - format.spaceBefore - format.spaceAfter;
+  maxLen = settings.__maxLen - format.spaceBefore - format.spaceAfter;
   if (maxLen < 0) maxLen = 0;
   columns = fixColumnsLen(columns, maxLen);
   each(columns, function(column) {
@@ -80,13 +81,13 @@ module.exports = function buildColumns(stack) {
 
 /**
  * @private
- * @param {!Columns} columns
+ * @param {Columns} columns
  * @param {number} maxLen
- * @return {!Columns}
+ * @return {Columns}
  */
 function fixColumnsLen(columns, maxLen) {
 
-  /** @type {!Columns} */
+  /** @type {Columns} */
   var dist;
   /** @type {number} */
   var len;
@@ -104,24 +105,18 @@ function fixColumnsLen(columns, maxLen) {
 
 /**
  * @private
- * @param {!Columns} columns
+ * @param {Columns} columns
  * @return {number}
  */
 function getColumnsLen(columns) {
-
-  /** @type {number} */
-  var len;
-
-  len = 0;
-  each(columns, function(column) {
-    len += column.spread;
+  return roll.up(0, columns, function(column) {
+    return column.spread;
   });
-  return len;
 }
 
 /**
  * @private
- * @param {!Columns} columns
+ * @param {Columns} columns
  * @return {?Columns}
  */
 function distColumns(columns) {
