@@ -69,8 +69,8 @@ module.exports = function newStack(error) {
     return !!base;
   });
 
-  stack = remap(stack, function(trace) {
-    return newTrace(trace, base);
+  stack = remap(stack, function(trace, i) {
+    return newTrace(i, trace, base);
   });
   stack.base = base;
 

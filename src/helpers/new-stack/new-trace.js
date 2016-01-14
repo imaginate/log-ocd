@@ -46,6 +46,7 @@ var KEYS = freeze({
 
 /**
  * @typedef {!{
+ *   index:  number,
  *   event:  string,
  *   dir:    !Array,
  *   file:   string,
@@ -56,16 +57,18 @@ var KEYS = freeze({
  */
 
 /**
+ * @param {number} index
  * @param {string} traceStr
  * @param {!Array<string>=} base
  * @return {!Trace}
  */
-module.exports = function newTrace(traceStr, base) {
+module.exports = function newTrace(index, traceStr, base) {
 
   /** @type {!Trace} */
   var trace;
 
   trace = newEmptyObj('Trace');
+  trace = amend(trace, 'index', index, 'number');
 
   if ( isNative(traceStr) ) return nativeTrace(trace);
 
