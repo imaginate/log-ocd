@@ -141,7 +141,7 @@ function error(intro, extra) {
  */
 function invalidMethod(method) {
   return new RangeError(
-    'Invalid method name , ' + method + ', for task, ' getTaskName() + '.'
+    fuse('Invalid method name , ', method, ', for task, ', getTaskName(), '.')
   );
 }
 
