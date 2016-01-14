@@ -27,6 +27,11 @@
  * @return {!Task}
  */
 module.exports = function newTask(defaultMethods, methods) {
+
+  if (arguments.length === 1) {
+    methods = defaultMethods;
+    defaultMethods = [];
+  }
   return new Task(defaultMethods, methods);
 };
 
@@ -42,11 +47,6 @@ module.exports = function newTask(defaultMethods, methods) {
  * @constructor
  */
 function Task(defaultMethods, methods) {
-
-  if (arguments.length === 1) {
-    methods = defaultMethods;
-    defaultMethods = [];
-  }
 
   if ( !is('!str|strs', defaultMethods) ) throw typeError('defaultMethods');
   if ( !is._obj(methods)                ) throw typeError('methods');
