@@ -21,11 +21,8 @@
 'use strict';
 
 var help = require('../../helpers');
-var is    = help.is;
 var fuse  = help.fuse;
 var until = help.until;
-
-var colors = require('../../helpers/colors');
 
 var getSpaces = require('../helpers/get-spaces');
 
@@ -60,13 +57,11 @@ module.exports = function titleToString(settings, columns, style) {
   style = fuse(style, '.title');
   format = settings.trace.format.row;
   spaces = getSpaces(format.spaceBefore, format.spaceAfter, style);
-
   style = fuse(style, '.');
   vals = buildVals(columns);
   over = columns.over && until(true, columns, function(column, i) {
     return val[i].length > column.len;
   });
-
   if (over) items = buildItems(columns, vals);
   result = over
     ? printItems(items, columns, spaces, style)
