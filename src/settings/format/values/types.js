@@ -89,11 +89,13 @@ types = {
     'indent':      { type: 'number', val: 2, setter: newNaturalNum }
   }
 };
+
 types = buildNewProps(types, types['array'], {
   'args': {
     'identifier':  { type: 'string', val: '[Arguments] ' }
   }
 });
+
 types = buildNewProps(types, types['object'], {
   'function': {
     'identifier':  { type: 'string', val: '[Function] ' }
@@ -113,36 +115,40 @@ types = fuse(types, {
     'spaceAfter':  { type: 'number', val: 1, setter: newNaturalNum }
   }
 });
+
 base = {
-  'spaceAfter': { type: 'number', val: 0, setter: newNaturalNum },
-  'lineLimit':  { type: 'number', val: 0, setter: newNaturalNum }
+  'spaceBefore': { type: 'number', val: 0, setter: newNaturalNum },
+  'spaceAfter':  { type: 'number', val: 0, setter: newNaturalNum },
+  'lineLimit':   { type: 'number', val: 0, setter: newNaturalNum }
 };
 types = buildNewProps(types, base, {
   'root': {
-    'spaceBefore': { type: 'number', val: 0, setter: newNaturalNum },
-    'identifier':  { type: 'string', val: '' },
-    'brackets':    { type: 'string', val: '' }
+    'identifier': { type: 'string', val: '' },
+    'brackets':   { type: 'string', val: '' }
   },
   'event': {
-    'spaceBefore': { type: 'number', val: 0, setter: newNaturalNum },
-    'title':       { type: 'string', val: 'event' }
-  },
+    'title':      { type: 'string', val: 'event' }
+  }
+});
+
+base = {
+  'spaceBefore': { type: 'number', val: 1, setter: newNaturalNum },
+  'spaceAfter':  { type: 'number', val: 0, setter: newNaturalNum },
+  'lineLimit':   { type: 'number', val: 0, setter: newNaturalNum }
+};
+types = buildNewProps(types, base, {
   'file': {
-    'spaceBefore': { type: 'number', val: 1,  setter: newNaturalNum },
-    'dirDepth':    { type: 'number', val: -1, setter: newNaturalNum.build(-1) },
-    'title':       { type: 'string', val: 'file' }
+    'dirDepth': { type: 'number', val: -1, setter: newNaturalNum.build(-1) },
+    'title':    { type: 'string', val: 'file' }
   },
   'module': {
-    'spaceBefore': { type: 'number', val: 1, setter: newNaturalNum },
-    'title':       { type: 'string', val: 'module' }
+    'title':    { type: 'string', val: 'module' }
   },
   'line': {
-    'spaceBefore': { type: 'number', val: 1, setter: newNaturalNum },
-    'title':       { type: 'string', val: 'line' }
+    'title':    { type: 'string', val: 'line' }
   },
   'column': {
-    'spaceBefore': { type: 'number', val: 1, setter: newNaturalNum },
-    'title':       { type: 'string', val: 'column' }
+    'title':    { type: 'string', val: 'column' }
   }
 });
 
