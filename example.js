@@ -5,39 +5,60 @@
  * @see [log-ocd](https://github.com/imaginate/log-ocd)
  *
  * @author Adam Smith <adam@imaginate.life> (https://github.com/imaginate)
- * @copyright 2015 Adam A Smith <adam@imaginate.life> (https://github.com/imaginate)
+ * @copyright 2016 Adam A Smith <adam@imaginate.life> (https://github.com/imaginate)
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
- * @see [Colors]{@link https://www.npmjs.com/package/colors}
+ * @see [vitals]{@link https://github.com/imaginate/vitals}
+ * @see [Colors]{@link https://github.com/Marak/colors.js}
  */
 
 'use strict';
 
+// make a local log-ocd instance
 var log = require('./log-ocd')();
+// or make it global
+require('./log-ocd')('log');
 
-// update config for all methods
-log.setConfig('all', { ocdmap: true });
-// or
-log.setConfig({ ocdmap: true });
+// set the config for all methods
+log.setConfig('all', { 'throw': false });
+log.setConfig({ 'exit': false });
 
-// update config for one method
-log.setConfig('error', { 'throw': false });
-// or
+// set the config for one method
+log.setConfig('error', { 'ocdmap': true });
 log.trace.setConfig({ 'root': false });
 
-// reset config for one method
-log.resetConfig('pass');
-// or
-log.pass.resetConfig();
+// reset the config for one method
+log.resetConfig('warn');
+log.debug.resetConfig();
 
-// set or reset format and style the same as config
-log.setFormat('fail', { linesBefore: 0 });
-log.fail.setStyle({ msg: { color: 'blue' } });
+// set and reset the format and style settings
+log.setFormat('fail', { 'linesBefore': 0 });
+log.warn.setFormat({ 'msg': { 'accentMark': '!' } });
+log.debug.setFormat({ 'lineLimit': 35 });
+log.fail.setStyle({ 'msg': { 'color': 'blue' } });
 log.resetStyle('fail');
 
 log('a quick message');
-log.pass('A `Success` Story', { ocdmap: true, easily: 'view', given: 'values' }, 'plus', { endless: 'superfluous', extra: 'details' });
-log.error('A `Failure`', 'with some `guidance`', { andAnOCDMap: 'with', easy: 'titling', of: 'any value' });
-log.warn('A Word of `Caution`', 'with a tale of `adventure`');
-log.debug('A Beacon of `Hope`', [ 'with', 'all', 'the', 'juicy', 'details' ], /you want to know/g);
+
+log.pass('A `Success` Story', 'and easy arg mapping via the ocdmap property', {
+  'ocdmap': true,
+  'a': 1.2,
+  'b': null,
+  'c': 'yum'
+});
+
+log.error('A `Failure`', 'with some `guidance`', {
+  'plus': 'easier',
+  'arg': 'mapping',
+  'via': 'config.ocdmap',
+  '===': true
+}, 'and the best (and most flexible) stacktrace printing');
+
+log.warn('A Word of `Caution`', 'with a tale of !accented adventure!');
+
+log.debug('A Beacon of `Hope`', [
+  'that', 'AUTOMAGICALLY', 'adjusts'
+], [
+  'to', 'the', 'line', 'limit'
+], /_or your max terminal width_/i);

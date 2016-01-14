@@ -2,21 +2,53 @@
 [_log-ocd_](https://github.com/imaginate/log-ocd) is the best way to handle logging for Node.js. It is easy to use and makes all logs more legible. Forget ``` console.log ``` and start using [_log-ocd_](https://github.com/imaginate/log-ocd) today!
 
 ```javascript
-// You can set the config for each or all methods with the constructor or
-var log = require('log-ocd')({
-  all:   { argMap: true },
-  error: { exit: false }
-});
-// with the setConfig and resetConfig methods
-log.setConfig('fail.spaceBefore', 0);
-log.setConfig('pass.spaceAfter', 0);
-log.resetConfig('pass');
+// make a local log-ocd instance
+var log = require('log-ocd')();
+// or make it global
+require('log-ocd')('log');
+
+// set the config for all methods
+log.setConfig('all', { 'throw': false });
+log.setConfig({ 'exit': false });
+
+// set the config for one method
+log.setConfig('error', { 'ocdmap': true });
+log.trace.setConfig({ 'root': false });
+
+// reset the config for one method
+log.resetConfig('warn');
+log.debug.resetConfig();
+
+// set and reset the format and style settings
+log.setFormat('fail', { 'linesBefore': 0 });
+log.warn.setFormat({ 'msg': { 'accentMark': '!' } });
+log.debug.setFormat({ 'lineLimit': 35 });
+log.fail.setStyle({ 'msg': { 'color': 'blue' } });
+log.resetStyle('fail');
 
 log('a quick message');
-log.pass('A `Success` Story', { argMap: true, easily: 'view', given: 'values' }, 'plus', { endless: 'superfluous', extra: 'details' });
-log.error('A `Failure`', 'with some `guidance`', { andAnArgMap: 'with', easy: 'titling', of: 'any value' });
-log.warn('A Word of `Caution`', 'with a tale of `adventure`');
-log.debug('A Beacon of `Hope`', [ 'with', 'all', 'the', 'juicy', 'details' ], /you want to know/g);
+
+log.pass('A `Success` Story', 'and easy arg mapping via the ocdmap property', {
+  'ocdmap': true,
+  'a': 1.2,
+  'b': null,
+  'c': 'yum'
+});
+
+log.error('A `Failure`', 'with some `guidance`', {
+  'plus': 'easier',
+  'arg': 'mapping',
+  'via': 'config.ocdmap',
+  '===': true
+}, 'and the best (and most flexible) stacktrace printing');
+
+log.warn('A Word of `Caution`', 'with a tale of !accented adventure!');
+
+log.debug('A Beacon of `Hope`', [
+  'that', 'AUTOMAGICALLY', 'adjusts'
+], [
+  'to', 'the', 'line', 'limit'
+], /_or your max terminal width_/i);
 ```
 <img src="http://www.algorithmiv.com/images/log-ocd/example-c9783b9285f4f7f1abfd.png" alt="log-ocd Example" />
 
