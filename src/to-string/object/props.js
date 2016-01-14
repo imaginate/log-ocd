@@ -20,24 +20,14 @@
 
 'use strict';
 
-var help = require('../../helpers');
-var is    = help.is;
-var fill  = help.fill;
-var fuse  = help.fuse;
-var has   = help.has;
-var remap = help.remap;
-
-var colors = require('../../helpers/colors');
-
-var getKeys = require('../helpers/get-keys');
-var stripStyle = require('../helpers/strip-style');
+var is = require('../../helpers').is;
 
 var newPropDetails = require('./helpers/new-prop-details');
-
-var toString = require('../index');
+var getPropVals = require('./helpers/get-prop-vals');
+var printProps = require('./helpers/print-props');
 
 /**
- * @this {!Settings}
+ * @this {Settings}
  * @param {string} method
  * @param {string} type
  * @param {!Object} obj
@@ -45,152 +35,17 @@ var toString = require('../index');
  */
 module.exports = function propsToString(method, type, obj) {
 
-  /** @type {!PropDetails} */
+  /** @type {PropDetails} */
   var details;
   /** @type {!Array<string>} */
   var vals;
 
   details = newPropDetails(this, method, type);
 
-  if ( is.empty(obj) ) return printVals(details);
+  if ( is.empty(obj) ) return printProps(this, details);
 
   this.__indent += details.indent;
-  vals = is.arr(obj)
-    ? getArrVals.call(this, method, details, obj)
-    : getObjVals.call(this, method, details, obj);
+  vals = getPropVals(this, method, details, obj);
   this.__indent -= details.indent;
-  return printVals(details, vals);
+  return printProps(this, details, vals);
 };
-
-/**
- * @private
- * @param {!PropDetails} details
- * @param {!Array<string>=} vals
- * @return {string}
- */
-function printVals(details, vals) {
-
-  /** @type {string} */
-  var result;
-  /** @type {string} */
-  var indent;
-
-  if (!vals) {
-    return details.identifier + details.brackets[0] + details.brackets[1];
-  }
-
-  if ( !details.limit || (vals.len > 0 && vals.len <= details.limit) ) {
-    return vals.join(' ') + ' ' + details.brackets[1];
-  }
-
-  indent = fill(details.indent + this.__indent, ' ');
-  result = vals.join('\n' + indent);
-  indent = fill(this.__indent, ' ');
-  return result + '\n' + indent + vals.brackets[1];
-}
-
-/**
- * @private
- * @this {!Settings}
- * @param {string} method
- * @param {!PropDetails} details
- * @param {!Object} obj
- * @return {!Array<string>}
- */
-function getObjVals(method, details, obj) {
-
-  /** @type {string} */
-  var intro;
-  /** @type {function} */
-  var color;
-  /** @type {!Array<string>} */
-  var vals;
-  /** @type {!Array<string>} */
-  var keys;
-  /** @type {number} */
-  var last;
-  /** @type {number} */
-  var len;
-
-  color = colors[details.style];
-  intro = getIntro(details);
-  len  = getLen(intro);
-  keys = getKeys(obj);
-  last = getLastIndex(keys);
-  vals = remap(keys, function(key, i) {
-    key = color(key + ':') + ' ' + toString.call(this, method, obj[key]);
-    if (i < last) key += details.delimiter;
-    len = getLen(key, len);
-    return key;
-  }, this);
-  vals = fuse([ intro ], vals);
-  vals.len = len === -1 ? len : getLen(details.brackets[1], len) + keys.length;
-  return vals;
-}
-
-/**
- * @private
- * @this {!Settings}
- * @param {string} method
- * @param {!PropDetails} details
- * @param {!Array} arr
- * @return {!Array<string>}
- */
-function getArrVals(method, details, arr) {
-
-  /** @type {string} */
-  var intro;
-  /** @type {function} */
-  var color;
-  /** @type {!Array<string>} */
-  var vals;
-  /** @type {number} */
-  var last;
-  /** @type {number} */
-  var len;
-
-  color = colors[details.style];
-  intro = getIntro(details);
-  len  = getLen(intro);
-  last = getLastIndex(arr);
-  vals = remap(arr, function(val, i) {
-    val = toString.call(this, method, val);
-    if (i < last) val += details.delimiter;
-    len = getLen(val, len);
-    return val;
-  }, this);
-  vals = fuse([ intro ], vals);
-  vals.len = len === -1 ? len : getLen(details.brackets[1], len) + arr.length;
-  return vals;
-}
-
-/**
- * @private
- * @param {!PropDetails} details
- * @return {string}
- */
-function getIntro(details) {
-  return details.identifier + details.brackets[0];
-}
-
-/**
- * @private
- * @param {string} str
- * @param {number=} len
- * @return {number}
- */
-function getLen(str, len) {
-  if (len === -1) return -1;
-  len = len || 0;
-  str = stripStyle(str);
-  return has(str, '\n') ? -1 : len + str.length;
-}
-
-/**
- * @private
- * @param {!Array} arr
- * @return {number}
- */
-function getLastIndex(arr) {
-  return arr.length - 1;
-}
