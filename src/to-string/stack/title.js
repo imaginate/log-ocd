@@ -20,7 +20,10 @@
 
 'use strict';
 
-var until = require('../../helpers').until;
+var help = require('../../helpers');
+var is    = help.is;
+var fuse  = help.fuse;
+var until = help.until;
 
 var colors = require('../../helpers/colors');
 
@@ -32,13 +35,15 @@ var buildItems = require('./helpers/build-items');
 var printItems = require('./helpers/print-items');
 
 /**
- * @this {!Settings}
- * @param {!Columns} columns
+ * @param {Settings} settings
+ * @param {Columns} columns
  * @param {string} style
  * @return {string}
  */
-module.exports = function titleToString(columns, style) {
+module.exports = function titleToString(settings, columns, style) {
 
+  /** @type {string} */
+  var result;
   /** @type {TitleFormat} */
   var format;
   /** @type {!Array<string>} */
@@ -50,20 +55,21 @@ module.exports = function titleToString(columns, style) {
   /** @type {boolean} */
   var over;
 
-  if (!this.trace.config.title) return '';
+  if (!settings.trace.config.title) return '';
 
-  style += '.title';
-  format = this.trace.format.row;
+  style = fuse(style, '.title');
+  format = settings.trace.format.row;
   spaces = getSpaces(format.spaceBefore, format.spaceAfter, style);
 
-  style += '.';
+  style = fuse(style, '.');
   vals = buildVals(columns);
   over = columns.over && until(true, columns, function(column, i) {
     return val[i].length > column.len;
   });
 
-  if (!over) return printVals(vals, columns, spaces, style);
-
-  items = buildItems(columns, vals);
-  return printItems(items, columns, spaces, style);
+  if (over) items = buildItems(columns, vals);
+  result = over
+    ? printItems(items, columns, spaces, style)
+    : printVals(vals, columns, spaces, style);
+  return fuse(result, '\n');
 };
