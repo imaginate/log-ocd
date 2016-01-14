@@ -93,6 +93,7 @@ function divideRoot(dirpath, limit, intro) {
   if (!limit) return dirpath;
 
   limit -= intro;
+  limit -= 2;
 
   if (dirpath.length <= limit) return dirpath;
 
