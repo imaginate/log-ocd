@@ -21,6 +21,8 @@
 'use strict';
 
 var help = require('../../../helpers');
+var is   = help.is;
+var fill = help.fill;
 var fuse = help.fuse;
 var roll = help.roll;
 
@@ -38,12 +40,32 @@ module.exports = function printVals(vals, columns, space, style) {
   /** @type {string} */
   var result;
   /** @type {string} */
+  var key;
+  /** @type {string} */
   var val;
 
   result = roll.up(space[0], columns, function(column, i) {
-    val = fuse(column.space[0], vals[i], column.space[1]);
-    i = fuse(style, column.key);
-    return colors[i](val);
+    val = prepVal(column, vals[i]);
+    key = fuse(style, column.key);
+    return colors[key](val);
   });
   return fuse(result, space[1]);
 };
+
+/**
+ * @private
+ * @param {Column} column
+ * @param {string} val
+ * @return {string}
+ */
+function prepVal(column, val) {
+
+  /** @type {string} */
+  var space;
+
+  space = fill(column.len - val.length, ' ');
+  val = is.same(column.align, 'left')
+    ? fuse(val, space)
+    : fuse(space, val);
+  return fuse(column.space[0], val, column.space[1]);
+}
