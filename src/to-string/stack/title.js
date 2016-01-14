@@ -60,7 +60,7 @@ module.exports = function titleToString(settings, columns, style) {
   style = fuse(style, '.');
   vals = buildVals(columns);
   over = columns.over && until(true, columns, function(column, i) {
-    return val[i].length > column.len;
+    return vals[i].length > column.len;
   });
   if (over) items = buildItems(columns, vals);
   result = over
