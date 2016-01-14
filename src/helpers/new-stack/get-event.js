@@ -21,16 +21,15 @@
 'use strict';
 
 var help = require('../index');
-var has    = help.has;
-var freeze = help.freeze;
-var get    = help.get;
+var has  = help.has;
+var get  = help.get;
 
 /**
  * @private
  * @type {!RegExp}
  * @const
  */
-var EVENT = freeze( /^[^\(]+(?=\()/ );
+var EVENT = /^[^\(]+?(?= *\()/;
 
 /**
  * @param {string} trace
