@@ -40,6 +40,7 @@ module.exports = function toString(vals) {
   var last;
 
   this.__maxLen = 0;
+  this.__keyLen = 0;
   this.__indent = 0;
   vals = slice(arguments);
   last = vals.length - 1;

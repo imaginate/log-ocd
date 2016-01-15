@@ -29,9 +29,11 @@ module.exports = function setupSettings(settings) {
   /** @type {number} */
   var max;
 
-  max = process.stdout.columns || 0;
+  max = process.stdout && process.stdout.columns;
+  max = max || 0;
   if (max && max < 21) max = 21;
   settings.__maxLen = max && --max;
+  settings.__keyLen = 0;
   settings.__indent = 0;
   return settings;
 };
