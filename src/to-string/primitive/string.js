@@ -26,13 +26,15 @@ var fill  = help.fill;
 var fuse  = help.fuse;
 var has   = help.has;
 var remap = help.remap;
+var roll  = help.roll;
 var slice = help.slice;
 
 var colors = require('../../helpers/colors');
 
 var getDelimiter = require('../helpers/get-delimiter');
-var getBrackets = require('../helpers/get-brackets');
 var getStyleKey = require('../helpers/get-style-key');
+var getBrackets = require('../helpers/get-brackets');
+var stripStyle = require('../helpers/strip-style');
 var getLimit = require('../helpers/get-limit');
 
 /**
@@ -81,15 +83,26 @@ module.exports = function stringToString(method, str) {
 
   limit = getLimit(this[method].format.lineLimit, this.__maxLen);
   limit -= this.__indent;
-  limit -= 6;
+  limit -= this.__keyLen;
+  limit -= getBracketsLen(brackets);
 
   if (limit <= 0 || str.length <= limit) {
-    return fuse(brackets[0], colors[style](str), brackets[1]);
+    str = colors[style](str);
+    return fuse(brackets[0], str, brackets[1]);
   }
 
+  limit -= 2; // for delimiter
   delimiter = getDelimiter(' +', style);
-  indent = fill(this.__indent + 2, ' ');
-  result = fuse(brackets[0], brackets[1], delimiter, '\n');
+  indent = fill(this.__indent, ' ');
+  result = getLine(str, limit, brackets, delimiter, style);
+  str = slice(str, limit);
+
+  if (this.__keyLen) {
+    limit += this.__keyLen;
+    limit -= 2; // for indent
+    indent = fuse(indent, '  ');
+  }
+
   while (str.length > limit) {
     line = getLine(str, limit, brackets, delimiter, style, indent);
     result = fuse(result, line);
@@ -114,4 +127,18 @@ function getLine(str, end, brackets, delimiter, style, indent) {
   str = colors[style](str);
   indent = indent || '';
   return fuse(indent, brackets[0], str, brackets[1], delimiter, '\n');
+}
+
+/**
+ * @private
+ * @param {!Array} brackets
+ * @return {number}
+ */
+function getBracketsLen(brackets) {
+  brackets = remap(brackets, function(bracket) {
+    return bracket && stripStyle(bracket);
+  });
+  return roll.up(0, brackets, function(bracket) {
+    return bracket.length;
+  });
 }
