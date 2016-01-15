@@ -44,7 +44,7 @@ module.exports = function propRangeError(settings, method, prop) {
   /** @type {string} */
   var msg;
 
-  config = this.error.config;
+  config = settings.error.config;
 
   header = fuse('Invalid `log-ocd.', method, '` Call');
   msg = fuse('the setting prop, `', prop, '`, does not exist');
