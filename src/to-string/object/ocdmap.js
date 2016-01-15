@@ -21,15 +21,17 @@
 'use strict';
 
 var help = require('../../helpers');
-var cut  = help.cut;
-var fuse = help.fuse;
-var has  = help.has;
-var roll = help.roll;
+var cut   = help.cut;
+var fuse  = help.fuse;
+var has   = help.has;
+var remap = help.remap;
+var roll  = help.roll;
 
 var colors = require('../../helpers/colors');
 
 var getDelimiter = require('../helpers/get-delimiter');
 var getStyleKey = require('../helpers/get-style-key');
+var stripStyle = require('../helpers/strip-style');
 var getSpaces = require('../helpers/get-spaces');
 var getKeys = require('../helpers/get-keys');
 
@@ -57,6 +59,8 @@ module.exports = function ocdmapToString(method, obj) {
   var keys;
   /** @type {number} */
   var last;
+  /** @type {number} */
+  var len;
   /** @type {string} */
   var val;
 
@@ -72,11 +76,31 @@ module.exports = function ocdmapToString(method, obj) {
   spaces = getSpaces(format.spaceBefore, format.spaceAfter, style);
   delimiter = getDelimiter(format.delimiter, style);
   delimiter = fuse(delimiter, ' ');
+  len = getExtraLen(spaces, delimiter);
   last = keys.length - 1;
-  return roll.up('', keys, function(key, i) {
+  val = roll.up('', keys, function(key, i) {
+    this.__keyLen = key.length + len;
     val = toString.call(this, method, obj[key]);
     val = i < last ? fuse(val, '\n') : val;
     key = colors[style](key);
     return fuse(spaces[0], key, spaces[1], delimiter, val);
   }, this);
+  this.__keyLen = 0;
+  return val;
 };
+
+/**
+ * @private
+ * @param {!Array} spaces
+ * @param {string} delimiter
+ * @return {number}
+ */
+function getExtraLen(spaces, delimiter) {
+  spaces = remap(spaces, function(space) {
+    return space && stripStyle(space);
+  });
+  delimiter = stripStyle(delimiter);
+  return roll.up(delimiter.length, spaces, function(space) {
+    return space.length;
+  });
+}
