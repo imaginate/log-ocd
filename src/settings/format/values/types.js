@@ -28,6 +28,7 @@ var fuse   = help.fuse;
 var remap  = help.remap;
 
 var newNaturalNum = require('../../../helpers/new-natural-num');
+var newAlignStr = require('../../../helpers/new-align-str');
 
 var fromProps = require('./helpers/from-props');
 
@@ -127,14 +128,16 @@ types = buildNewProps(types, base, {
     'brackets':   { type: 'string', val: '' }
   },
   'event': {
+    'align':      { type: 'string', val: 'left', setter: newAlignStr },
     'title':      { type: 'string', val: 'event' }
   }
 });
 
 base = {
-  'spaceBefore': { type: 'number', val: 1, setter: newNaturalNum },
-  'spaceAfter':  { type: 'number', val: 0, setter: newNaturalNum },
-  'lineLimit':   { type: 'number', val: 0, setter: newNaturalNum }
+  'spaceBefore': { type: 'number', val: 1,       setter: newNaturalNum },
+  'spaceAfter':  { type: 'number', val: 0,       setter: newNaturalNum },
+  'lineLimit':   { type: 'number', val: 0,       setter: newNaturalNum },
+  'align':       { type: 'string', val: 'right', setter: newAlignStr   }
 };
 types = buildNewProps(types, base, {
   'file': {

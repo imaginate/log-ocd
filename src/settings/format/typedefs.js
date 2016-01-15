@@ -119,6 +119,7 @@
  *   spaceBefore: number,
  *   spaceAfter:  number,
  *   lineLimit:   number,
+ *   align:       string,
  *   title:       string
  * }} ColumnFormat
  */
@@ -130,6 +131,7 @@
  *   spaceAfter:  number,
  *   lineLimit:   number,
  *   dirDepth:    number,
+ *   align:       string,
  *   title:       string
  * }} FileColumnFormat
  */
