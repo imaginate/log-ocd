@@ -38,7 +38,7 @@ var CATEGORIES = {
     'msg':    { type: 'boolean',  val: false       }
   },
   'prep': {
-    'style':  { type: 'boolean',  val: false }
+    'style':  { type: 'boolean',  val: false       }
   },
   'trace': {
     'logger': { type: 'function', val: console.log },
