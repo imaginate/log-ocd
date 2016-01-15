@@ -56,7 +56,7 @@ module.exports = function newSettings(inst) {
   };
   settings = amend(settings, '__INST', inst, desc);
 
-  props = { '__maxLen': -1, '__indent': 0 };
+  props = { '__maxLen': -1, '__keyLen': 0, '__indent': 0 };
   desc = { enumerable: false };
   each(props, function(val, key) {
     setter = val ? newNaturalNum.build(val) : newNaturalNum;

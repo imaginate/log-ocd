@@ -33,6 +33,7 @@
  *   __INST:   number,
  *   __maxLen: number,
  *   __indent: number,
+ *   __keyLen: number,
  *   toString: Setting,
  *   log:      Setting,
  *   pass:     Setting,
