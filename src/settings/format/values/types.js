@@ -111,25 +111,16 @@ types = buildNewProps(types, types['object'], {
 
 // PROPS FOR TRACE CATEGORY
 types = fuse(types, {
+  'root': {
+    'spaceBefore': { type: 'number', val: 0, setter: newNaturalNum },
+    'spaceAfter':  { type: 'number', val: 0, setter: newNaturalNum },
+    'identifier':  { type: 'string', val: ''                       },
+    'lineLimit':   { type: 'number', val: 0, setter: newNaturalNum },
+    'brackets':    { type: 'string', val: ''                       }
+  },
   'row': {
     'spaceBefore': { type: 'number', val: 1, setter: newNaturalNum },
     'spaceAfter':  { type: 'number', val: 1, setter: newNaturalNum }
-  }
-});
-
-base = {
-  'spaceBefore': { type: 'number', val: 0, setter: newNaturalNum },
-  'spaceAfter':  { type: 'number', val: 0, setter: newNaturalNum },
-  'lineLimit':   { type: 'number', val: 0, setter: newNaturalNum }
-};
-types = buildNewProps(types, base, {
-  'root': {
-    'identifier': { type: 'string', val: '' },
-    'brackets':   { type: 'string', val: '' }
-  },
-  'event': {
-    'align':      { type: 'string', val: 'left', setter: newAlignStr },
-    'title':      { type: 'string', val: 'event' }
   }
 });
 
@@ -140,18 +131,24 @@ base = {
   'align':       { type: 'string', val: 'right', setter: newAlignStr   }
 };
 types = buildNewProps(types, base, {
+  'event': {
+    'spaceBefore': { type: 'number', val: 0,      setter: newNaturalNum },
+    'align':       { type: 'string', val: 'left', setter: newAlignStr   },
+    'title':       { type: 'string', val: 'event'                       }
+  },
   'file': {
-    'dirDepth': { type: 'number', val: -1, setter: newNaturalNum.build(-1) },
-    'title':    { type: 'string', val: 'file' }
+    'dirDepth':    { type: 'number', val: -1, setter: newNaturalNum.build(-1) },
+    'title':       { type: 'string', val: 'file'                              }
   },
   'module': {
-    'title':    { type: 'string', val: 'module' }
+    'title':       { type: 'string', val: 'module' }
   },
   'line': {
-    'title':    { type: 'string', val: 'line' }
+    'spaceBefore': { type: 'number', val: 2, setter: newNaturalNum },
+    'title':       { type: 'string', val: 'line'                   }
   },
   'column': {
-    'title':    { type: 'string', val: 'column' }
+    'title':       { type: 'string', val: 'column' }
   }
 });
 
