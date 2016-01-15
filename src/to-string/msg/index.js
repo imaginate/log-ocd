@@ -30,9 +30,11 @@ var colors = require('../../helpers/colors');
 
 var parseAccents = require('../helpers/parse-accents');
 var getStyleKey = require('../helpers/get-style-key');
+var stripStyle = require('../helpers/strip-style');
 var getAccent = require('../helpers/get-accent');
 var getBullet = require('../helpers/get-bullet');
 var getLimit = require('../helpers/get-limit');
+var noStyle = require('../helpers/no-style');
 
 var linesToString = require('./lines');
 
@@ -52,6 +54,8 @@ module.exports = function msgToString(method, msg) {
   var bullet;
   /** @type {string} */
   var indent;
+  /** @type {string} */
+  var result;
   /** @type {string} */
   var style;
   /** @type {number} */
@@ -78,7 +82,8 @@ module.exports = function msgToString(method, msg) {
     key = is.odd(i) ? fuse(style, '.accent') : style;
     return colors[key](part);
   });
-  return fuse(indent, bullet, msg);
+  result = fuse(indent, bullet, msg);
+  return noStyle(this[method].config) ? stripStyle(result) : result;
 };
 
 /**
