@@ -41,14 +41,6 @@ var slice = help.slice;
  * }} Column
  */
 
-var ALIGN = {
-  'event':  'left',
-  'file':   'left',
-  'module': 'left',
-  'line':   'right',
-  'column': 'right'
-};
-
 /**
  * @param {Settings} settings
  * @param {Stack} stack
@@ -72,7 +64,7 @@ module.exports = function buildColumn(settings, stack, key, title) {
     dirs:  null,
     over:  false,
     title: title,
-    align: ALIGN[key],
+    align: format.align,
     space: [
       fill(format.spaceBefore, ' '),
       fill(format.spaceAfter,  ' ')
@@ -116,7 +108,7 @@ function getDir(dirDepth, dirpath, file) {
   /** @type {number} */
   var index;
 
-  if (!dirpath.length) return file;
+  if (!dirDepth || !dirpath.length) return file;
 
   if (dirDepth > -1) {
     index = 0 - dirDepth;
