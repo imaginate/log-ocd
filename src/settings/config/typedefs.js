@@ -24,6 +24,7 @@
  *   logger: function,
  *   ocdmap: boolean,
  *   header: boolean,
+ *   style:  boolean,
  *   stack:  boolean,
  *   throw:  boolean,
  *   exit:   boolean,
@@ -42,6 +43,7 @@
  * @typedef {!{
  *   __TYPE: string,
  *   logger: function,
+ *   style:  boolean,
  *   throw:  boolean,
  *   exit:   boolean,
  *   root:   boolean,

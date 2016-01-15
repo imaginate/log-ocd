@@ -31,6 +31,7 @@ var CATEGORIES = {
     'logger': { type: 'function', val: console.log },
     'ocdmap': { type: 'boolean',  val: false       },
     'header': { type: 'boolean',  val: false       },
+    'style':  { type: 'boolean',  val: true        },
     'stack':  { type: 'boolean',  val: false       },
     'throw':  { type: 'boolean',  val: false       },
     'exit':   { type: 'boolean',  val: false       },
@@ -41,6 +42,7 @@ var CATEGORIES = {
   },
   'trace': {
     'logger': { type: 'function', val: console.log },
+    'style':  { type: 'boolean',  val: true        },
     'throw':  { type: 'boolean',  val: false       },
     'exit':   { type: 'boolean',  val: false       },
     'root':   { type: 'boolean',  val: true        },
