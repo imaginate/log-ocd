@@ -41,11 +41,13 @@ module.exports = function propsToString(method, type, obj) {
   var vals;
 
   details = newPropDetails(this, method, type);
+  this.__keyLen = 0;
 
   if ( is.empty(obj) ) return printProps(this, details);
 
   this.__indent += details.indent;
   vals = getPropVals(this, method, details, obj);
   this.__indent -= details.indent;
+  this.__keyLen = 0;
   return printProps(this, details, vals);
 };

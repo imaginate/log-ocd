@@ -81,6 +81,7 @@ function getObjVals(settings, method, details, obj, color, intro) {
   keys = getKeys(obj);
   last = getLastIndex(keys);
   vals = remap(keys, function(key, i) {
+    settings.__keyLen = key.length + 2;
     val = toString.call(settings, method, obj[key]);
     key = fuse(key, ':');
     key = color(key);
