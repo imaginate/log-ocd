@@ -26,17 +26,17 @@ var NPM_VERSION = /("version": ")[0-9]+\.[0-9]+\.[0-9]+/;
 
 
 exports['desc'] = 'updates version for the repo';
-exports['value'] = 'semantic-version';
+exports['value'] = 'x.x.x';
 exports['default'] = '-all';
 exports['methods'] = {
   'all': {
     'desc': 'updates version for entire repo',
-    'value': 'semantic-version',
+    'value': 'x.x.x',
     'method': updateAllVersion
   },
   'npm': {
     'desc': 'updates only npm version',
-    'value': 'semantic-version',
+    'value': 'x.x.x-pre.x',
     'method': updateNPMVersion
   }
 };

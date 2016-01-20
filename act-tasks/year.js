@@ -18,6 +18,7 @@ require('node-are')();
 require('node-vitals')(2, 'all');
 
 exports['desc'] = 'updates year in entire repo';
+exports['value'] = '2xxx';
 exports['method'] = updateYear;
 
 /**
