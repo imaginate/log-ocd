@@ -19,6 +19,7 @@
     "node-vitals": "2.x"
   },
   "devDependencies": {
+    "node-act": ">0.0.1-alpha",
     "mocha": "2.x"
   },
   "scripts": {
