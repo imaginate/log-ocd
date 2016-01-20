@@ -34,7 +34,7 @@ module.exports = function getExtern(dir) {
   /** @type {number} */
   var i;
 
-  ii = get.ii(trace.dir, '/node_modules');
+  ii = get.ii(dir, '/node_modules');
   i  = ii[ii.length - 1] + 1;
-  return cutSlash( trace.dir[i] );
+  return cutSlash( dir[i] );
 };
