@@ -20,9 +20,9 @@ require('node-vitals')(2, 'all');
 
 var ERROR_MSG = 'invalid version (must be a semantic version) for act version task';
 var BASE_SEMANTIC = /^[0-9]+\.[0-9]+\.[0-9]+$/;
-var PRE_SEMANTIC = /^[0-9]+\.[0-9]+\.[0-9]+(?:-[a-z]+(?:.[0-9]+)?)?$/;
+var PRE_SEMANTIC = /^[0-9]+\.[0-9]+\.[0-9]+(?:-[a-z]+.?[0-9]*)?$/;
 var BASE_VERSION = /\b(v?)[0-9]+\.[0-9]+\.[0-9]+\b/g;
-var NPM_VERSION = /("version": ")[0-9]+\.[0-9]+\.[0-9]+/;
+var NPM_VERSION = /("version": ")[0-9]+\.[0-9]+\.[0-9]+(?:-[a-z]+.?[0-9]*)?/;
 
 
 exports['desc'] = 'updates version for the repo';
@@ -64,7 +64,7 @@ function updateAllVersion(version) {
 
   insertNPMVersion(version);
 
-  console.log('\u001b[42m Completed version.all task      \u001b[49m');
+  console.log('\n\u001b[42m Completed version.all task      \u001b[49m');
 }
 
 /**
@@ -77,7 +77,7 @@ function updateNPMVersion(version) {
 
   insertNPMVersion(version);
 
-  console.log('\u001b[42m Completed version.npm task      \u001b[49m');
+  console.log('\n\u001b[42m Completed version.npm task      \u001b[49m');
 }
 
 

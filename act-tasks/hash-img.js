@@ -44,7 +44,7 @@ function hashAllImg() {
     });
   });
 
-  console.log('\u001b[42m Completed hash-img task      \u001b[49m');
+  console.log('\n\u001b[42m Completed hash-img task      \u001b[49m');
 }
 
 /**
