@@ -27,7 +27,7 @@ var until = help.until;
 var stripStyle = require('../helpers/strip-style');
 var noStyle = require('../helpers/no-style');
 
-var isOcdmap = require('./helpers/is-ocdmap');
+var ocdmap = require('./helpers/ocdmap');
 
 /**
  * @private
@@ -37,15 +37,13 @@ var isOcdmap = require('./helpers/is-ocdmap');
 var TYPES = 'function, regexp, array, args, element, document, object';
 
 /**
- * @this {!Settings}
+ * @this {Settings}
  * @param {string} method
  * @param {(!Object|function)} obj
  * @return {string}
  */
 module.exports = function objectToString(method, obj) {
 
-  /** @type {!Config} */
-  var config;
   /** @type {string} */
   var result;
   /** @type {string} */
@@ -57,8 +55,7 @@ module.exports = function objectToString(method, obj) {
     if ( is[typeOpt](obj) ) type = typeOpt;
     return !!type;
   });
-  config = this[method].config;
-  type = isOcdmap(config, type, obj) ? 'ocdmap' : type;
+  type = ocdmap(this, method, type, obj);
   result = require('./' + type).call(this, method, obj);
-  return noStyle(config) ? stripStyle(result) : result;
+  return noStyle(this[method].config) ? stripStyle(result) : result;
 };
