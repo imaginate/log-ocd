@@ -1,6 +1,6 @@
 /**
  * -----------------------------------------------------------------------------
- * LOG-OCD: IS-OCDMAP HELPER
+ * LOG-OCD: OCDMAP HELPER
  * -----------------------------------------------------------------------------
  * @version 1.0.0
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
@@ -32,18 +32,25 @@ var until = help.until;
 var KEYS = 'ocdmap, _ocdmap, __ocdmap, ocdMap, _ocdMap, __ocdMap';
 
 /**
- * @param {!Object} config
+ * @param {Settings} settings
+ * @param {string} method
  * @param {string} type
  * @param {(!Object|function)} obj
- * @return {boolean}
+ * @return {string}
  */
-module.exports = function isOcdmap(config, type, obj) {
+module.exports = function ocdmap(settings, method, type, obj) {
 
-  if ( type === 'object' && check(config, 'ocdmap') ) return true;
+  /** @type {boolean} */
+  var pass;
 
-  return until(true, KEYS, function(key) {
+  if (!settings.__ocdmap) return type;
+
+  settings.__ocdmap = false;
+  pass = type === 'object' && check(settings[method].config, 'ocdmap');
+  pass = until(true, KEYS, function(key) {
     return check(obj, key);
   });
+  return pass ? 'ocdmap' : type;
 };
 
 /**
