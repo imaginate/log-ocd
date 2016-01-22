@@ -29,7 +29,6 @@ var slice = help.slice;
 var newStack = require('../helpers/new-stack');
 
 var setupSettings = require('./helpers/setup-settings');
-var getErrorType = require('./helpers/get-error-type');
 var typeError = require('./helpers/type-error');
 var getLines = require('./helpers/get-lines');
 
@@ -62,15 +61,21 @@ module.exports = function log(method, vals) {
 
   config = this[method].config;
   header = config.header ? vals.shift() : '';
-  msg    = config.msg    ? vals.shift() : '';
 
   if ( is.error(header) ) {
     error = header;
-    header = getErrorType(error);
+    header = error.name || 'Error';
+    msg = config.msg && is.str( vals[0] ) ? vals.shift() : error.message;
+    msg = msg || '';
   }
-  else if ( is.error(msg) ) {
-    error = msg;
-    msg = getErrorType(error);
+  else {
+    msg = config.msg ? vals.shift() : '';
+    if ( is.error(msg) ) {
+      error = msg;
+      msg = error.name || '';
+      msg = msg && fuse(msg, ': ');
+      msg = fuse(msg, error.message || '');
+    }
   }
 
   if ( !is.str(header) ) return typeError(this, method, 'header', header);
@@ -78,8 +83,8 @@ module.exports = function log(method, vals) {
 
   if ( !error && is.error( vals[0] ) ) error = vals.shift();
   if ( !error && config['throw'] ) {
-    error = header ? fuse(header, ': ') : '';
-    error = fuse(error, msg || '');
+    error = header && fuse(header, ': ');
+    error = fuse(error, msg);
     error = new Error(error);
   }
   stack = config.stack ? newStack(error) : null;
