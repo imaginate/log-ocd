@@ -63,6 +63,8 @@ module.exports = function newSettings(inst) {
     settings = amend(settings, key, val, desc, 'number', setter);
   });
 
+  settings = amend(settings, '__ocdmap', true, desc, 'boolean');
+
   desc = { writable: false };
   each(METHODS, function(method) {
     settings = amend(settings, method, newSetting(method), desc);

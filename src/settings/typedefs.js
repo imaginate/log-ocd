@@ -34,6 +34,7 @@
  *   __maxLen: number,
  *   __indent: number,
  *   __keyLen: number,
+ *   __ocdmap: boolean,
  *   toString: Setting,
  *   log:      Setting,
  *   pass:     Setting,
