@@ -42,6 +42,7 @@ module.exports = function toString(vals) {
   this.__maxLen = 0;
   this.__keyLen = 0;
   this.__indent = 0;
+  this.__ocdmap = true;
   vals = slice(arguments);
   last = vals.length - 1;
   return roll.up('', vals, function(val, i) {

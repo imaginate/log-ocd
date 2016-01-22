@@ -35,5 +35,6 @@ module.exports = function setupSettings(settings) {
   settings.__maxLen = max && --max;
   settings.__keyLen = 0;
   settings.__indent = 0;
+  settings.__ocdmap = true;
   return settings;
 };
