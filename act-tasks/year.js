@@ -51,8 +51,6 @@ function updateYear(year) {
     invalidExts: '.json'
   });
   insertYears('src', filepaths, year);
-
-  console.log('\n\u001b[1;42m Completed year task      \u001b[0m');
 }
 
 /**

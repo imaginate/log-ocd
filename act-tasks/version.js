@@ -63,8 +63,6 @@ function updateAllVersion(version) {
   });
 
   insertNPMVersion(version);
-
-  console.log('\n\u001b[1;42m Completed version.all task      \u001b[0m');
 }
 
 /**
@@ -76,8 +74,6 @@ function updateNPMVersion(version) {
   if ( !isSemVersion(version, true) ) throw new Error(ERROR_MSG);
 
   insertNPMVersion(version);
-
-  console.log('\n\u001b[1;42m Completed version.npm task      \u001b[0m');
 }
 
 

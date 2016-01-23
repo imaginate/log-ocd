@@ -43,8 +43,6 @@ function hashAllImg() {
       'eol':      null
     });
   });
-
-  console.log('\n\u001b[1;42m Completed hash-img task      \u001b[0m');
 }
 
 /**
