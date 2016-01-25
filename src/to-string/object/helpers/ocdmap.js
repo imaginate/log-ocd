@@ -47,7 +47,7 @@ module.exports = function ocdmap(settings, method, type, obj) {
 
   settings.__ocdmap = false;
   pass = type === 'object' && check(settings[method].config, 'ocdmap');
-  pass = until(true, KEYS, function(key) {
+  pass = pass || until(true, KEYS, function(key) {
     return check(obj, key);
   });
   return pass ? 'ocdmap' : type;
