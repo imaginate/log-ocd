@@ -59,12 +59,12 @@ var SETTERS = {
 
 var METHODS = {
   'toString': require('./methods/to-string'),
-  'log':      LOG,
-  'pass':     LOG,
-  'error':    LOG,
-  'warn':     LOG,
-  'debug':    LOG,
-  'fail':     LOG,
+  'log':      null,
+  'pass':     null,
+  'error':    null,
+  'warn':     null,
+  'debug':    null,
+  'fail':     null,
   'trace':    require('./methods/trace')
 };
 
@@ -81,14 +81,12 @@ module.exports = function setupLogOCD() {
   var settings;
   /** @type {LogOCD} */
   var logocd;
-  /** @type {function} */
-  var setter;
 
   settings = newSettings( ++instCount );
   logocd = bind(LOG, settings, 'log');
   logocd = addSetters(logocd, settings);
   each(METHODS, function(func, method) {
-    func = bind(func, settings, method);
+    func = func ? bind(func, settings) : bind(LOG, settings, method);
     logocd[method] = addSetters(func, settings, method);
     setColors(instCount, settings[method].style, method);
   });
