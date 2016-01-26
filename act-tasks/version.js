@@ -13,25 +13,26 @@
 
 'use strict';
 
-// globally append all of are and vitals methods
-require('node-are')();
-require('node-vitals')(2, 'all');
+var vitals = require('node-vitals')('base', 'fs');
+var each   = vitals.each;
+var fuse   = vitals.fuse;
+var get    = vitals.get;
+var has    = vitals.has;
+var remap  = vitals.remap;
+var to     = vitals.to;
 
-
-var ERROR_MSG = 'invalid version (must be a semantic version) for act version task';
-var BASE_SEMANTIC = /^[0-9]+\.[0-9]+\.[0-9]+$/;
-var PRE_SEMANTIC = /^[0-9]+\.[0-9]+\.[0-9]+(?:-[a-z]+.?[0-9]*)?$/;
-var BASE_VERSION = /\b(v?)[0-9]+\.[0-9]+\.[0-9]+\b/g;
+var ERROR_MSG = 'invalid value (must be a semantic version)';
+var SEMANTIC  = /^[0-9]+\.[0-9]+\.[0-9]+(?:-[a-z]+.?[0-9]*)?$/;
+var ALL_VERSION = /\b(v?)[0-9]+\.[0-9]+\.[0-9]+(?:-[a-z]+.?[0-9]*)?\b/g;
 var NPM_VERSION = /("version": ")[0-9]+\.[0-9]+\.[0-9]+(?:-[a-z]+.?[0-9]*)?/;
 
-
 exports['desc'] = 'updates version for the repo';
-exports['value'] = 'x.x.x';
+exports['value'] = 'x.x.x-pre.x';
 exports['default'] = '-all';
 exports['methods'] = {
   'all': {
     'desc': 'updates version for entire repo',
-    'value': 'x.x.x',
+    'value': 'x.x.x-pre.x',
     'method': updateAllVersion
   },
   'npm': {
@@ -41,7 +42,6 @@ exports['methods'] = {
   }
 };
 
-
 /**
  * @public
  * @param {string} version
@@ -50,17 +50,18 @@ function updateAllVersion(version) {
 
   /** @type {!Array<string>} */
   var filepaths;
+  /** @type {!Object} */
+  var opts;
 
   if ( !isSemVersion(version) ) throw new Error(ERROR_MSG);
 
-  filepaths = get.filepaths('.', {
-    deep:      true,
-    validExts: '.js',
-    validDirs: 'src'
-  });
-  each(filepaths, function(filepath) {
-    insertJSVersion(filepath, version);
-  });
+  opts = { validExts: /js$/ };
+  filepaths = get.filepaths('.', opts);
+  insertJSVersions('.', filepaths, version);
+
+  opts.deep = true;
+  filepaths = get.filepaths('src', opts);
+  insertJSVersions('src', filepaths, version);
 
   insertNPMVersion(version);
 }
@@ -80,16 +81,25 @@ function updateNPMVersion(version) {
 /**
  * @private
  * @param {string} version
- * @param {boolean=} includePre
  * @return {boolean}
  */
-function isSemVersion(version, includePre) {
+function isSemVersion(version) {
+  return !!version && has(version, SEMANTIC);
+}
 
-  /** @type {!RegExp} */
-  var semantic;
-
-  semantic = includePre ? PRE_SEMANTIC : BASE_SEMANTIC;
-  return is._str(version) && has(version, semantic);
+/**
+ * @private
+ * @param {string} basedir
+ * @param {!Array<string>} filepaths
+ * @param {string} version
+ */
+function insertJSVersions(basedir, filepaths, version) {
+  basedir = basedir && fuse(basedir, '/');
+  version = fuse('$1', version);
+  each(filepaths, function(filepath) {
+    filepath = fuse(basedir, filepath);
+    insertJSVersion(filepath, version);
+  });
 }
 
 /**
@@ -103,8 +113,7 @@ function insertJSVersion(filepath, version) {
   var content;
 
   content = get.file(filepath);
-  version = fuse('$1', version);
-  content = remap(content, BASE_VERSION, version);
+  content = remap(content, ALL_VERSION, version);
   to.file(content, filepath);
 }
 
