@@ -29,20 +29,30 @@ var seal  = help.seal;
 var newEmptyObj = require('../../helpers/new-empty-obj');
 
 var THEME_PROPS = require('./values/theme-props');
+var SETTERS = require('./values/setters');
+
+var DESC = {
+  configurable: false,
+  enumerable:   false
+};
 
 /**
  * @param {Object<string, (string|boolean)>=} props
- * @return {!Theme}
+ * @return {Theme}
  */
 module.exports = function newTheme(props) {
 
-  /** @type {!Theme} */
+  /** @type {function} */
+  var setter;
+  /** @type {Theme} */
   var theme;
 
   props = props || null;
   theme = newEmptyObj('Theme');
+  theme = amend(theme, '__keys', null, DESC, 'strings');
   each(THEME_PROPS, function(obj, key) {
-    theme = amend(theme, key, obj.val, obj.type);
+    setter = SETTERS[key].bind(theme);
+    theme = amend(theme, key, obj.val, obj.type, setter);
   });
   theme = seal(theme);
   return fuse(theme, props);

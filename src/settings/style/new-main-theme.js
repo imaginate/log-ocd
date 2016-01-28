@@ -24,11 +24,18 @@ var help = require('../../helpers');
 var amend = help.amend;
 var each  = help.each;
 var fuse  = help.fuse;
+var has   = help.has;
 var seal  = help.seal;
 
 var newEmptyObj = require('../../helpers/new-empty-obj');
 
 var SECTION_PROPS = require('./values/section-props');
+var SETTERS = require('./values/setters');
+
+var DESC = {
+  configurable: false,
+  enumerable:   false
+};
 
 var newTheme = require('./new-theme');
 
@@ -36,20 +43,26 @@ var newTheme = require('./new-theme');
  * @param {string} section
  * @param {string} type
  * @param {Object<string, (string|boolean|Theme)>=} props
- * @return {!MainTheme}
+ * @return {MainTheme}
  */
 module.exports = function newMainTheme(section, type, props) {
 
-  /** @type {!MainTheme} */
+  /** @type {function} */
+  var setter;
+  /** @type {MainTheme} */
   var theme;
   /** @type {*} */
   var val;
 
   props = props || null;
   theme = newEmptyObj(type + 'Theme');
+  theme = amend(theme, '__keys', null, DESC, 'strings');
   each(SECTION_PROPS[section][type], function(obj, key) {
     val = obj.make ? newTheme(obj.props) : obj.val;
-    theme = amend(theme, key, val, obj.type);
+    setter = has(SETTERS, key) && SETTERS[key].bind(theme);
+    theme = setter
+      ? amend(theme, key, val, obj.type, setter)
+      : amend(theme, key, val, obj.type);
   });
   theme = seal(theme);
   return fuse(theme, props);

@@ -24,6 +24,7 @@
 
 /**
  * @typedef {!{
+ *   __keys:        Array<string>,
  *   __TYPE:        string,
  *   color:         string,
  *   bg:            string,
@@ -40,6 +41,7 @@
 
 /**
  * @typedef {!{
+ *   __keys:        Array<string>,
  *   __TYPE:        string,
  *   accent:        Theme,
  *   color:         string,
@@ -57,6 +59,7 @@
 
 /**
  * @typedef {!{
+ *   __keys:        Array<string>,
  *   __TYPE:        string,
  *   accent:        Theme,
  *   color:         string,
@@ -74,6 +77,7 @@
 
 /**
  * @typedef {!{
+ *   __keys:        Array<string>,
  *   __TYPE:        string,
  *   delimiter:     Theme,
  *   color:         string,
@@ -91,6 +95,7 @@
 
 /**
  * @typedef {!{
+ *   __keys:        Array<string>,
  *   __TYPE:        string,
  *   delimiter:     Theme,
  *   brackets:      Theme,
@@ -109,6 +114,7 @@
 
 /**
  * @typedef {!{
+ *   __keys:        Array<string>,
  *   __TYPE:        string,
  *   identifier:    Theme,
  *   delimiter:     Theme,
@@ -127,6 +133,7 @@
 
 /**
  * @typedef {!{
+ *   __keys:        Array<string>,
  *   __TYPE:        string,
  *   identifier:    Theme,
  *   brackets:      Theme,
@@ -146,6 +153,7 @@
 
 /**
  * @typedef {!{
+ *   __keys:        Array<string>,
  *   __TYPE:        string,
  *   identifier:    Theme,
  *   delimiter:     Theme,
@@ -165,6 +173,7 @@
 
 /**
  * @typedef {!{
+ *   __keys:        Array<string>,
  *   __TYPE:        string,
  *   identifier:    Theme,
  *   delimiter:     Theme,
@@ -198,6 +207,7 @@
 
 /**
  * @typedef {!{
+ *   __keys:        Array<string>,
  *   __TYPE:        string,
  *   identifier:    Theme,
  *   brackets:      Theme,
@@ -216,6 +226,7 @@
 
 /**
  * @typedef {!{
+ *   __keys:        Array<string>,
  *   __TYPE:        string,
  *   event:         Theme,
  *   file:          Theme,
@@ -237,6 +248,7 @@
 
 /**
  * @typedef {!{
+ *   __keys:        Array<string>,
  *   __TYPE:        string,
  *   alternate:     Theme,
  *   event:         Theme,
