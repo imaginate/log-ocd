@@ -24,8 +24,6 @@ var help = require('./helpers');
 var each = help.each;
 var fuse = help.fuse;
 
-var setColors = require('./helpers/colors').setThemes;
-
 var newSettings = require('./settings');
 
 var LOG   = require('./methods/log');
@@ -75,7 +73,7 @@ var instCount = 0;
  * Creates a new log-ocd instance.
  * @return {LogOCD}
  */
-module.exports = function setupLogOCD() {
+module.exports = function newLogOCD() {
 
   /** @type {Settings} */
   var settings;
@@ -88,8 +86,9 @@ module.exports = function setupLogOCD() {
   each(METHODS, function(func, method) {
     func = func ? bind(func, settings) : bind(LOG, settings, method);
     logocd[method] = addSetters(func, settings, method);
-    setColors(instCount, settings[method].style, method);
   });
+  logocd.constructor = newLogOCD;
+  logocd.construct = newLogOCD;
   return logocd;
 };
 
