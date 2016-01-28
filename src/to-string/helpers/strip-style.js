@@ -22,10 +22,13 @@
 
 var cut = require('../../helpers').cut;
 
+/** @type {!RegExp} */
+var STYLE = /\u001b\[[0-9]+m/g;
+
 /**
  * @param {string} str
  * @return {string}
  */
 module.exports = function stripStyle(str) {
-  return cut(str, /\x1B\[\d+m/g);
+  return cut(str, STYLE);
 };
