@@ -35,4 +35,4 @@ module.exports = function color(theme, str) {
   return roll(chalk, theme.__keys, function(chalk, key) {
     return chalk[key];
   })(str);
-}
+};
