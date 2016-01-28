@@ -10,8 +10,8 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
+ * @see [chalk]{@link https://github.com/chalk/chalk}
  * @see [vitals]{@link https://github.com/imaginate/vitals}
- * @see [Colors]{@link https://github.com/Marak/colors.js}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
@@ -25,11 +25,10 @@ var cut  = help.cut;
 var fuse = help.fuse;
 var get  = help.get;
 
-var colors = require('../../helpers/colors');
+var color = require('../../helpers/color');
 
 var getIdentifier = require('../helpers/get-identifier');
 var getBrackets = require('../helpers/get-brackets');
-var getStyleKey = require('../helpers/get-style-key');
 var getFlags = require('../helpers/get-flags');
 
 /**
@@ -44,21 +43,21 @@ module.exports = function regexpToString(method, val) {
   var identifier;
   /** @type {!Array} */
   var brackets;
-  /** @type {!RegExpFormat} */
+  /** @type {RegExpFormat} */
   var format;
-  /** @type {string} */
-  var style;
+  /** @type {RegExpTheme} */
+  var theme;
   /** @type {string} */
   var flags;
 
-  style = getStyleKey(this, method, 'regexp');
+  theme = this[method].style.regexp;
   val = val.toString();
   format = this[method].format.regexp;
-  identifier = getIdentifier(format.identifier, style);
-  brackets = getBrackets(format.brackets, style);
+  identifier = getIdentifier(theme, format.identifier);
+  brackets = getBrackets(theme, format.brackets);
   flags = get(val, /[a-z]+$/)[0];
-  flags = getFlags(flags, style);
+  flags = getFlags(theme, flags);
   val = cut(val, /^\/|\/[a-z]*$/g);
-  val = colors[style](val);
+  val = color(theme, val);
   return fuse(identifier, brackets[0], val, brackets[1], flags);
 };

@@ -10,8 +10,8 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
+ * @see [chalk]{@link https://github.com/chalk/chalk}
  * @see [vitals]{@link https://github.com/imaginate/vitals}
- * @see [Colors]{@link https://github.com/Marak/colors.js}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
@@ -27,10 +27,9 @@ var has   = help.has;
 var remap = help.remap;
 var roll  = help.roll;
 
-var colors = require('../../helpers/colors');
+var color = require('../../helpers/color');
 
 var getDelimiter = require('../helpers/get-delimiter');
-var getStyleKey = require('../helpers/get-style-key');
 var stripStyle = require('../helpers/strip-style');
 var getSpaces = require('../helpers/get-spaces');
 var getKeys = require('../helpers/get-keys');
@@ -40,7 +39,7 @@ var toString = require('../index');
 var OCDMAP = /^_*ocdmap$/i;
 
 /**
- * @this {!Settings}
+ * @this {Settings}
  * @param {string} method
  * @param {!Object} obj
  * @return {string}
@@ -49,12 +48,12 @@ module.exports = function ocdmapToString(method, obj) {
 
   /** @type {string} */
   var delimiter;
-  /** @type {!OcdMapFormat} */
+  /** @type {OcdMapFormat} */
   var format;
   /** @type {!Array<string>} */
   var spaces;
-  /** @type {string} */
-  var style;
+  /** @type {OcdMapTheme} */
+  var theme;
   /** @type {!Array<string>} */
   var keys;
   /** @type {number} */
@@ -71,10 +70,10 @@ module.exports = function ocdmapToString(method, obj) {
 
   if (!keys.length) return '';
 
-  style = getStyleKey(this, method, 'ocdmap');
+  theme = this[method].style.ocdmap;
   format = this[method].format.ocdmap;
-  spaces = getSpaces(format.spaceBefore, format.spaceAfter, style);
-  delimiter = getDelimiter(format.delimiter, style);
+  spaces = getSpaces(format.spaceBefore, format.spaceAfter, theme);
+  delimiter = getDelimiter(theme, format.delimiter);
   delimiter = fuse(delimiter, ' ');
   len = getExtraLen(spaces, delimiter);
   last = keys.length - 1;
@@ -82,7 +81,7 @@ module.exports = function ocdmapToString(method, obj) {
     this.__keyLen = key.length + len;
     val = toString.call(this, method, obj[key]);
     val = i < last ? fuse(val, '\n') : val;
-    key = colors[style](key);
+    key = color(theme, key);
     return fuse(spaces[0], key, spaces[1], delimiter, val);
   }, this);
   this.__keyLen = 0;
