@@ -10,8 +10,8 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
+ * @see [chalk]{@link https://github.com/chalk/chalk}
  * @see [vitals]{@link https://github.com/imaginate/vitals}
- * @see [Colors]{@link https://github.com/Marak/colors.js}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
@@ -20,19 +20,19 @@
 
 'use strict';
 
-var colors = require('../../helpers/colors');
+var color = require('../../helpers/color');
 
 /**
+ * @param {MainTheme} theme
  * @param {string} brackets
- * @param {string} style
  * @return {!Array}
  */
-module.exports = function getBrackets(brackets, style) {
-  if (!brackets) return [ '','' ];
+module.exports = function getBrackets(theme, brackets) {
+  if (!brackets) return [ '', '' ];
   brackets += brackets.length > 1 ? '' : brackets;
-  style += '.brackets';
+  theme = theme.brackets;
   return [
-    colors[style]( brackets[0] ),
-    colors[style]( brackets[1] )
+    color(theme, brackets[0]),
+    color(theme, brackets[1])
   ];
 };
