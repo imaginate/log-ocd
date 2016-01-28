@@ -10,8 +10,8 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
+ * @see [chalk]{@link https://github.com/chalk/chalk}
  * @see [vitals]{@link https://github.com/imaginate/vitals}
- * @see [Colors]{@link https://github.com/Marak/colors.js}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
@@ -28,11 +28,11 @@ var has   = help.has;
 var remap = help.remap;
 var roll  = help.roll;
 var slice = help.slice;
+var until = help.until;
 
-var colors = require('../../helpers/colors');
+var color = require('../../helpers/color');
 
 var getDelimiter = require('../helpers/get-delimiter');
-var getStyleKey = require('../helpers/get-style-key');
 var getBrackets = require('../helpers/get-brackets');
 var stripStyle = require('../helpers/strip-style');
 var getLimit = require('../helpers/get-limit');
@@ -46,7 +46,7 @@ var getLimit = require('../helpers/get-limit');
 var FILLER = /^<[\s\S]+>$/;
 
 /**
- * @this {!Settings}
+ * @this {Settings}
  * @param {string} method
  * @param {string} str
  * @return {string}
@@ -57,29 +57,29 @@ module.exports = function stringToString(method, str) {
   var delimiter;
   /** @type {!Array} */
   var brackets;
-  /** @type {!StringFormat} */
+  /** @type {StringFormat} */
   var format;
   /** @type {string} */
   var result;
   /** @type {string} */
   var indent;
-  /** @type {string} */
-  var style;
+  /** @type {StringTheme} */
+  var theme;
   /** @type {number} */
   var limit;
   /** @type {string} */
   var line;
 
-  style = getStyleKey(this, method, 'string');
+  theme = this[method].style.string;
   str = remap(str, /\n/g, '\\n');
 
   if ( has(str, FILLER) ) {
     str = cut(str, /^<<|>>$/g);
-    return colors[style](str);
+    return color(theme, str);
   }
 
   format = this[method].format.string;
-  brackets = getBrackets(format.brackets, style);
+  brackets = getBrackets(theme, format.brackets);
 
   limit = getLimit(this[method].format.lineLimit, this.__maxLen);
   limit -= this.__indent;
@@ -87,14 +87,14 @@ module.exports = function stringToString(method, str) {
   limit -= getBracketsLen(brackets);
 
   if (limit <= 0 || str.length <= limit) {
-    str = colors[style](str);
+    str = color(theme, str);
     return fuse(brackets[0], str, brackets[1]);
   }
 
   limit -= 2; // for delimiter
-  delimiter = getDelimiter(' +', style);
+  delimiter = getDelimiter(theme, ' +');
   indent = fill(this.__indent, ' ');
-  result = getLine(str, limit, brackets, delimiter, style);
+  result = getLine(theme, str, limit, brackets, delimiter);
   str = slice(str, limit);
 
   if (this.__keyLen) {
@@ -103,30 +103,31 @@ module.exports = function stringToString(method, str) {
     indent = fuse(indent, '  ');
   }
 
-  while (str.length > limit) {
-    line = getLine(str, limit, brackets, delimiter, style, indent);
+  until(0, function() {
+    line = getLine(theme, str, limit, brackets, delimiter, indent);
     result = fuse(result, line);
     str = slice(str, limit);
-  }
-  line = fuse(indent, brackets[0], colors[style](str), brackets[1]);
-  return fuse(result, line);
+    return str.length;
+  });
+  return result;
 };
 
 /**
  * @private
+ * @param {StringTheme} theme
  * @param {string} str
  * @param {number} end
  * @param {!Array} brackets
  * @param {string} delimiter
- * @param {string} style
  * @param {string=} indent
  * @return {string}
  */
-function getLine(str, end, brackets, delimiter, style, indent) {
+function getLine(theme, str, end, brackets, delimiter, indent) {
+  delimiter = str.length > end ? fuse(delimiter, '\n') : '';
   str = slice(str, 0, end);
-  str = colors[style](str);
+  str = color(theme, str);
   indent = indent || '';
-  return fuse(indent, brackets[0], str, brackets[1], delimiter, '\n');
+  return fuse(indent, brackets[0], str, brackets[1], delimiter);
 }
 
 /**

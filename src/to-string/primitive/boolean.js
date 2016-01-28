@@ -10,8 +10,8 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
+ * @see [chalk]{@link https://github.com/chalk/chalk}
  * @see [vitals]{@link https://github.com/imaginate/vitals}
- * @see [Colors]{@link https://github.com/Marak/colors.js}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
@@ -20,21 +20,15 @@
 
 'use strict';
 
-var colors = require('../../helpers/colors');
-var getStyleKey = require('../helpers/get-style-key');
+var color = require('../../helpers/color');
 
 /**
- * @this {!Settings}
+ * @this {Settings}
  * @param {string} method
  * @param {boolean} val
  * @return {string}
  */
 module.exports = function booleanToString(method, val) {
-
-  /** @type {string} */
-  var style;
-
-  style = getStyleKey(this, method, 'boolean');
   val = String(val);
-  return colors[style](val);
+  return color(this[method]['style']['boolean'], val);
 };

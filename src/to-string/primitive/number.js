@@ -10,8 +10,8 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
+ * @see [chalk]{@link https://github.com/chalk/chalk}
  * @see [vitals]{@link https://github.com/imaginate/vitals}
- * @see [Colors]{@link https://github.com/Marak/colors.js}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
@@ -27,14 +27,13 @@ var get   = help.get;
 var has   = help.has;
 var remap = help.remap;
 
-var colors = require('../../helpers/colors');
+var color = require('../../helpers/color');
 
 var getIdentifier = require('../helpers/get-identifier');
 var getDelimiter = require('../helpers/get-delimiter');
-var getStyleKey = require('../helpers/get-style-key');
 
 /**
- * @this {!Settings}
+ * @this {Settings}
  * @param {string} method
  * @param {number} val
  * @return {string}
@@ -45,24 +44,24 @@ module.exports = function numberToString(method, val) {
   var identifier;
   /** @type {string} */
   var delimiter;
-  /** @type {string} */
-  var style;
+  /** @type {NumberTheme} */
+  var theme;
 
-  style = getStyleKey(this, method, 'number');
+  theme = this[method]['style']['number'];
   val = String(val);
   identifier = get(val, /^[+-]/)[0] || '';
-  identifier = getIdentifier(identifier, style);
+  identifier = getIdentifier(theme, identifier);
   val = cut(val, /^[+-]/);
 
   if ( !has(val, '.') ) {
-    val = colors[style](val);
+    val = color(theme, val);
     return fuse(identifier, val);
   }
 
-  delimiter = getDelimiter('.', style);
+  delimiter = getDelimiter(theme, '.');
   val = val.split('.');
   val = remap(val, function(subval) {
-    return colors[style](subval);
+    return color(theme, subval);
   });
   return fuse(identifier, val[0], delimiter, val[1]);
 };
