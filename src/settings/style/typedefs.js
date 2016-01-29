@@ -10,8 +10,8 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
+ * @see [chalk]{@link https://github.com/chalk/chalk}
  * @see [vitals]{@link https://github.com/imaginate/vitals}
- * @see [Colors]{@link https://github.com/Marak/colors.js}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
@@ -250,7 +250,7 @@
  * @typedef {!{
  *   __keys:        Array<string>,
  *   __TYPE:        string,
- *   alternate:     Theme,
+ *   alternate:     StackAltRowTheme,
  *   event:         Theme,
  *   file:          Theme,
  *   module:        Theme,
@@ -270,10 +270,33 @@
  */
 
 /**
+ * @typedef {!{
+ *   __keys:        Array<string>,
+ *   __TYPE:        string,
+ *   event:         Theme,
+ *   file:          Theme,
+ *   module:        Theme,
+ *   line:          Theme,
+ *   column:        Theme,
+ *   color:         string,
+ *   bg:            string,
+ *   bold:          boolean,
+ *   dim:           boolean,
+ *   hidden:        boolean,
+ *   inverse:       boolean,
+ *   italic:        boolean,
+ *   reset:         boolean,
+ *   strikethrough: boolean,
+ *   underline:     boolean
+ * }} StackAltRowTheme
+ */
+
+/**
  * @typedef {!(
  *   StackRootTheme|
  *   StackTitleTheme|
- *   StackRowTheme
+ *   StackRowTheme|
+ *   StackAltRowTheme
  * )} StackTheme
  */
 
@@ -330,7 +353,7 @@
 /**
  * @typedef {!{
  *   __TYPE: string
- *   root:   Theme,
+ *   root:   StackRootTheme,
  *   title:  StackTitleTheme,
  *   row:    StackRowTheme
  * }} TraceStyle
