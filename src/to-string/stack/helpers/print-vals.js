@@ -10,8 +10,8 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
+ * @see [chalk]{@link https://github.com/chalk/chalk}
  * @see [vitals]{@link https://github.com/imaginate/vitals}
- * @see [Colors]{@link https://github.com/Marak/colors.js}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
@@ -26,16 +26,16 @@ var fill = help.fill;
 var fuse = help.fuse;
 var roll = help.roll;
 
-var colors = require('../../../helpers/colors');
+var color = require('../../../helpers/color');
 
 /**
+ * @param {StackTheme} theme
  * @param {!Array<string>} vals
  * @param {Columns} columns
- * @param {!Array<string>} space
- * @param {string} style
+ * @param {!Array<string>} spaces
  * @return {string}
  */
-module.exports = function printVals(vals, columns, space, style) {
+module.exports = function printVals(theme, vals, columns, spaces) {
 
   /** @type {string} */
   var result;
@@ -44,12 +44,11 @@ module.exports = function printVals(vals, columns, space, style) {
   /** @type {string} */
   var val;
 
-  result = roll.up(space[0], columns, function(column, i) {
+  result = roll.up(spaces[0], columns, function(column, i) {
     val = prepVal(column, vals[i]);
-    key = fuse(style, column.key);
-    return colors[key](val);
+    return color(theme[column.key], val);
   });
-  return fuse(result, space[1]);
+  return fuse(result, spaces[1]);
 };
 
 /**

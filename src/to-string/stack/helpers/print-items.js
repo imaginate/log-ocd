@@ -10,8 +10,8 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
+ * @see [chalk]{@link https://github.com/chalk/chalk}
  * @see [vitals]{@link https://github.com/imaginate/vitals}
- * @see [Colors]{@link https://github.com/Marak/colors.js}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
@@ -24,46 +24,45 @@ var help = require('../../../helpers');
 var fuse = help.fuse;
 var roll = help.roll;
 
-var colors = require('../../../helpers/colors');
+var color = require('../../../helpers/color');
 
 /**
+ * @param {StackTheme} theme
  * @param {Items} items
  * @param {Columns} columns
- * @param {!Array<string>} space
- * @param {string} style
+ * @param {!Array<string>} spaces
  * @return {string}
  */
-module.exports = function printItems(items, columns, space, style) {
+module.exports = function printItems(theme, items, columns, spaces) {
 
   /** @type {number} */
   var last;
 
   last = items.length - 1;
   return roll.up('', items, function(item, i) {
-    item = printItem(item, columns, space, style);
+    item = printItem(theme, item, columns, spaces);
     return i < last ? fuse(item, '\n') : item;
   });
 };
 
 /**
  * @private
+ * @param {StackTheme} theme
  * @param {Item} item
  * @param {Columns} columns
- * @param {!Array} space
- * @param {string} style
+ * @param {!Array} spaces
  * @return {string}
  */
-function printItem(item, columns, space, style) {
+function printItem(theme, item, columns, spaces) {
 
   /** @type {string} */
   var result;
   /** @type {string} */
   var val;
 
-  result = roll.up(space[0], columns, function(column, i) {
-    val = column.space[0] + item[i] + column.space[1];
-    i = fuse(style, column.key);
-    return colors[i](val);
+  result = roll.up(spaces[0], columns, function(column, i) {
+    val = fuse(column.space[0], item[i], column.space[1]);
+    return color(theme[column.key], val);
   });
-  return fuse(result, space[1]);
+  return fuse(result, spaces[1]);
 }
