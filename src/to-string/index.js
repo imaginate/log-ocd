@@ -26,7 +26,7 @@ var objectToString = require('./object');
 var primitiveToString = require('./primitive');
 
 /**
- * @this {!Settings}
+ * @this {Settings}
  * @param {string} method
  * @param {*} val
  * @return {string}
