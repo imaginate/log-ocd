@@ -15,9 +15,13 @@
 
 var crypto = require('crypto');
 
-// globally append all of are and vitals methods
-require('node-are')();
-require('node-vitals')(2, 'all');
+var vitals = require('node-vitals')('base', 'fs');
+var each   = vitals.each;
+var fuse   = vitals.fuse;
+var get    = vitals.get;
+var has    = vitals.has;
+var remap  = vitals.remap;
+var to     = vitals.to;
 
 exports['desc'] = 'hashes all image names in repo';
 exports['method'] = hashAllImg;
@@ -32,16 +36,17 @@ function hashAllImg() {
   var filepaths;
   /** @type {!Array<string>} */
   var newpath;
+  /** @type {!Buffer} */
+  var buffer;
 
-  filepaths = get.filepaths('.', {
-    validExts: 'jpg|png|gif|jpeg'
+  filepaths = get.filepaths('example', {
+    validExts: /jpe?g|png|gif$/
   });
   each(filepaths, function(filepath) {
+    filepath = fuse('example/', filepath);
     newpath = hashFile(filepath);
-    copy.file(filepath, newpath, {
-      'encoding': null,
-      'eol':      null
-    });
+    buffer = get.file(filepath, true);
+    to.file(buffer, newpath);
   });
 }
 
