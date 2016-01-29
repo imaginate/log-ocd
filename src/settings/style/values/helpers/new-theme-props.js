@@ -30,9 +30,8 @@ var fromThemeProps = require('./from-theme-props');
  */
 
 /**
- * @private
  * @param {Object} props
- * @return {!ThemeProps}
+ * @return {ThemeProps}
  */
 module.exports = function newThemeProps(props) {
   props = remap(props, function(val) {
