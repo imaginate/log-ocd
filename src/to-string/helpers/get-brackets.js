@@ -20,6 +20,8 @@
 
 'use strict';
 
+var fuse = require('../../helpers').fuse;
+
 var color = require('../../helpers/color');
 
 /**
@@ -29,7 +31,7 @@ var color = require('../../helpers/color');
  */
 module.exports = function getBrackets(theme, brackets) {
   if (!brackets) return [ '', '' ];
-  brackets += brackets.length > 1 ? '' : brackets;
+  brackets = fuse(brackets[0], brackets[1] || brackets);
   theme = theme.brackets;
   return [
     color(theme, brackets[0]),

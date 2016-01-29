@@ -23,11 +23,12 @@
 var color = require('../../helpers/color');
 
 /**
- * @param {Theme} theme
+ * @param {MainTheme} theme
  * @param {string} identifier
  * @return {string}
  */
 module.exports = function getIdentifier(theme, identifier) {
+  if (!identifier) return '';
   theme = theme.identifier;
-  return identifier && color(theme, identifier);
+  return color(theme, identifier);
 };
