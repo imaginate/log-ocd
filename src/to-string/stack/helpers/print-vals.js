@@ -29,7 +29,7 @@ var roll = help.roll;
 var color = require('../../../helpers/color').parent;
 
 /**
- * @param {StackTheme} theme
+ * @param {StackRowTheme} theme
  * @param {!Array<string>} vals
  * @param {Columns} columns
  * @param {!Array<string>} spaces

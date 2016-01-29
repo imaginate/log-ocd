@@ -44,7 +44,7 @@ module.exports = function titleToString(settings, columns) {
   var format;
   /** @type {!Array<string>} */
   var spaces;
-  /** @type {StackTitleTheme} */
+  /** @type {StackRowTheme} */
   var theme;
   /** @type {Items} */
   var items;

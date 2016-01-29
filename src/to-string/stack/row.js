@@ -31,7 +31,7 @@ var buildItems = require('./helpers/build-items');
 var printItems = require('./helpers/print-items');
 
 /**
- * @param {StackTheme} theme
+ * @param {StackRowTheme} theme
  * @param {Trace} trace
  * @param {Columns} columns
  * @param {!Array<string>} spaces

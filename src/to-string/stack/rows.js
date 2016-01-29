@@ -41,21 +41,21 @@ module.exports = function rowsToString(settings, stack, columns) {
   var format;
   /** @type {!Array<string>} */
   var spaces;
-  /** @type {StackRowTheme} */
-  var theme;
+  /** @type {TraceStyle} */
+  var style;
   /** @type {number} */
   var last;
 
-  theme  = settings.trace.style.row;
+  style  = settings.trace.style;
   format = settings.trace.format.row;
-  spaces = getSpaces(format.spaceBefore, format.spaceAfter, theme);
-  spaces.alt = getSpaces(format.spaceBefore, format.spaceAfter, theme.alternate);
+  spaces = getSpaces(format.spaceBefore, format.spaceAfter, style.row);
+  spaces.alt = getSpaces(format.spaceBefore, format.spaceAfter, style.altrow);
 
   last = stack.length - 1;
   return roll.up('', stack, function(trace, i) {
     trace = is.odd(i)
-      ? rowToString(theme, trace, columns, spaces)
-      : rowToString(theme.alternate, trace, columns, spaces.alt);
+      ? rowToString(style.row, trace, columns, spaces)
+      : rowToString(style.altrow, trace, columns, spaces.alt);
     return i < last ? fuse(trace, '\n') : trace;
   });
 };
