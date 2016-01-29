@@ -20,7 +20,7 @@
 
 'use strict';
 
-var newLogOCD = require('./src/setup');
+var newLogOCD = require('./src/init');
 
 /**
  * @public
