@@ -10,8 +10,8 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
+ * @see [chalk]{@link https://github.com/chalk/chalk}
  * @see [vitals]{@link https://github.com/imaginate/vitals}
- * @see [Colors]{@link https://github.com/Marak/colors.js}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
@@ -31,13 +31,13 @@ var buildItems = require('./helpers/build-items');
 var printItems = require('./helpers/print-items');
 
 /**
+ * @param {StackTheme} theme
  * @param {Trace} trace
  * @param {Columns} columns
- * @param {!Array<string>} space
- * @param {string} style
+ * @param {!Array<string>} spaces
  * @return {string}
  */
-module.exports = function rowToString(trace, columns, space, style) {
+module.exports = function rowToString(theme, trace, columns, spaces) {
 
   /** @type {Items} */
   var items;
@@ -46,15 +46,14 @@ module.exports = function rowToString(trace, columns, space, style) {
   /** @type {boolean} */
   var over;
 
-  style = fuse(style, '.');
   vals = buildVals(columns, trace);
   over = until(true, columns, function(column, i) {
     if ( !column.over && !is.same(column.key, 'file') ) return false;
     return vals[i].length > column.len;
   });
 
-  if (!over) return printVals(vals, columns, space, style);
+  if (!over) return printVals(theme, vals, columns, spaces);
 
   items = buildItems(columns, vals);
-  return printItems(items, columns, space, style);
+  return printItems(theme, items, columns, spaces);
 };

@@ -10,8 +10,8 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
+ * @see [chalk]{@link https://github.com/chalk/chalk}
  * @see [vitals]{@link https://github.com/imaginate/vitals}
- * @see [Colors]{@link https://github.com/Marak/colors.js}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
@@ -22,9 +22,8 @@
 
 var fuse = require('../../helpers').fuse;
 
-var getStyleKey = require('../helpers/get-style-key');
-var stripStyle = require('../helpers/strip-style');
 var noStyle = require('../helpers/no-style');
+var stripStyle = require('../helpers/strip-style');
 
 var buildColumns = require('./helpers/build-columns');
 
@@ -45,19 +44,16 @@ module.exports = function stackToString(method, stack) {
   /** @type {string} */
   var result;
   /** @type {string} */
-  var style;
-  /** @type {string} */
   var title;
   /** @type {string} */
   var root;
   /** @type {string} */
   var rows;
 
-  style = getStyleKey(this, 'trace');
   columns = buildColumns(this, stack);
-  root = rootToString(this, stack, style);
-  title = titleToString(this, columns, style);
-  rows = rowsToString(this, stack, columns, style);
+  root   = rootToString(this, stack);
+  title  = titleToString(this, columns);
+  rows   = rowsToString(this, stack, columns);
   result = fuse(root, title, rows);
   return noStyle(this.trace.config) ? stripStyle(result) : result;
 };

@@ -10,8 +10,8 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
+ * @see [chalk]{@link https://github.com/chalk/chalk}
  * @see [vitals]{@link https://github.com/imaginate/vitals}
- * @see [Colors]{@link https://github.com/Marak/colors.js}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
@@ -25,7 +25,7 @@ var fill  = help.fill;
 var fuse  = help.fuse;
 var slice = help.slice;
 
-var colors = require('../../helpers/colors');
+var color = require('../../helpers/color');
 
 var getIdentifier = require('../helpers/get-identifier');
 var getBrackets = require('../helpers/get-brackets');
@@ -35,10 +35,9 @@ var getLimit = require('../helpers/get-limit');
 /**
  * @param {Settings} settings
  * @param {Stack} stack
- * @param {string} style
  * @return {string}
  */
-module.exports = function rootToString(settings, stack, style) {
+module.exports = function rootToString(settings, stack) {
 
   /** @type {string} */
   var identifier;
@@ -46,8 +45,10 @@ module.exports = function rootToString(settings, stack, style) {
   var brackets;
   /** @type {string} */
   var dirpath;
-  /** @type {!RootFormat} */
+  /** @type {RootFormat} */
   var format;
+  /** @type {StackRootTheme} */
+  var theme;
   /** @type {string} */
   var space;
   /** @type {number} */
@@ -57,16 +58,16 @@ module.exports = function rootToString(settings, stack, style) {
 
   if (!settings.trace.config.root || !stack.base) return '';
 
-  style = fuse(style, '.root');
+  theme  = settings.trace.style.root;
   format = settings.trace.format.root;
-  intro = format.brackets.length && 1;
-  intro = intro + format.identifier.length + format.spaceBefore;
-  identifier = getIdentifier(format.identifier, style);
-  brackets = getBrackets(format.brackets, style);
-  space = getSpace(format.spaceBefore, style);
+  intro  = format.brackets.length && 1;
+  intro += format.identifier.length + format.spaceBefore;
+  identifier = getIdentifier(theme, format.identifier);
+  brackets = getBrackets(theme, format.brackets);
+  space = getSpace(format.spaceBefore, theme);
   limit = getLimit(format.lineLimit, settings.__maxLen);
   dirpath = divideRoot(stack.base, limit, intro);
-  dirpath = colors[style](dirpath);
+  dirpath = color(theme, dirpath);
   return fuse(space, identifier, brackets[0], dirpath, brackets[1], '\n');
 };
 

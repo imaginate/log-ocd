@@ -10,8 +10,8 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
+ * @see [chalk]{@link https://github.com/chalk/chalk}
  * @see [vitals]{@link https://github.com/imaginate/vitals}
- * @see [Colors]{@link https://github.com/Marak/colors.js}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
@@ -34,10 +34,9 @@ var printItems = require('./helpers/print-items');
 /**
  * @param {Settings} settings
  * @param {Columns} columns
- * @param {string} style
  * @return {string}
  */
-module.exports = function titleToString(settings, columns, style) {
+module.exports = function titleToString(settings, columns) {
 
   /** @type {string} */
   var result;
@@ -45,6 +44,8 @@ module.exports = function titleToString(settings, columns, style) {
   var format;
   /** @type {!Array<string>} */
   var spaces;
+  /** @type {StackTitleTheme} */
+  var theme;
   /** @type {Items} */
   var items;
   /** @type {!Array<string>} */
@@ -54,17 +55,16 @@ module.exports = function titleToString(settings, columns, style) {
 
   if (!settings.trace.config.title) return '';
 
-  style = fuse(style, '.title');
+  theme  = settings.trace.style.title;
   format = settings.trace.format.row;
-  spaces = getSpaces(format.spaceBefore, format.spaceAfter, style);
-  style = fuse(style, '.');
+  spaces = getSpaces(format.spaceBefore, format.spaceAfter, theme);
   vals = buildVals(columns);
   over = columns.over && until(true, columns, function(column, i) {
     return vals[i].length > column.len;
   });
   if (over) items = buildItems(columns, vals);
   result = over
-    ? printItems(items, columns, spaces, style)
-    : printVals(vals, columns, spaces, style);
+    ? printItems(theme, items, columns, spaces)
+    : printVals(theme, vals, columns, spaces);
   return fuse(result, '\n');
 };

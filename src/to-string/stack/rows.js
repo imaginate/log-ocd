@@ -10,8 +10,8 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
+ * @see [chalk]{@link https://github.com/chalk/chalk}
  * @see [vitals]{@link https://github.com/imaginate/vitals}
- * @see [Colors]{@link https://github.com/Marak/colors.js}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
@@ -30,66 +30,32 @@ var getSpaces = require('../helpers/get-spaces');
 var rowToString = require('./row');
 
 /**
- * @typedef {!{
- *   odd:  !Array<string>,
- *   even: !Array<string>
- * }} AltSpaces
- */
-
-/**
  * @param {Settings} settings
  * @param {Stack} stack
  * @param {Columns} columns
- * @param {string} style
  * @return {string}
  */
-module.exports = function rowsToString(settings, stack, columns, style) {
+module.exports = function rowsToString(settings, stack, columns) {
 
   /** @type {StackFormat} */
   var format;
-  /** @type {AltSpaces} */
+  /** @type {!Array<string>} */
   var spaces;
-  /** @type {string} */
-  var space;
+  /** @type {StackRowTheme} */
+  var theme;
   /** @type {number} */
   var last;
-  /** @type {string} */
-  var nth;
 
+  theme  = settings.trace.style.row;
   format = settings.trace.format.row;
-  style = fuse(style, '.row.');
-  spaces = newAltSpaces(format, style);
+  spaces = getSpaces(format.spaceBefore, format.spaceAfter, theme);
+  spaces.alt = getSpaces(format.spaceBefore, format.spaceAfter, theme.alternate);
+
   last = stack.length - 1;
   return roll.up('', stack, function(trace, i) {
-    nth = is.odd(i) ? 'odd' : 'even';
-    space = spaces[nth];
-    nth = fuse(style, nth);
-    trace = rowToString(trace, columns, space, nth);
+    trace = is.odd(i)
+      ? rowToString(theme, trace, columns, spaces)
+      : rowToString(theme.alternate, trace, columns, spaces.alt);
     return i < last ? fuse(trace, '\n') : trace;
   });
 };
-
-/**
- * @private
- * @param {StackFormat} format
- * @param {string} style
- * @return {AltSpaces}
- */
-function newAltSpaces(format, style) {
-  return {
-    even: newAltSpace(format, style, 'even'),
-    odd:  newAltSpace(format, style, 'odd')
-  };
-}
-
-/**
- * @private
- * @param {StackFormat} format
- * @param {string} style
- * @param {string} nth
- * @return {!Array<string>}
- */
-function newAltSpace(format, style, nth) {
-  style = fuse(style, nth);
-  return getSpaces(format.spaceBefore, format.spaceAfter, style);
-}
