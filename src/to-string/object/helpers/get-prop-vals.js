@@ -10,8 +10,8 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
+ * @see [chalk]{@link https://github.com/chalk/chalk}
  * @see [vitals]{@link https://github.com/imaginate/vitals}
- * @see [Colors]{@link https://github.com/Marak/colors.js}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
@@ -26,7 +26,7 @@ var fuse  = help.fuse;
 var has   = help.has;
 var remap = help.remap;
 
-var colors = require('../../../helpers/colors');
+var color = require('../../../helpers/color');
 
 var getKeys = require('../../helpers/get-keys');
 var stripStyle = require('../../helpers/strip-style');
@@ -42,16 +42,13 @@ var toString = require('../../index');
  */
 module.exports = function getPropVals(settings, method, details, obj) {
 
-  /** @type {function} */
-  var color;
   /** @type {string} */
   var intro;
 
-  color = colors[details.style];
   intro = fuse(details.identifier, details.brackets[0]);
   return is.arr(obj)
-    ? getArrVals(settings, method, details, obj, color, intro)
-    : getObjVals(settings, method, details, obj, color, intro);
+    ? getArrVals(settings, method, details, obj, intro)
+    : getObjVals(settings, method, details, obj, intro);
 };
 
 /**
@@ -60,11 +57,10 @@ module.exports = function getPropVals(settings, method, details, obj) {
  * @param {string} method
  * @param {PropDetails} details
  * @param {!Object} obj
- * @param {function} color
  * @param {string} intro
  * @return {!Array<string>}
  */
-function getObjVals(settings, method, details, obj, color, intro) {
+function getObjVals(settings, method, details, obj, intro) {
 
   /** @type {!Array<string>} */
   var vals;
@@ -84,7 +80,7 @@ function getObjVals(settings, method, details, obj, color, intro) {
     settings.__keyLen = key.length + 2;
     val = toString.call(settings, method, obj[key]);
     key = fuse(key, ':');
-    key = color(key);
+    key = color(details.theme, key);
     val = fuse(key, ' ', val);
     if (i < last) val = fuse(val, details.delimiter);
     len = getLen(val, len);
@@ -101,11 +97,10 @@ function getObjVals(settings, method, details, obj, color, intro) {
  * @param {string} method
  * @param {PropDetails} details
  * @param {!Array} arr
- * @param {function} color
  * @param {string} intro
  * @return {!Array<string>}
  */
-function getArrVals(settings, method, details, arr, color, intro) {
+function getArrVals(settings, method, details, arr, intro) {
 
   /** @type {!Array<string>} */
   var vals;
