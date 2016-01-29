@@ -42,7 +42,7 @@ log.resetStyle('fail');
 
 log('a quick message');
 
-log.pass('A `Success` Story', 'with easy value mapping via ocdmap', {
+log.pass('A `Success` Story', 'with easy value mapping', {
   'ocdmap': true,
   '+bold': true,
   '-bold': null,
