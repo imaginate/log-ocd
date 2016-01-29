@@ -10,8 +10,8 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
+ * @see [chalk]{@link https://github.com/chalk/chalk}
  * @see [vitals]{@link https://github.com/imaginate/vitals}
- * @see [Colors]{@link https://github.com/Marak/colors.js}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
@@ -26,10 +26,9 @@ var fill = help.fill;
 var fuse = help.fuse;
 var roll = help.roll;
 
-var colors = require('../../helpers/colors');
+var color = require('../../helpers/color');
 
 var parseAccents = require('../helpers/parse-accents');
-var getStyleKey = require('../helpers/get-style-key');
 var stripStyle = require('../helpers/strip-style');
 var getAccent = require('../helpers/get-accent');
 var getBullet = require('../helpers/get-bullet');
@@ -39,7 +38,7 @@ var noStyle = require('../helpers/no-style');
 var linesToString = require('./lines');
 
 /**
- * @this {!Settings}
+ * @this {Settings}
  * @param {string} method
  * @param {string} msg
  * @return {string}
@@ -56,17 +55,17 @@ module.exports = function msgToString(method, msg) {
   var indent;
   /** @type {string} */
   var result;
-  /** @type {string} */
-  var style;
+  /** @type {MsgTheme} */
+  var theme;
   /** @type {number} */
   var limit;
   /** @type {string} */
   var key;
 
-  style  = getStyleKey(this, method, 'msg');
+  theme  = this[method].style.msg;
   format = this[method].format.msg;
   accent = getAccent(format.accentMark);
-  bullet = getBullet(format.bullet, style);
+  bullet = getBullet(theme, format.bullet);
   indent = fill(format.indent, ' ');
   limit  = getLimit(format.lineLimit, this.__maxLen);
   limit -= limit && format.bullet.length && format.bullet.length + 1;
@@ -74,13 +73,12 @@ module.exports = function msgToString(method, msg) {
   msg = parseAccents(msg, accent);
 
   if ( limit && getLen(msg) > limit ) {
-    return linesToString(msg, ++limit, bullet, indent, style);
+    return linesToString(theme, msg, ++limit, indent, bullet);
   }
 
   if (format.bullet) bullet = fuse(bullet, ' ');
   msg = roll.up('', msg, function(part, i) {
-    key = is.odd(i) ? fuse(style, '.accent') : style;
-    return colors[key](part);
+    return is.odd(i) ? color(theme.accent, part) : color(theme, part);
   });
   result = fuse(indent, bullet, msg);
   return noStyle(this[method].config) ? stripStyle(result) : result;

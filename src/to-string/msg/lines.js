@@ -10,8 +10,8 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
+ * @see [chalk]{@link https://github.com/chalk/chalk}
  * @see [vitals]{@link https://github.com/imaginate/vitals}
- * @see [Colors]{@link https://github.com/Marak/colors.js}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
@@ -22,6 +22,7 @@
 
 var help = require('../../helpers');
 var fill  = help.fill;
+var fuse  = help.fuse;
 var until = help.until;
 
 var stripStyle = require('../helpers/strip-style');
@@ -29,31 +30,34 @@ var stripStyle = require('../helpers/strip-style');
 var lineToString = require('./line');
 
 /**
+ * @param {MsgTheme} theme
  * @param {!Array} msg
  * @param {number} limit
- * @param {string} bullet
  * @param {string} indent
- * @param {string} style
+ * @param {string} bullet
  * @return {string}
  */
-module.exports = function linesToString(msg, limit, bullet, indent, style) {
+module.exports = function linesToString(theme, msg, limit, indent, bullet) {
 
   /** @type {string} */
   var result;
+  /** @type {string} */
+  var lead;
   /** @type {string} */
   var line;
   /** @type {number} */
   var len;
 
-  bullet += bullet && ' ';
-  result = lineToString(msg, limit, indent + bullet, style);
+  bullet = bullet && fuse(bullet, ' ');
+  lead   = fuse(indent, bullet);
+  result = lineToString(theme, msg, limit, lead);
   bullet = bullet && stripStyle(bullet);
   bullet = fill(bullet.length, ' ');
-  indent += bullet;
-  until('', 100, function() {
-    line = lineToString(msg, limit, indent, style);
-    result += line;
-    return line;
+  lead   = fuse(indent, bullet);
+  until(0, function() {
+    line = lineToString(theme, msg, limit, lead);
+    result = fuse(result, line);
+    return line.length;
   });
   return result;
 };

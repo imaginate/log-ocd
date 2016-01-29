@@ -10,8 +10,8 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
+ * @see [chalk]{@link https://github.com/chalk/chalk}
  * @see [vitals]{@link https://github.com/imaginate/vitals}
- * @see [Colors]{@link https://github.com/Marak/colors.js}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
@@ -21,19 +21,20 @@
 'use strict';
 
 var help = require('../../helpers');
+var fuse  = help.fuse;
 var slice = help.slice;
 var until = help.until;
 
-var colors = require('../../helpers/colors');
+var color = require('../../helpers/color');
 
 /**
+ * @param {MsgTheme} theme
  * @param {!Array} msg
  * @param {number} limit
- * @param {string} indent
- * @param {string} style
+ * @param {string} lead
  * @return {string}
  */
-module.exports = function lineToString(msg, limit, indent, style) {
+module.exports = function lineToString(theme, msg, limit, lead) {
 
   /** @type {string} */
   var result;
@@ -46,9 +47,10 @@ module.exports = function lineToString(msg, limit, indent, style) {
     remain = slice(part, limit);
     part   = slice(part, 0, limit);
     limit -= part.length;
-    result += colors[ i % 2 ? style + '.accent' : style ](part);
+    part   = is.odd(i) ? color(theme.accent, part) : color(theme, part);
+    result = fuse(result, part);
     msg[i] = remain;
     return limit;
   });
-  return result && indent + result;
+  return result && fuse(lead, result);
 };
