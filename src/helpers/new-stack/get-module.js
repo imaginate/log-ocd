@@ -20,6 +20,8 @@
 
 'use strict';
 
+var fuse = require('../index').fuse;
+
 var isExtern = require('./is-extern');
 var getExtern = require('./get-extern');
 var getRelativePath = require('./get-relative-path');
@@ -40,5 +42,5 @@ module.exports = function getModule(traceStr, base, trace) {
   if (!base || !trace.dir.length) return '(node.js core)';
 
   basepath = getRelativePath(base, trace.dir);
-  return basepath + trace.file;
+  return fuse(basepath, trace.file);
 };
