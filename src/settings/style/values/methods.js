@@ -59,7 +59,8 @@ methods['pass'].makeProps = function() {
       bg: 'green',
       accent: newTheme({
         color: 'yellow',
-        bg:    'green'
+        bg:    'green',
+        bold:  true
       })
     })
   };
@@ -70,7 +71,8 @@ methods['error'].makeProps = function() {
       bg: 'red',
       accent: newTheme({
         color: 'yellow',
-        bg:    'red'
+        bg:    'red',
+        bold:  true
       })
     })
   };
@@ -81,7 +83,8 @@ methods['warn'].makeProps = function() {
       bg: 'yellow',
       accent: newTheme({
         color: 'blue',
-        bg:    'yellow'
+        bg:    'yellow',
+        bold:  true
       })
     })
   };
@@ -92,7 +95,8 @@ methods['debug'].makeProps = function() {
       bg: 'blue',
       accent: newTheme({
         color: 'magenta',
-        bg:    'blue'
+        bg:    'blue',
+        bold:  true
       })
     })
   };
@@ -103,7 +107,8 @@ methods['fail'].makeProps = function() {
       bg: 'red',
       accent: newTheme({
         color: 'yellow',
-        bg:    'red'
+        bg:    'red',
+        bold:  true
       })
     })
   };
