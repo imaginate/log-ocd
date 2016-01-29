@@ -10,8 +10,8 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
+ * @see [chalk]{@link https://github.com/chalk/chalk}
  * @see [vitals]{@link https://github.com/imaginate/vitals}
- * @see [Colors]{@link https://github.com/Marak/colors.js}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
@@ -25,10 +25,9 @@ var is   = help.is;
 var fuse = help.fuse;
 var roll = help.roll;
 
-var colors = require('../../helpers/colors');
+var color = require('../../helpers/color');
 
 var parseAccents = require('../helpers/parse-accents');
-var getStyleKey = require('../helpers/get-style-key');
 var stripStyle = require('../helpers/strip-style');
 var getAccent = require('../helpers/get-accent');
 var getSpaces = require('../helpers/get-spaces');
@@ -53,29 +52,28 @@ module.exports = function headerToString(method, header) {
   var spaces;
   /** @type {string} */
   var result;
-  /** @type {string} */
-  var style;
+  /** @type {HeaderTheme} */
+  var theme;
   /** @type {number} */
   var limit;
   /** @type {string} */
   var key;
 
-  style  = getStyleKey(this, method, 'header');
+  theme  = this[method].style.header;
   format = this[method].format.header;
   accent = getAccent(format.accentMark);
-  spaces = getSpaces(format.spaceBefore, format.spaceAfter, style);
+  spaces = getSpaces(format.spaceBefore, format.spaceAfter, theme);
   limit  = getLimit(format.lineLimit, this.__maxLen);
   limit -= limit && format.spaceBefore;
   limit -= limit && format.spaceAfter;
   header = parseAccents(header, accent);
 
   if ( limit && getLen(header) > limit ) {
-    return linesToString(header, ++limit, spaces, style);
+    return linesToString(theme, header, ++limit, spaces);
   }
 
   header = roll.up('', header, function(part, i) {
-    key = is.odd(i) ? fuse(style, '.accent') : style;
-    return colors[key](part);
+    return is.odd(i) ? color(theme.accent, part) : color(theme, part);
   });
   result = fuse(spaces[0], header, spaces[1]);
   return noStyle(this[method].config) ? stripStyle(result) : result;

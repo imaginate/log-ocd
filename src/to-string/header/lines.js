@@ -10,8 +10,8 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
+ * @see [chalk]{@link https://github.com/chalk/chalk}
  * @see [vitals]{@link https://github.com/imaginate/vitals}
- * @see [Colors]{@link https://github.com/Marak/colors.js}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
@@ -25,13 +25,13 @@ var until = require('../../helpers').until;
 var lineToString = require('./line');
 
 /**
+ * @param {HeaderTheme} theme
  * @param {!Array} header
  * @param {number} limit
  * @param {!Array} spaces
- * @param {string} style
  * @return {string}
  */
-module.exports = function linesToString(header, limit, spaces, style) {
+module.exports = function linesToString(theme, header, limit, spaces) {
 
   /** @type {string} */
   var result;
@@ -42,7 +42,7 @@ module.exports = function linesToString(header, limit, spaces, style) {
 
   result = '';
   until('', 100, function() {
-    line = lineToString(header, limit, spaces, style);
+    line = lineToString(theme, header, limit, spaces);
     result += line;
     return line;
   });
