@@ -243,61 +243,11 @@
  *   reset:         boolean,
  *   strikethrough: boolean,
  *   underline:     boolean
- * }} StackTitleTheme
- */
-
-/**
- * @typedef {!{
- *   __keys:        Array<string>,
- *   __TYPE:        string,
- *   alternate:     StackAltRowTheme,
- *   event:         Theme,
- *   file:          Theme,
- *   module:        Theme,
- *   line:          Theme,
- *   column:        Theme,
- *   color:         string,
- *   bg:            string,
- *   bold:          boolean,
- *   dim:           boolean,
- *   hidden:        boolean,
- *   inverse:       boolean,
- *   italic:        boolean,
- *   reset:         boolean,
- *   strikethrough: boolean,
- *   underline:     boolean
  * }} StackRowTheme
  */
 
 /**
- * @typedef {!{
- *   __keys:        Array<string>,
- *   __TYPE:        string,
- *   event:         Theme,
- *   file:          Theme,
- *   module:        Theme,
- *   line:          Theme,
- *   column:        Theme,
- *   color:         string,
- *   bg:            string,
- *   bold:          boolean,
- *   dim:           boolean,
- *   hidden:        boolean,
- *   inverse:       boolean,
- *   italic:        boolean,
- *   reset:         boolean,
- *   strikethrough: boolean,
- *   underline:     boolean
- * }} StackAltRowTheme
- */
-
-/**
- * @typedef {!(
- *   StackRootTheme|
- *   StackTitleTheme|
- *   StackRowTheme|
- *   StackAltRowTheme
- * )} StackTheme
+ * @typedef {!(StackRootTheme|StackRowTheme)} StackTheme
  */
 
 /**
@@ -354,8 +304,9 @@
  * @typedef {!{
  *   __TYPE: string
  *   root:   StackRootTheme,
- *   title:  StackTitleTheme,
- *   row:    StackRowTheme
+ *   title:  StackRowTheme,
+ *   row:    StackRowTheme,
+ *   altrow: StackRowTheme
  * }} TraceStyle
  */
 
