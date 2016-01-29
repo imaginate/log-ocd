@@ -20,9 +20,9 @@
 
 'use strict';
 
-var capFirst = require('../../helpers/cap-first');
+var capFirst = require('../../../helpers/cap-first');
 
-var help = require('../../helpers');
+var help = require('../../../helpers');
 var cut    = help.cut;
 var each   = help.each;
 var freeze = help.freeze;
