@@ -4,7 +4,7 @@
 
 [see example code](https://github.com/imaginate/log-ocd/blob/master/example/index.js)
 
-<a href="https://github.com/imaginate/log-ocd/blob/master/example/index.js"><img src="http://www.algorithmiv.com/images/log-ocd/example-4b4b357ffd482a1713ed.png" alt="log-ocd example" /></a>
+<a href="https://github.com/imaginate/log-ocd/blob/master/example/index.js"><img src="http://www.algorithmiv.com/images/log-ocd/example-8c57cb990f748484ace0.png" alt="log-ocd example" /></a>
 
 
 ## Install
