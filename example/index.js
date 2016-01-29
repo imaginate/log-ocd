@@ -9,16 +9,16 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
+ * @see [chalk]{@link https://github.com/chalk/chalk}
  * @see [vitals]{@link https://github.com/imaginate/vitals}
- * @see [Colors]{@link https://github.com/Marak/colors.js}
  */
 
 'use strict';
 
 // make a local log-ocd instance
-var log = require('../log-ocd')();
+var log = require('log-ocd')();
 // or make it global
-require('../log-ocd')('log');
+require('log-ocd')('log');
 
 // set the config for all methods
 log.setConfig('all', { 'throw': false });
@@ -37,25 +37,24 @@ log.setFormat('log', { 'linesAfter': 0 });
 log.error.setFormat({ 'msg': { 'accentMark': '!' } });
 log.debug.setFormat({ 'lineLimit': 35 });
 log.trace.setFormat({ 'root': { 'identifier': 'stacktrace-root-dir: ' } });
-log.fail.setStyle({ 'msg': { 'color': 'blue' } });
+log.pass.setStyle({ 'boolean': { 'bold': true } });
 log.resetStyle('fail');
 
 log('a quick message');
 
-log.pass('A `Success` Story', 'with easy arg mapping via ocdmap', {
+log.pass('A `Success` Story', 'with easy value mapping via ocdmap', {
   'ocdmap': true,
-  'a': 1.2,
-  'b': null,
-  'c': 'yum'
+  '+bold': true,
+  '-bold': null,
+  ' @ @ ': undefined,
+  ' \\_/ ': -1.2
 });
 
 var errorInst = require('./error');
 log.error(errorInst, 'some !guidance! and a tale of !accented adventure!', {
-  'plus': 'easier',
-  'arg': 'mapping',
-  'via': 'config.ocdmap',
-  '===': true
-}, 'and the best (and most flexible) stacktrace printing');
+  'plus': 'automatic mapping',
+  'with': '< setConfig({ ocdmap: true }) >'
+}, '<<and the BEST stacktrace printing EVER!!!>>');
 
 log.debug('A Beacon of `Hope`', [
   'that', 'AUTOMAGICALLY', 'adjusts'
