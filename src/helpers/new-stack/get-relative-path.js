@@ -21,7 +21,9 @@
 'use strict';
 
 var help = require('../index');
+var is    = help.is;
 var fill  = help.fill;
+var fuse  = help.fuse;
 var slice = help.slice;
 var until = help.until;
 
@@ -46,16 +48,17 @@ module.exports = function getRelativePath(base, dir) {
   index = -1;
   min = base.length;
   min = dir.length < min ? dir.length : min;
-  until(false, min, function(i) {
-    if (base[i] !== dir[i]) index = i;
-    return index < 0;
+  until(true, min, function(i) {
+    if ( is.same(base[i], dir[i]) ) return false;
+    index = i;
+    return true;
   });
 
   len = base.length - dir.length;
-  dir = index < 0 ? [] : slice(dir, index);
+  dir = is.same(index, -1) ? [] : slice(dir, index);
   len += dir.length;
   dir = dir.join('');
-  dir = dir && cutSlash(dir) + '/';
+  dir = dir && fuse(cutSlash(dir), '/');
   pre = fill(len, '../') || './';
-  return pre + dir;
+  return fuse(pre, dir);
 };
