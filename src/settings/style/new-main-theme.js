@@ -63,6 +63,7 @@ module.exports = function newMainTheme(section, type, props) {
     theme = setter
       ? amend(theme, key, val, obj.type, setter)
       : amend(theme, key, val, obj.type);
+    if (setter && val) theme[key] = val;
   });
   theme = seal(theme);
   return fuse(theme, props);
