@@ -48,8 +48,8 @@ module.exports = function newPropDetails(settings, method, type) {
   var details;
   /** @type {(Format|ObjectFormat)} */
   var format;
-  /** @type {string} */
-  var style;
+  /** @type {(Theme|MainTheme)} */
+  var theme;
 
   details = {};
   format = settings[method].format;
