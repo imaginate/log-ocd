@@ -154,30 +154,40 @@ stack['title'] = {
 };
 
 stack['row'] = {
-  'color':     'white',
-  'event':     null,
-  'file':      null,
-  'module':    null,
-  'line':      null,
-  'column':    null,
-  'alternate': {
-    'color': 'white',
-    'bg':    'blue'
-  }
+  'color':  'white',
+  'event':  null,
+  'file':   null,
+  'module': null,
+  'line':   null,
+  'column': null
 };
 
-type = remap(type, function(prop) {
-  return newThemeProps(prop);
-});
-stack = remap(stack, function(prop) {
-  return newThemeProps(prop);
-});
+stack['altrow'] = {
+  'color':  'white',
+  'bg':     'blue',
+  'event':  null,
+  'file':   null,
+  'module': null,
+  'line':   null,
+  'column': null
+};
 
 /**
  * @type {SectionProps}
  * @const
  */
 module.exports = freeze({
-  type:  type,
-  stack: stack
+  type:  newSectionProp(type),
+  stack: newSectionProp(stack)
 }, true);
+
+/**
+ * @private
+ * @param {!Object} props
+ * @return {SectionProp}
+ */
+function newSectionProp(props) {
+  return remap(props, function(prop) {
+    return newThemeProps(prop);
+  });
+}
