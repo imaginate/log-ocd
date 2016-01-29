@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------------
  * LOG-OCD: CONFIG NEW-CONFIG
  * -----------------------------------------------------------------------------
- * @version 1.0.0
+ * @version 1.0.0-beta.5
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
  *
  * @author Adam Smith <adam@imaginate.life> (https://github.com/imaginate)
