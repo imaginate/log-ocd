@@ -80,7 +80,7 @@ type['string'] = {
 
 type['number'] = {
   'color':      'magenta',
-  'identifier': { color: 'magenta' },
+  'identifier': { color: 'red'     },
   'delimiter':  { color: 'magenta' }
 };
 
