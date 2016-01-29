@@ -20,7 +20,9 @@
 
 'use strict';
 
-var roll = require('./index').roll;
+var help = require('./index');
+var fuse = help.fuse;
+var roll = help.roll;
 
 var chalk = require('chalk');
 
@@ -28,11 +30,30 @@ var chalk = require('chalk');
  * @param {(Theme|MainTheme)} theme
  * @param {string} str
  */
-module.exports = function color(theme, str) {
+exports = module.exports = function color(theme, str) {
 
   if (!theme.__keys) return str;
 
   return roll(chalk, theme.__keys, function(chalk, key) {
+    return chalk[key];
+  })(str);
+};
+
+/**
+ * @param {MainTheme} main
+ * @param {Theme} theme
+ * @param {string} str
+ */
+exports.parent = function colorParent(main, theme, str) {
+
+  /** @type {!Array} */
+  var keys;
+
+  if (!main.__keys && !theme.__keys) return str;
+
+  keys = main.__keys || [];
+  keys = fuse(keys, theme.__keys);
+  return roll(chalk, keys, function(chalk, key) {
     return chalk[key];
   })(str);
 };

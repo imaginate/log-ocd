@@ -24,7 +24,7 @@ var help = require('../../../helpers');
 var fuse = help.fuse;
 var roll = help.roll;
 
-var color = require('../../../helpers/color');
+var color = require('../../../helpers/color').parent;
 
 /**
  * @param {StackTheme} theme
@@ -62,7 +62,7 @@ function printItem(theme, item, columns, spaces) {
 
   result = roll.up(spaces[0], columns, function(column, i) {
     val = fuse(column.space[0], item[i], column.space[1]);
-    return color(theme[column.key], val);
+    return color(theme, theme[column.key], val);
   });
   return fuse(result, spaces[1]);
 }
