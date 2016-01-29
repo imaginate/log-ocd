@@ -10,8 +10,8 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
+ * @see [chalk]{@link https://github.com/chalk/chalk}
  * @see [vitals]{@link https://github.com/imaginate/vitals}
- * @see [Colors]{@link https://github.com/Marak/colors.js}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
@@ -27,8 +27,6 @@ var fuse  = help.fuse;
 var get   = help.get;
 var has   = help.has;
 var until = help.until;
-
-var setColors = require('../../helpers/colors').setThemes;
 
 var propTypeError = require('../helpers/prop-type-error');
 var propRangeError = require('../helpers/prop-range-error');
@@ -46,36 +44,26 @@ var METHOD = 'setStyle';
  */
 exports.all = function setAllStyle(settings, props) {
 
-  /** @type {MainTheme} */
-  var maintheme;
-  /** @type {boolean} */
-  var result;
   /** @type {Theme} */
   var theme;
   /** @type {Style} */
   var style;
-  /** @type {!Array} */
-  var keys;
-  /** @type {*} */
-  var val;
+  /** @type {MainTheme} */
+  var main;
 
   return !until(true, settings, function(setting, method) {
     style = setting.style;
-    keys = get.keys(props);
-    keys = cut(keys, function(key) {
-      return has(style, key);
-    });
-    result = until(false, keys, function(key) {
-      val = props[key];
+    return until(false, props, function(val, key) {
+      if ( !has(style, key) ) return true;
       if ( !is.obj(val) ) return setProp(settings, style, key, val);
-      maintheme = style[key];
-      if ( !is.obj(maintheme) ) return propTypeError(settings, METHOD, key, val);
+      main = style[key];
+      if ( !is.obj(main) ) return propTypeError(settings, METHOD, key, val);
       return !until(false, val, function(mainval, mainkey) {
-        if ( !has(maintheme, mainkey) ) return true;
+        if ( !has(main, mainkey) ) return true;
         if ( !is.obj(mainval) ) {
-          return setProp(settings, maintheme, key, mainkey, mainval);
+          return setProp(settings, main, key, mainkey, mainval);
         }
-        theme = maintheme[mainkey];
+        theme = main[mainkey];
         mainkey = fuse(key, '.', mainkey);
         if ( !is.obj(theme) ) {
           return propTypeError(settings, METHOD, mainkey, mainval);
@@ -89,8 +77,6 @@ exports.all = function setAllStyle(settings, props) {
         });
       });
     });
-    setColors(settings.__INST, style, method, keys);
-    return result;
   });
 };
 
@@ -102,32 +88,28 @@ exports.all = function setAllStyle(settings, props) {
  */
 exports.one = function setOneStyle(settings, method, props) {
 
-  /** @type {!MainTheme} */
-  var maintheme;
-  /** @type {boolean} */
-  var result;
+  /** @type {Style} */
+  var style;
   /** @type {Theme} */
   var theme;
-  /** @type {!Style} */
-  var style;
-  /** @type {!Array} */
-  var keys;
+  /** @type {MainTheme} */
+  var main;
 
   style = settings[method].style;
-  result = !until(false, props, function(val, key) {
+  return !until(false, props, function(val, key) {
     if ( !has(style, key) ) return propRangeError(settings, METHOD, key);
     if ( !is.obj(val) ) return setProp(settings, style, key, val);
-    maintheme = style[key];
-    if ( !is.obj(maintheme) ) return propTypeError(settings, METHOD, key, val);
+    main = style[key];
+    if ( !is.obj(main) ) return propTypeError(settings, METHOD, key, val);
     return !until(false, val, function(mainval, mainkey) {
-      if ( !has(maintheme, mainkey) ) {
+      if ( !has(main, mainkey) ) {
         mainkey = fuse(key, '.', mainkey);
         return propRangeError(settings, METHOD, mainkey);
       }
       if ( !is.obj(mainval) ) {
-        return setProp(settings, maintheme, key, mainkey, mainval);
+        return setProp(settings, main, key, mainkey, mainval);
       }
-      theme = maintheme[mainkey];
+      theme = main[mainkey];
       mainkey = fuse(key, '.', mainkey);
       if ( !is.obj(theme) ) {
         return propTypeError(settings, METHOD, mainkey, mainval);
@@ -141,14 +123,6 @@ exports.one = function setOneStyle(settings, method, props) {
       });
     });
   });
-  keys = get.keys(props);
-  if (!result) {
-    keys = cut(keys, function(key) {
-      return has(style, key);
-    });
-  }
-  setColors(settings.__INST, style, method, keys);
-  return result;
 };
 
 /**

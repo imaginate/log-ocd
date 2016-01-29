@@ -10,8 +10,8 @@
  *
  * Supporting Libraries:
  * @see [are]{@link https://github.com/imaginate/are}
+ * @see [chalk]{@link https://github.com/chalk/chalk}
  * @see [vitals]{@link https://github.com/imaginate/vitals}
- * @see [Colors]{@link https://github.com/Marak/colors.js}
  *
  * Annotations:
  * @see [JSDoc3]{@link http://usejsdoc.org/}
@@ -24,8 +24,6 @@ var help = require('../helpers');
 var is   = help.is;
 var each = help.each;
 var has  = help.has;
-
-var setColors = require('../helpers/colors').setThemes;
 
 var typeError = require('./helpers/type-error');
 var rangeError = require('./helpers/range-error');
@@ -61,17 +59,11 @@ module.exports = function reset(type, method) {
     each(this, function(setting, method) {
       setting[type] = getDefault(method);
     });
-    if ( is.same(type, 'style') ) {
-      each(this, function(setting, method) {
-        setColors(this.__INST, setting.style, method);
-      }, this);
-    }
     return true;
   }
 
   if ( !has(this, method) ) return rangeError(this, 'reset', method);
 
   this[method][type] = getDefault(method);
-  if ( is.same(type, 'style') ) setColors(this.__INST, this[method].style, method);
   return true;
 };
