@@ -21,23 +21,14 @@
 'use strict';
 
 var help = require('../index');
-var cut    = help.cut;
-var freeze = help.freeze;
-var get    = help.get;
+var cut  = help.cut;
+var fuse = help.fuse;
+var get  = help.get;
+var has  = help.has;
 
-/**
- * @private
- * @type {!RegExp}
- * @const
- */
-var DIR = freeze( /(?:\(|\/)[^\/]+/ );
-
-/**
- * @private
- * @type {!RegExp}
- * @const
- */
-var OPEN_PAR = freeze( /^\(/ );
+var DIR   = /\/[^\/]+/;
+var DRIVE = /^[a-z]:/i;
+var EVENT = /^[^\(]+? *\(/;
 
 /**
  * @param {string} trace
@@ -47,9 +38,17 @@ module.exports = function getDirpath(trace) {
 
   /** @type {!Array} */
   var dirpath;
+  /** @type {string} */
+  var drive;
 
+  trace = cut(trace, EVENT);
   dirpath = get(trace, DIR);
   dirpath = cut(dirpath, -1);
-  if (dirpath.length) dirpath[0] = cut(dirpath[0], OPEN_PAR);
+
+  if ( has(trace, DRIVE) ) {
+    drive = get(trace, DRIVE)[0];
+    dirpath = fuse.val.top(dirpath, drive);
+  }
+
   return dirpath;
 };
