@@ -20,10 +20,11 @@
 'use strict';
 
 var help = require('../index');
-var is    = help.is;
 var fill  = help.fill;
 var fuse  = help.fuse;
+var same  = help.same;
 var slice = help.slice;
+var to    = help.to;
 var until = help.until;
 
 var cutSlash = require('./cut-slash');
@@ -48,16 +49,17 @@ module.exports = function getRelativePath(base, dir) {
   min = base.length;
   min = dir.length < min ? dir.length : min;
   until(true, min, function(i) {
-    if ( is.same(base[i], dir[i]) ) return false;
+    if ( same(base[i], dir[i]) ) return false;
     index = i;
     return true;
   });
 
   len = base.length - dir.length;
-  dir = is.same(index, -1) ? [] : slice(dir, index);
+  dir = same(index, -1) ? [] : slice(dir, index);
   len += dir.length;
-  dir = dir.join('');
-  dir = dir && fuse(cutSlash(dir), '/');
+  dir = to.string(dir, '');
+  dir = dir && cutSlash(dir);
+  dir = dir && fuse(dir, '/');
   pre = fill(len, '../') || './';
   return fuse(pre, dir);
 };
