@@ -20,8 +20,9 @@
 'use strict';
 
 var help = require('../../helpers');
-var is  = help.is;
-var has = help.has;
+var is   = help.is;
+var has  = help.has;
+var same = help.same;
 
 var typeError = require('../helpers/type-error');
 var rangeError = require('../helpers/range-error');
@@ -53,7 +54,7 @@ module.exports = function set(type, method, props) {
   if ( !is.str(method) ) return typeError(this, 'set', 'method', method);
   if ( !is.obj(props)  ) return typeError(this, 'set', 'props', props);
 
-  if ( is.same(method, 'all') ) return SET[type].all(this, props);
+  if ( same(method, 'all') ) return SET[type].all(this, props);
 
   if ( !has(this, method) ) return rangeError(this, 'set', 'method', method);
 

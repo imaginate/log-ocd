@@ -23,6 +23,7 @@ var help = require('../helpers');
 var is   = help.is;
 var each = help.each;
 var has  = help.has;
+var same = help.same;
 
 var typeError = require('./helpers/type-error');
 var rangeError = require('./helpers/range-error');
@@ -54,7 +55,7 @@ module.exports = function reset(type, method) {
 
   getDefault = GET_DEFAULT[type];
 
-  if ( is.same(method, 'all') ) {
+  if ( same(method, 'all') ) {
     each(this, function(setting, method) {
       setting[type] = getDefault(method);
     });
