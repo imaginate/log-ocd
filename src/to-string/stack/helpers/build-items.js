@@ -20,10 +20,10 @@
 'use strict';
 
 var help = require('../../../helpers');
-var is    = help.is;
 var fill  = help.fill;
 var fuse  = help.fuse;
 var remap = help.remap;
+var same  = help.same;
 var slice = help.slice;
 var until = help.until;
 
@@ -99,7 +99,7 @@ function newItem(columns, vals, done) {
     done[i] = true;
     vals[i] = fill(column.len, ' ');
     space = fill(column.len - val.length, ' ');
-    return is.same(column.align, 'left')
+    return same(column.align, 'left')
       ? fuse(val, space)
       : fuse(space, val);
   });

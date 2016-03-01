@@ -20,8 +20,8 @@
 'use strict';
 
 var help = require('../../helpers');
-var is    = help.is;
 var fuse  = help.fuse;
+var same  = help.same;
 var until = help.until;
 
 var buildVals = require('./helpers/build-vals');
@@ -47,7 +47,7 @@ module.exports = function rowToString(theme, trace, columns, spaces) {
 
   vals = buildVals(columns, trace);
   over = until(true, columns, function(column, i) {
-    if ( !column.over && !is.same(column.key, 'file') ) return false;
+    if ( !column.over && !same(column.key, 'file') ) return false;
     return vals[i].length > column.len;
   });
 

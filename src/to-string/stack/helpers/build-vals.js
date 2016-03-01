@@ -20,8 +20,8 @@
 'use strict';
 
 var help = require('../../../helpers');
-var is    = help.is;
 var remap = help.remap;
+var same  = help.same;
 
 /**
  * @param {Columns} columns
@@ -33,7 +33,7 @@ module.exports = function buildVals(columns, trace) {
   if (!trace) return buildTitleVals(columns);
 
   return remap(columns, function(column) {
-    return is.same(column.key, 'file')
+    return same(column.key, 'file')
       ? column.dirs[trace.index]
       : trace[column.key];
   });

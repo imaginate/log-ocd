@@ -24,6 +24,7 @@ var is    = help.is;
 var fuse  = help.fuse;
 var has   = help.has;
 var remap = help.remap;
+var same  = help.same;
 
 var color = require('../../../helpers/color');
 
@@ -128,7 +129,7 @@ function getArrVals(settings, method, details, arr, intro) {
  * @return {number}
  */
 function getLen(str, len) {
-  if ( is.same(len, -1) ) return -1;
+  if ( same(len, -1) ) return -1;
   len = len || 0;
   str = stripStyle(str);
   return has(str, '\n') ? -1 : len + str.length;

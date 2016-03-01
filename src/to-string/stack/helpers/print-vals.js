@@ -20,10 +20,10 @@
 'use strict';
 
 var help = require('../../../helpers');
-var is   = help.is;
 var fill = help.fill;
 var fuse = help.fuse;
 var roll = help.roll;
+var same  = help.same;
 
 var color = require('../../../helpers/color').parent;
 
@@ -62,7 +62,7 @@ function prepVal(column, val) {
   var space;
 
   space = fill(column.len - val.length, ' ');
-  val = is.same(column.align, 'left')
+  val = same(column.align, 'left')
     ? fuse(val, space)
     : fuse(space, val);
   return fuse(column.space[0], val, column.space[1]);
