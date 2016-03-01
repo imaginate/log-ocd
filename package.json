@@ -1,7 +1,7 @@
 {
   "name": "log-ocd",
   "version": "1.0.0-beta.7",
-  "description": "node.js logging at its finest",
+  "description": "the best node.js logger",
   "main": "log-ocd.js",
   "repository": {
     "type": "git",
