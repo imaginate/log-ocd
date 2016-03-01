@@ -13,20 +13,6 @@
 
 'use strict';
 
-var vitals = require('node-vitals')('base', 'fs');
-var each   = vitals.each;
-var fuse   = vitals.fuse;
-var get    = vitals.get;
-var has    = vitals.has;
-var remap  = vitals.remap;
-var to     = vitals.to;
-
-var ERROR_MSG = 'invalid value (must be a semantic version)';
-var SEMANTIC  = /^[0-9]+\.[0-9]+\.[0-9]+(?:-[a-z]+\.?[0-9]*)?$/;
-var NPM_BADGE = /(badge\/npm-)[0-9]+\.[0-9]+\.[0-9]+(?:--[a-z]+\.?[0-9]*)?/;
-var ALL_VERSION = /\b(v?)[0-9]+\.[0-9]+\.[0-9]+(?:-[a-z]+\.?[0-9]*)?\b/g;
-var NPM_VERSION = /("version": ")[0-9]+\.[0-9]+\.[0-9]+(?:-[a-z]+\.?[0-9]*)?/;
-
 exports['desc'] = 'updates version for the repo';
 exports['value'] = 'x.x.x-pre.x';
 exports['default'] = '-all';
@@ -43,6 +29,20 @@ exports['methods'] = {
   }
 };
 
+var vitals = require('node-vitals')('base', 'fs');
+var each   = vitals.each;
+var fuse   = vitals.fuse;
+var get    = vitals.get;
+var has    = vitals.has;
+var remap  = vitals.remap;
+var to     = vitals.to;
+
+var ERROR_MSG = 'invalid value (must be a semantic version)';
+var SEMANTIC  = /^[0-9]+\.[0-9]+\.[0-9]+(?:-[a-z]+\.?[0-9]*)?$/;
+var NPM_BADGE = /(badge\/npm-)[0-9]+\.[0-9]+\.[0-9]+(?:--[a-z]+\.?[0-9]*)?/;
+var ALL_VERSION = /\b(v?)[0-9]+\.[0-9]+\.[0-9]+(?:-[a-z]+\.?[0-9]*)?\b/g;
+var NPM_VERSION = /("version": ")[0-9]+\.[0-9]+\.[0-9]+(?:-[a-z]+\.?[0-9]*)?/;
+
 /**
  * @public
  * @param {string} version
@@ -50,21 +50,25 @@ exports['methods'] = {
 function updateAllVersion(version) {
 
   /** @type {!Array<string>} */
-  var filepaths;
+  var files;
   /** @type {!Object} */
   var opts;
 
   if ( !isSemVersion(version) ) throw new Error(ERROR_MSG);
 
-  opts = { validExts: /js$/ };
-  filepaths = get.filepaths('.', opts);
-  insertJSVersions('.', filepaths, version);
+  opts = { base: true, validExts: 'js' };
+  files = get.filepaths('.', opts);
+  each(files, function(file) {
+    insertVersion(file, version);
+  });
 
   opts.deep = true;
-  filepaths = get.filepaths('src', opts);
-  insertJSVersions('src', filepaths, version);
+  files = get.filepaths('src', opts);
+  each(files, function(file) {
+    insertVersion(file, version);
+  });
 
-  insertNPMVersion(version);
+  updateNPMVersion(version);
 }
 
 /**
@@ -73,9 +77,20 @@ function updateAllVersion(version) {
  */
 function updateNPMVersion(version) {
 
+  /** @type {string} */
+  var content;
+
   if ( !isSemVersion(version, true) ) throw new Error(ERROR_MSG);
 
-  insertNPMVersion(version);
+  content = get.file('./package.json');
+  version = fuse('$1', version);
+  content = remap(content, NPM_VERSION, version);
+  to.file(content, './package.json');
+
+  content = get.file('./README.md');
+  version = remap(version, /-/, '--');
+  content = remap(content, NPM_BADGE, version);
+  to.file(content, './README.md');
 }
 
 
@@ -90,50 +105,16 @@ function isSemVersion(version) {
 
 /**
  * @private
- * @param {string} basedir
- * @param {!Array<string>} filepaths
- * @param {string} version
- */
-function insertJSVersions(basedir, filepaths, version) {
-  basedir = basedir && fuse(basedir, '/');
-  version = fuse('$1', version);
-  each(filepaths, function(filepath) {
-    filepath = fuse(basedir, filepath);
-    insertJSVersion(filepath, version);
-  });
-}
-
-/**
- * @private
  * @param {string} filepath
  * @param {string} version
  */
-function insertJSVersion(filepath, version) {
+function insertVersion(filepath, version) {
 
   /** @type {string} */
   var content;
 
+  version = fuse('$1', version);
   content = get.file(filepath);
   content = remap(content, ALL_VERSION, version);
   to.file(content, filepath);
-}
-
-/**
- * @private
- * @param {string} version
- */
-function insertNPMVersion(version) {
-
-  /** @type {string} */
-  var content;
-
-  content = get.file('./package.json');
-  version = fuse('$1', version);
-  content = remap(content, NPM_VERSION, version);
-  to.file(content, './package.json');
-
-  content = get.file('./README.md');
-  version = remap(version, /-/, '--');
-  content = remap(content, NPM_BADGE, version);
-  to.file(content, './README.md');
 }

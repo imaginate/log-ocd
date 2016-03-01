@@ -13,7 +13,8 @@
 
 'use strict';
 
-var crypto = require('crypto');
+exports['desc'] = 'hashes all image names in repo';
+exports['method'] = hashAllImg;
 
 var vitals = require('node-vitals')('base', 'fs');
 var each   = vitals.each;
@@ -23,8 +24,7 @@ var has    = vitals.has;
 var remap  = vitals.remap;
 var to     = vitals.to;
 
-exports['desc'] = 'hashes all image names in repo';
-exports['method'] = hashAllImg;
+var crypto = require('crypto');
 
 /**
  * @public
@@ -40,7 +40,7 @@ function hashAllImg() {
   var buffer;
 
   filepaths = get.filepaths('example', {
-    validExts: /jpe?g|png|gif$/
+    validExts: /\.jpe?g|png|gif$/
   });
   each(filepaths, function(filepath) {
     filepath = fuse('example/', filepath);

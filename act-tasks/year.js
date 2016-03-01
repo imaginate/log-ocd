@@ -13,13 +13,17 @@
 
 'use strict';
 
-// globally append all of are and vitals methods
-require('node-are')();
-require('node-vitals')(2, 'all');
-
 exports['desc'] = 'updates year in entire repo';
 exports['value'] = '2xxx';
 exports['method'] = updateYear;
+
+var vitals = require('node-vitals')('base', 'fs');
+var each   = vitals.each;
+var fuse   = vitals.fuse;
+var get    = vitals.get;
+var has    = vitals.has;
+var remap  = vitals.remap;
+var to     = vitals.to;
 
 /**
  * @public
@@ -28,29 +32,34 @@ exports['method'] = updateYear;
 function updateYear(year) {
 
   /** @type {!Array<string>} */
-  var filepaths;
+  var files;
+  /** @type {!Object} */
+  var opts;
 
-  if ( !isYear(year) ) throw new Error('invalid year for act year task');
+  if ( !isYear(year) ) throw new Error('invalid `year` - should be `2xxx`');
 
-  filepaths = get.filepaths('.', {
-    validExts:   '.js',
-    invalidExts: '.json'
+  opts = {
+    basepath:    true,
+    validExts:   'js',
+    invalidExts: 'json'
+  };
+
+  files = get.filepaths('.', opts);
+  each(files, function(file) {
+    insertYear(file, year);
   });
-  insertYears('.', filepaths, year);
 
-  filepaths = get.filepaths('example', {
-    deep:        true,
-    validExts:   '.js',
-    invalidExts: '.json'
-  });
-  insertYears('example', filepaths, year);
+  opts.deep = true;
 
-  filepaths = get.filepaths('src', {
-    deep:        true,
-    validExts:   '.js',
-    invalidExts: '.json'
+  files = get.filepaths('src', opts);
+  each(files, function(file) {
+    insertYear(file, year);
   });
-  insertYears('src', filepaths, year);
+
+  files = get.filepaths('example', opts);
+  each(files, function(file) {
+    insertYear(file, year);
+  });
 }
 
 /**
@@ -60,21 +69,6 @@ function updateYear(year) {
  */
 function isYear(year) {
   return !!year && has(year, /^2[0-9]{3}$/);
-}
-
-/**
- * @private
- * @param {string} base
- * @param {!Array<string>} filepaths
- * @param {string} year
- */
-function insertYears(base, filepaths, year) {
-  base = fuse(base, '/');
-  year = fuse('$1', year);
-  each(filepaths, function(filepath) {
-    filepath = fuse(base, filepath);
-    insertYear(filepath, year);
-  });
 }
 
 /**
@@ -90,6 +84,7 @@ function insertYear(filepath, year) {
   var regex;
 
   regex = /(\@copyright )2[0-9]{3}/g;
+  year = fuse('$1', year);
   content = get.file(filepath);
   content = remap(content, regex, year);
   to.file(content, filepath);
