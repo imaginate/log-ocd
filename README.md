@@ -1,4 +1,4 @@
-# log-ocd [![npm version](https://img.shields.io/badge/npm-1.0.0--beta.6-yellow.svg?style=flat)](https://www.npmjs.com/package/log-ocd)
+# log-ocd [![npm version](https://img.shields.io/badge/npm-1.0.0--beta.7-yellow.svg?style=flat)](https://www.npmjs.com/package/log-ocd)
 ### A New Logging Level
 [_log-ocd_](https://github.com/imaginate/log-ocd) is the best way to handle [node.js](https://nodejs.org) logging. It will increase your efficiency with **beyond legible logs** and simple architecture. For the ocd among us, you can **easily customize an insane number of details** from error handling to font colors to type - bullets and brackets and delimiters, oh my! Quite simply, your logs will never be the same.
 
