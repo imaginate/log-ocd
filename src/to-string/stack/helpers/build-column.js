@@ -20,12 +20,13 @@
 'use strict';
 
 var help = require('../../../helpers');
-var is    = help.is;
 var fill  = help.fill;
 var fuse  = help.fuse;
 var remap = help.remap;
 var roll  = help.roll;
+var same  = help.same;
 var slice = help.slice;
+var to    = help.to;
 
 /**
  * @typedef {!{
@@ -69,7 +70,7 @@ module.exports = function buildColumn(settings, stack, key, title) {
       fill(format.spaceAfter,  ' ')
     ]
   };
-  if ( is.same(key, 'file') ) {
+  if ( same(key, 'file') ) {
     column.dirs = getDirs(format.dirDepth, stack);
     column.len = getLen(column.len, column.dirs);
   }
@@ -113,7 +114,7 @@ function getDir(dirDepth, dirpath, file) {
     index = 0 - dirDepth;
     dirpath = slice(dirpath, index);
   }
-  dirpath = dirpath.join('');
+  dirpath = to.string(dirpath, '');
   return fuse(dirpath, '/', file);
 }
 
