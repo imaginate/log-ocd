@@ -15,8 +15,7 @@
   "homepage": "https://github.com/imaginate/log-ocd",
   "dependencies": {
     "chalk": "1.x",
-    "node-are": "0.x",
-    "node-vitals": "2.x"
+    "node-vitals": "4.x"
   },
   "devDependencies": {
     "node-act": "1.x",
