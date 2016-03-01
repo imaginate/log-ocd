@@ -19,11 +19,6 @@
 
 'use strict';
 
-// see https://github.com/imaginate/are
-var are = require('node-are');
-exports.is  = are.is;
-exports.are = are.are;
-
 // see https://github.com/imaginate/vitals
 var vitals = require('node-vitals')('base', 'strict');
 exports.amend  = vitals.amend;
@@ -36,10 +31,13 @@ exports.freeze = vitals.freeze;
 exports.fuse   = vitals.fuse;
 exports.get    = vitals.get;
 exports.has    = vitals.has;
+exports.is     = vitals.is;
 exports.remap  = vitals.remap;
 exports.roll   = vitals.roll;
+exports.same   = vitals.same;
 exports.seal   = vitals.seal;
 exports.slice  = vitals.slice;
+exports.to     = vitals.to;
 exports.until  = vitals.until;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -52,6 +50,6 @@ var has = vitals.has;
  * @param {!Object} obj
  * @return {boolean}
  */
-are.is.theme = function isTheme(obj) {
+exports.is.theme = function isTheme(obj) {
   return has(obj, '__TYPE') && has(obj.__TYPE, /Theme$/);
 };
