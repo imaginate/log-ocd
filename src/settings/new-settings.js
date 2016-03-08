@@ -48,25 +48,36 @@ module.exports = function newSettings(inst) {
 
   settings = newEmptyObj('Settings');
 
+  // set private instance prop
   desc = {
     configurable: false,
-    enumerable: false,
-    writable: false
+    enumerable:   false,
+    writable:     false
   };
   settings = amend(settings, '__INST', inst, desc);
 
-  props = { '__maxLen': -1, '__keyLen': 0, '__indent': 0 };
+  // set private count props
+  props = {
+    '__maxLen': -1,
+    '__keyLen': 0,
+    '__indent': 0
+  };
   desc = { enumerable: false };
   each(props, function(val, key) {
-    setter = val ? newNaturalNum.build(val) : newNaturalNum;
+    setter = val
+      ? newNaturalNum.build(val)
+      : newNaturalNum;
     settings = amend(settings, key, val, desc, 'number', setter);
   });
 
+  // set private ocdmap prop
   settings = amend(settings, '__ocdmap', true, desc, 'boolean');
 
+  // set public props
   desc = { writable: false };
   each(METHODS, function(method) {
     settings = amend(settings, method, newSetting(method), desc);
   });
+
   return seal(settings);
 };
