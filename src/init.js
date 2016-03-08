@@ -92,7 +92,6 @@ module.exports = function newLogOCD() {
       : bind(LOG, settings, method);
     logocd[method] = addSetters(func, settings, method);
   });
-  logocd.constructor = newLogOCD;
   logocd.construct = newLogOCD;
   return logocd;
 };
