@@ -19,13 +19,22 @@
 
 'use strict';
 
-var freeze = require('../../../helpers').freeze;
+/**
+ * @typedef {{
+ *   type: string,
+ *   val:  *
+ * }} ConfigProp
+ *
+ * @typedef {Object<string, !ConfigProp>} ConfigProps
+ */
 
 /**
- * @type {!Object}
+ * The `Config` categories.
+ *
+ * @type {!ConfigProps}
  * @const
  */
-var CATEGORIES = {
+module.exports = {
   'log': {
     'logger': { type: 'function', val: console.log },
     'ocdmap': { type: 'boolean',  val: false       },
@@ -53,5 +62,3 @@ var CATEGORIES = {
     'column': { type: 'boolean',  val: false       }
   }
 };
-
-module.exports = freeze(CATEGORIES, true);

@@ -19,22 +19,23 @@
 
 'use strict';
 
-var freeze = require('../../../helpers').freeze;
-
 /**
- * @typedef {!{
+ * @typedef {{
  *   category: string,
  *   trueKeys: string
  * }} ConfigDefault
  *
- * @typedef {!Object<string, ConfigDefault>} ConfigDefaults
+ * @typedef {Object<string, !ConfigDefault>} ConfigDefaults
  */
 
 /**
- * @type {ConfigDefaults}
+ * The category for each method, and its boolean properties with `true` default
+ *   values. See the category values for all properties and defaults.
+ *
+ * @type {!ConfigDefaults}
  * @const
  */
-var METHODS = {
+module.exports = {
   'toString': { category: 'prep',  trueKeys: ''                          },
   'log':      { category: 'log',   trueKeys: ''                          },
   'pass':     { category: 'log',   trueKeys: 'header'                    },
@@ -44,5 +45,3 @@ var METHODS = {
   'fail':     { category: 'log',   trueKeys: 'header'                    },
   'trace':    { category: 'trace', trueKeys: ''                          }
 };
-
-module.exports = freeze(METHODS, true);
