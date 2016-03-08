@@ -35,6 +35,7 @@
  *   __keyLen: number,
  *   __ocdmap: boolean,
  *   toString: Setting,
+ *   get:      Setting,
  *   log:      Setting,
  *   pass:     Setting,
  *   error:    Setting,
