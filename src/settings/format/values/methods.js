@@ -34,6 +34,7 @@
  */
 module.exports = {
   'toString': { category: 'prep',  mkProps: null },
+  'get':      { category: 'log',   mkProps: null },
   'log':      { category: 'log',   mkProps: null },
   'pass':     { category: 'log',   mkProps: null },
   'error':    { category: 'log',   mkProps: null },
