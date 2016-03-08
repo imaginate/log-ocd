@@ -44,13 +44,18 @@ module.exports = function newFormat(category, props) {
   var val;
 
   props = props || null;
+
   format = newEmptyObj('Format');
+
   each(CATEGORIES[category], function(obj, key) {
-    val = obj.make ? newSubFormat(key) : obj.val;
+    val = obj.make
+      ? newSubFormat(key)
+      : obj.val;
     format = obj.setter
       ? amend(format, key, val, obj.type, obj.setter)
       : amend(format, key, val, obj.type);
   });
+
   format = seal(format);
   return fuse(format, props);
 };
