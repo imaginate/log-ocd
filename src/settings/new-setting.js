@@ -27,6 +27,18 @@ var seal  = help.seal;
 var newEmptyObj = require('../helpers/new-empty-obj');
 
 /**
+ * The properties for each `Setting` as `propName => getDefault` pairs.
+ *
+ * @type {!Object<string, function>}
+ * @const
+ */
+var PROPS = {
+  'config': require('./config'),
+  'format': require('./format'),
+  'style':  require('./style')
+};
+
+/**
  * @param {string} method
  * @return {!Setting}
  */
@@ -34,12 +46,9 @@ module.exports = function newSetting(method) {
 
   /** @type {!Setting} */
   var setting;
-  /** @type {function} */
-  var getDefault;
 
   setting = newEmptyObj('Setting');
-  each('config, format, style', function(key) {
-    getDefault = require('./' + key);
+  each(PROPS, function(getDefault, key) {
     setting = amend(setting, key, getDefault(method), '!object');
   });
   return seal(setting);
