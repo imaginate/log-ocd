@@ -62,7 +62,7 @@ module.exports = function get(type, method) {
       props[method] = settings[method][type];
     });
   }
-  else if ( !has(settings, method) ) return rangeError(settings 'get', method);
+  else if ( !has(settings, method) ) return rangeError(settings, 'get', method);
   else props = settings[method][type];
 
   config = settings.get.config;
