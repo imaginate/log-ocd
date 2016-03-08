@@ -26,6 +26,7 @@ var fuse = help.fuse;
 var newSettings = require('./settings');
 
 var LOG   = require('./methods/log');
+var GET   = require('./methods/get');
 var SET   = require('./methods/set');
 var RESET = require('./methods/reset');
 
@@ -45,6 +46,9 @@ var SETTERS = {
  *   debug:       function,
  *   fail:        function,
  *   trace:       function,
+ *   getConfig:   function,
+ *   getFormat:   function,
+ *   getStyle:    function,
  *   setConfig:   function,
  *   setFormat:   function,
  *   setStyle:    function,
@@ -83,7 +87,9 @@ module.exports = function newLogOCD() {
   logocd = bind(LOG, settings, 'log');
   logocd = addSetters(logocd, settings);
   each(METHODS, function(func, method) {
-    func = func ? bind(func, settings) : bind(LOG, settings, method);
+    func = func
+      ? bind(func, settings)
+      : bind(LOG, settings, method);
     logocd[method] = addSetters(func, settings, method);
   });
   logocd.constructor = newLogOCD;
@@ -99,7 +105,9 @@ module.exports = function newLogOCD() {
  * @return {function}
  */
 function bind(func, settings, method) {
-  return method ? func.bind(settings, method) : func.bind(settings);
+  return method
+    ? func.bind(settings, method)
+    : func.bind(settings);
 }
 
 /**
@@ -111,7 +119,9 @@ function bind(func, settings, method) {
  * @return {function}
  */
 function bindType(func, settings, type, method) {
-  return method ? func.bind(settings, type, method) : func.bind(settings, type);
+  return method
+    ? func.bind(settings, type, method)
+    : func.bind(settings, type);
 }
 
 /**
@@ -122,11 +132,13 @@ function bindType(func, settings, type, method) {
  * @return {function}
  */
 function addSetters(func, settings, method) {
-
   each(SETTERS, function(key, type) {
     func[key] = bindType(SET, settings, type, method);
     key = fuse('re', key);
     func[key] = bindType(RESET, settings, type, method);
+    key = slice(key, 3);
+    key = fuse('g', key);
+    func[key] = bindType(GET, settings, type, method);
   });
   return func;
 }
