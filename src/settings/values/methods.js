@@ -19,14 +19,15 @@
 
 'use strict';
 
-var freeze = require('../../helpers').freeze;
-
 /**
+ * All the public methods with configurable settings.
+ *
  * @type {!Array<string>}
  * @const
  */
-var METHODS = [
+module.exports = [
   'toString',
+  'get',
   'log',
   'pass',
   'error',
@@ -35,5 +36,3 @@ var METHODS = [
   'fail',
   'trace'
 ];
-
-module.exports = freeze(METHODS);
