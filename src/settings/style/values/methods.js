@@ -19,40 +19,34 @@
 
 'use strict';
 
-var help = require('../../../helpers');
-var freeze = help.freeze;
-var remap  = help.remap;
-
 var newTheme = require('../new-theme');
 var newMainTheme = require('../new-main-theme');
 
 /**
- * @typedef {!{
- *   category:  string,
- *   makeProps: ?function
+ * @typedef {{
+ *   category: string,
+ *   mkProps: ?function
  * }} StyleDefault
+ *
+ * @typedef {Object<string, !StyleDefault>} StyleDefaults
  */
 
-/** @type {!Object<string, StyleDefault>} */
-var methods = {
-  'toString': { category: 'prep'  },
-  'log':      { category: 'log'   },
-  'pass':     { category: 'log'   },
-  'error':    { category: 'log'   },
-  'warn':     { category: 'log'   },
-  'debug':    { category: 'log'   },
-  'fail':     { category: 'log'   },
-  'trace':    { category: 'trace' }
+/**
+ * @type {!StyleDefaults}
+ * @const
+ */
+module.exports = {
+  'toString': { category: 'prep',  mkProps: null       },
+  'log':      { category: 'log',   mkProps: null       },
+  'pass':     { category: 'log',   mkProps: passProps  },
+  'error':    { category: 'log',   mkProps: errorProps },
+  'warn':     { category: 'log',   mkProps: warnProps  },
+  'debug':    { category: 'log',   mkProps: debugProps },
+  'fail':     { category: 'log',   mkProps: failProps  },
+  'trace':    { category: 'trace', mkProps: null       }
 };
 
-// append null makeProps property to each method
-methods = remap(methods, function(obj) {
-  obj.makeProps = null;
-  return obj;
-});
-
-// append all makeProps methods
-methods['pass'].makeProps = function() {
+function passProps() {
   return {
     header: newMainTheme('type', 'header', {
       bg: 'green',
@@ -63,8 +57,9 @@ methods['pass'].makeProps = function() {
       })
     })
   };
-};
-methods['error'].makeProps = function() {
+}
+
+function errorProps() {
   return {
     header: newMainTheme('type', 'header', {
       bg: 'red',
@@ -75,8 +70,9 @@ methods['error'].makeProps = function() {
       })
     })
   };
-};
-methods['warn'].makeProps = function() {
+}
+
+function warnProps() {
   return {
     header: newMainTheme('type', 'header', {
       bg: 'yellow',
@@ -87,8 +83,9 @@ methods['warn'].makeProps = function() {
       })
     })
   };
-};
-methods['debug'].makeProps = function() {
+}
+
+function debugProps() {
   return {
     header: newMainTheme('type', 'header', {
       bg: 'blue',
@@ -99,8 +96,9 @@ methods['debug'].makeProps = function() {
       })
     })
   };
-};
-methods['fail'].makeProps = function() {
+}
+
+function failProps() {
   return {
     header: newMainTheme('type', 'header', {
       bg: 'red',
@@ -111,10 +109,4 @@ methods['fail'].makeProps = function() {
       })
     })
   };
-};
-
-/**
- * @type {!Object<string, StyleDefault>}
- * @const
- */
-module.exports = freeze(methods, true);
+}
