@@ -37,6 +37,7 @@ var newMainTheme = require('../new-main-theme');
  */
 module.exports = {
   'toString': { category: 'prep',  mkProps: null       },
+  'get':      { category: 'log',   mkProps: null       },
   'log':      { category: 'log',   mkProps: null       },
   'pass':     { category: 'log',   mkProps: passProps  },
   'error':    { category: 'log',   mkProps: errorProps },
