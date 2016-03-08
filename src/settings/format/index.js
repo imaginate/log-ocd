@@ -33,6 +33,6 @@ module.exports = function getDefaultFormat(method) {
   var props;
 
   method = METHODS[method];
-  props = method.makeProps && method.makeProps();
+  props = method.mkProps && method.mkProps();
   return newFormat(method.category, props);
 };
