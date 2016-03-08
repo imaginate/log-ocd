@@ -37,6 +37,7 @@
  */
 module.exports = {
   'toString': { category: 'prep',  trueKeys: ''                          },
+  'get':      { category: 'log',   trueKeys: 'header'                    },
   'log':      { category: 'log',   trueKeys: ''                          },
   'pass':     { category: 'log',   trueKeys: 'header'                    },
   'error':    { category: 'log',   trueKeys: 'header, stack, throw, msg' },
