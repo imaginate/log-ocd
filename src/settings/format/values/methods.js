@@ -19,35 +19,26 @@
 
 'use strict';
 
-var help = require('../../../helpers');
-var freeze = help.freeze;
-var remap  = help.remap;
-
 /**
- * @typedef {!{
- *   category:  string,
- *   makeProps: ?function
+ * @typedef {{
+ *   category: string,
+ *   mkProps: ?function
  * }} FormatDefault
  *
- * @typedef {!Object<string, FormatDefault>} FormatDefaults
+ * @typedef {Object<string, !FormatDefault>} FormatDefaults
  */
 
-/** @type {FormatDefaults} */
-var methods = {
-  'toString': { category: 'prep'  },
-  'log':      { category: 'log'   },
-  'pass':     { category: 'log'   },
-  'error':    { category: 'log'   },
-  'warn':     { category: 'log'   },
-  'debug':    { category: 'log'   },
-  'fail':     { category: 'log'   },
-  'trace':    { category: 'trace' }
+/**
+ * @type {!FormatDefaults}
+ * @const
+ */
+module.exports = {
+  'toString': { category: 'prep',  mkProps: null },
+  'log':      { category: 'log',   mkProps: null },
+  'pass':     { category: 'log',   mkProps: null },
+  'error':    { category: 'log',   mkProps: null },
+  'warn':     { category: 'log',   mkProps: null },
+  'debug':    { category: 'log',   mkProps: null },
+  'fail':     { category: 'log',   mkProps: null },
+  'trace':    { category: 'trace', mkProps: null }
 };
-
-// append null makeProps property to each method
-methods = remap(methods, function(obj) {
-  obj.makeProps = null;
-  return obj;
-});
-
-module.exports = freeze(methods, true);
