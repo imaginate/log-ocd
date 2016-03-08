@@ -20,8 +20,9 @@
 'use strict';
 
 var help = require('./helpers');
-var each = help.each;
-var fuse = help.fuse;
+var each  = help.each;
+var fuse  = help.fuse;
+var slice = help.slice;
 
 var newSettings = require('./settings');
 
