@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------------
  * LOG-OCD: NAN-TO-STRING
  * -----------------------------------------------------------------------------
- * @version 1.0.0-beta.7
+ * @version 1.0.0-beta.8
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
  *
  * @author Adam Smith <adam@imaginate.life> (https://github.com/imaginate)
