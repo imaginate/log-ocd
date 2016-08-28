@@ -53,9 +53,9 @@ module.exports = function getStack(error) {
  * @return {!Array}
  */
 function cleanStack(stack) {
-  stack = remap(stack, /\r\n?/g, '\n'); // normalize line breaks
-  stack = remap(stack, /\\/g, '/');     // normalize slashes
-  stack = cut(stack, /^.*\n\s+at /);    // remove message
+  stack = remap(stack, /\r\n?/g, '\n');    // normalize line breaks
+  stack = remap(stack, /\\/g, '/');        // normalize slashes
+  stack = cut(stack, /^[\s\S]*?\n\s+at /); // remove message
   return stack.split(/\n\s+at /);
 }
 
