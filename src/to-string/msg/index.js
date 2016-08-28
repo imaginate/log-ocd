@@ -19,11 +19,13 @@
 
 'use strict';
 
-var help = require('../../helpers');
-var is   = help.is;
-var fill = help.fill;
-var fuse = help.fuse;
-var roll = help.roll;
+var help  = require('../../helpers');
+var is    = help.is;
+var fill  = help.fill;
+var fuse  = help.fuse;
+var remap = help.remap;
+var roll  = help.roll;
+var same  = help.same;
 
 var color = require('../../helpers/color');
 
@@ -34,10 +36,8 @@ var getBullet = require('../helpers/get-bullet');
 var getLimit = require('../helpers/get-limit');
 var noStyle = require('../helpers/no-style');
 
-var linesToString = require('./lines');
-
 /**
- * @this {Settings}
+ * @this {!Settings}
  * @param {string} method
  * @param {string} msg
  * @return {string}
@@ -46,7 +46,7 @@ module.exports = function msgToString(method, msg) {
 
   /** @type {?Object} */
   var accent;
-  /** @type {Format} */
+  /** @type {!Format} */
   var format;
   /** @type {string} */
   var bullet;
@@ -54,42 +54,118 @@ module.exports = function msgToString(method, msg) {
   var indent;
   /** @type {string} */
   var result;
-  /** @type {MsgTheme} */
+  /** @type {!MsgTheme} */
   var theme;
   /** @type {number} */
   var limit;
-  /** @type {string} */
-  var key;
 
   theme  = this[method].style.msg;
   format = this[method].format.msg;
-  accent = getAccent(format.accentMark);
-  bullet = getBullet(theme, format.bullet);
-  indent = fill(format.indent, ' ');
-  limit  = getLimit(format.lineLimit, this.__maxLen);
-  limit -= limit && format.bullet.length && format.bullet.length + 1;
-  limit -= limit && format.indent;
-  msg = parseAccents(msg, accent);
+  bullet = format.bullet;
 
-  if ( limit && getLen(msg) > limit ) {
-    return linesToString(theme, msg, ++limit, indent, bullet);
+  limit = getLimit(format.lineLimit, this.__maxLen);
+  if (limit) {
+    if (bullet.length) limit -= bullet.length + 1;
+    limit -= format.indent;
   }
 
-  if (format.bullet) bullet = fuse(bullet, ' ');
-  msg = roll.up('', msg, function(part, i) {
-    return is.odd(i) ? color(theme.accent, part) : color(theme, part);
-  });
-  result = fuse(indent, bullet, msg);
-  return noStyle(this[method].config) ? stripStyle(result) : result;
+  accent = getAccent(format.accentMark);
+  bullet = getBullet(theme, bullet);
+  bullet = bullet && fuse(bullet, ' ');
+  indent = fill(format.indent, ' ');
+
+  msg = parseAccents(msg, accent);
+  msg = addBreaks(msg, limit);
+  msg = addColor(theme, msg);
+  msg = addBegin(msg, indent, bullet);
+
+  return noStyle(this[method].config)
+    ? stripStyle(msg)
+    : msg;
 };
 
 /**
  * @private
  * @param {!Array<string>} msg
- * @return {number}
+ * @param {number} limit
+ * @return {!Array<string>}
  */
-function getLen(msg) {
-  return roll.up(0, msg, function(part) {
-    return part.length;
+function addBreaks(msg, limit) {
+
+  /** @type {number} */
+  var count;
+
+  if (!limit) return msg;
+
+  count = 0;
+  return remap(msg, parseLine);
+
+  /**
+   * @private
+   * @param {string} line
+   * @return {string}
+   */
+  function parseLine(line) {
+
+    /** @type {string} */
+    var result;
+    /** @type {number} */
+    var len;
+    /** @type {string} */
+    var ch;
+    /** @type {number} */
+    var i;
+
+    result = '';
+    len = line.length;
+    i = -1;
+    while (++i < len) {
+      ch = line[i];
+      if ( same(ch, '\n') ) {
+        count = 0;
+      }
+      else {
+        ++count;
+        if (count > limit) {
+          result = fuse(result, '\n');
+          count = 0;
+        }
+      }
+      result = fuse(result, ch);
+    }
+    return result;
+  }
+}
+
+/**
+ * @private
+ * @param {!MsgTheme} theme
+ * @param {!Array<string>} msg
+ * @return {string}
+ */
+function addColor(theme, msg) {
+  return roll.up('', msg, function(part, i) {
+    return is.odd(i)
+      ? color(theme.accent, part)
+      : color(theme, part);
   });
+}
+
+/**
+ * @private
+ * @param {string} msg
+ * @param {string} indent
+ * @param {string} bullet
+ * @return {string}
+ */
+function addBegin(msg, indent, bullet) {
+
+  /** @type {string} */
+  var spacer;
+
+  spacer = bullet && stripStyle(bullet);
+  spacer = fill(spacer.length, ' ');
+  spacer = fuse('\n', indent, spacer);
+  msg = remap(msg, /\n/g, spacer);
+  return fuse(indent, bullet, msg);
 }
