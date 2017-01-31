@@ -20,7 +20,7 @@
   "devDependencies": {
     "node-act": "1.x",
     "log-ocd": ">1.0.0-beta",
-    "mocha": "2.x"
+    "mocha": "3.x"
   },
   "scripts": {
     "test": "node ./test/init.js"
