@@ -8,11 +8,15 @@
  * @author Adam Smith <adam@imaginate.life> (https://github.com/imaginate)
  * @copyright 2017 Adam A Smith <adam@imaginate.life> (https://github.com/imaginate)
  *
- * @see [JSDoc3]{@link http://usejsdoc.org/}
- * @see [Closure Compiler specific JSDoc]{@link https://developers.google.com/closure/compiler/docs/js-for-compiler}
+ * @see [JSDoc3](http://usejsdoc.org)
+ * @see [Closure Compiler JSDoc](https://developers.google.com/closure/compiler/docs/js-for-compiler)
  */
 
 'use strict';
+
+////////////////////////////////////////////////////////////
+// EXPORTS
+////////////////////////////////////////////////////////////
 
 exports['desc'] = 'updates version for the repo';
 exports['value'] = 'x.x.x-pre.x';
@@ -30,6 +34,10 @@ exports['methods'] = {
   }
 };
 
+////////////////////////////////////////////////////////////
+// HELPERS
+////////////////////////////////////////////////////////////
+
 var vitals = require('node-vitals')('base', 'fs');
 var each   = vitals.each;
 var fuse   = vitals.fuse;
@@ -38,11 +46,24 @@ var has    = vitals.has;
 var remap  = vitals.remap;
 var to     = vitals.to;
 
-var ERROR_MSG = 'invalid value (must be a semantic version)';
-var SEMANTIC  = /^[0-9]+\.[0-9]+\.[0-9]+(?:-[a-z]+\.?[0-9]*)?$/;
-var NPM_BADGE = /(badge\/npm-)[0-9]+\.[0-9]+\.[0-9]+(?:--[a-z]+\.?[0-9]*)?/;
-var ALL_VERSION = /\b(v?)[0-9]+\.[0-9]+\.[0-9]+(?:-[a-z]+\.?[0-9]*)?\b/g;
-var NPM_VERSION = /("version": ")[0-9]+\.[0-9]+\.[0-9]+(?:-[a-z]+\.?[0-9]*)?/;
+var path = require('path');
+var resolve = path.resolve;
+
+////////////////////////////////////////////////////////////
+// CONSTANTS
+////////////////////////////////////////////////////////////
+
+var ROOTPATH = resolve(__dirname, '..');
+var ERRMSG   = 'invalid value (must be a semantic version)';
+
+var SEMVER = /^[0-9]+\.[0-9]+\.[0-9]+(?:-[a-z]+\.?[0-9]*)?$/;
+var BDGVER = /(badge\/npm-)[0-9]+\.[0-9]+\.[0-9]+(?:--[a-z]+\.?[0-9]*)?/;
+var SRCVER = /\b(v?)[0-9]+\.[0-9]+\.[0-9]+(?:-[a-z]+\.?[0-9]*)?\b/g;
+var PKGVER = /("version": ")[0-9]+\.[0-9]+\.[0-9]+(?:-[a-z]+\.?[0-9]*)?/;
+
+////////////////////////////////////////////////////////////
+// PUBLIC METHODS
+////////////////////////////////////////////////////////////
 
 /**
  * @public
@@ -51,23 +72,17 @@ var NPM_VERSION = /("version": ")[0-9]+\.[0-9]+\.[0-9]+(?:-[a-z]+\.?[0-9]*)?/;
 function updateAllVersion(version) {
 
   /** @type {!Array<string>} */
-  var files;
-  /** @type {!Object} */
-  var opts;
+  var filepaths;
 
-  if ( !isSemVersion(version) ) throw new Error(ERROR_MSG);
+  if ( !isSemVersion(version) ) throw new Error(ERRMSG);
 
-  opts = { base: true, validExts: 'js' };
-  files = get.filepaths('.', opts);
-  each(files, function(file) {
-    insertVersion(file, version);
+  filepaths = get.filepaths(ROOTPATH, {
+    basepath:    true,
+    recursive:   true,
+    validExts:   'js',
+    invalidDirs: '.*|node_modules|tmp'
   });
-
-  opts.deep = true;
-  files = get.filepaths('src', opts);
-  each(files, function(file) {
-    insertVersion(file, version);
-  });
+  insertVersions(filepaths, version);
 
   updateNPMVersion(version);
 }
@@ -79,21 +94,28 @@ function updateAllVersion(version) {
 function updateNPMVersion(version) {
 
   /** @type {string} */
+  var filepath;
+  /** @type {string} */
   var content;
 
-  if ( !isSemVersion(version, true) ) throw new Error(ERROR_MSG);
+  if ( !isSemVersion(version) ) throw new Error(ERRMSG);
 
-  content = get.file('./package.json');
-  version = fuse('$1', version);
-  content = remap(content, NPM_VERSION, version);
-  to.file(content, './package.json');
+  filepath = resolve(ROOTPATH, 'package.json');
+  content  = get.file(filepath);
+  version  = fuse('$1', version);
+  content  = remap(content, PKGVER, version);
+  to.file(content, filepath);
 
-  content = get.file('./README.md');
-  version = remap(version, /-/, '--');
-  content = remap(content, NPM_BADGE, version);
-  to.file(content, './README.md');
+  filepath = resolve(ROOTPATH, 'README.md');
+  content  = get.file(filepath);
+  version  = remap(version, /-/, '--');
+  content  = remap(content, BDGVER, version);
+  to.file(content, filepath);
 }
 
+////////////////////////////////////////////////////////////
+// PRIVATE METHODS
+////////////////////////////////////////////////////////////
 
 /**
  * @private
@@ -101,7 +123,19 @@ function updateNPMVersion(version) {
  * @return {boolean}
  */
 function isSemVersion(version) {
-  return !!version && has(version, SEMANTIC);
+  return !!version && has(version, SEMVER);
+}
+
+/**
+ * @private
+ * @param {!Array<string>} filepaths
+ * @param {string} version
+ */
+function insertVersions(filepaths, version) {
+  version = fuse('$1', version);
+  each(filepaths, function(filepath) {
+    insertVersion(filepath, version);
+  });
 }
 
 /**
@@ -114,8 +148,8 @@ function insertVersion(filepath, version) {
   /** @type {string} */
   var content;
 
-  version = fuse('$1', version);
   content = get.file(filepath);
-  content = remap(content, ALL_VERSION, version);
+  content = remap(content, SRCVER, version);
   to.file(content, filepath);
 }
+

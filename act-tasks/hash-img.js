@@ -8,14 +8,22 @@
  * @author Adam Smith <adam@imaginate.life> (https://github.com/imaginate)
  * @copyright 2017 Adam A Smith <adam@imaginate.life> (https://github.com/imaginate)
  *
- * @see [JSDoc3]{@link http://usejsdoc.org/}
- * @see [Closure Compiler specific JSDoc]{@link https://developers.google.com/closure/compiler/docs/js-for-compiler}
+ * @see [JSDoc3](http://usejsdoc.org)
+ * @see [Closure Compiler JSDoc](https://developers.google.com/closure/compiler/docs/js-for-compiler)
  */
 
 'use strict';
 
+////////////////////////////////////////////////////////////
+// EXPORTS
+////////////////////////////////////////////////////////////
+
 exports['desc'] = 'hashes all image names in repo';
 exports['method'] = hashAllImg;
+
+////////////////////////////////////////////////////////////
+// HELPERS
+////////////////////////////////////////////////////////////
 
 var vitals = require('node-vitals')('base', 'fs');
 var each   = vitals.each;
@@ -27,6 +35,19 @@ var to     = vitals.to;
 
 var crypto = require('crypto');
 
+var path = require('path');
+var resolve = path.resolve;
+
+////////////////////////////////////////////////////////////
+// CONSTANTS
+////////////////////////////////////////////////////////////
+
+var ROOTPATH = resolve(__dirname, '..');
+
+////////////////////////////////////////////////////////////
+// PUBLIC METHODS
+////////////////////////////////////////////////////////////
+
 /**
  * @public
  * @type {function}
@@ -34,22 +55,29 @@ var crypto = require('crypto');
 function hashAllImg() {
 
   /** @type {!Array<string>} */
-  var filepaths;
-  /** @type {!Array<string>} */
-  var newpath;
+  var imgpaths;
+  /** @type {string} */
+  var dirpath;
+  /** @type {string} */
+  var dest;
   /** @type {!Buffer} */
-  var buffer;
+  var buff;
 
-  filepaths = get.filepaths('example', {
-    validExts: /\.jpe?g|png|gif$/
+  dirpath = resolve(ROOTPATH, 'example');
+  imgpaths = get.filepaths(dirpath, {
+    basepath:  true,
+    validExts: 'jpg|jpeg|png|gif'
   });
-  each(filepaths, function(filepath) {
-    filepath = fuse('example/', filepath);
-    newpath = hashFile(filepath);
-    buffer = get.file(filepath, true);
-    to.file(buffer, newpath);
+  each(imgpaths, function(src) {
+    dest = hashFile(src);
+    buff = get.file(src, true);
+    to.file(buff, dest);
   });
 }
+
+////////////////////////////////////////////////////////////
+// PRIVATE METHODS
+////////////////////////////////////////////////////////////
 
 /**
  * @private
@@ -71,3 +99,4 @@ function hashFile(filepath) {
   hash = fuse('$1-', hash, '$2');
   return remap(filepath, /^(.*)(\.[a-z]{2,5})$/i, hash);
 }
+

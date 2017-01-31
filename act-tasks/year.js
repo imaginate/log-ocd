@@ -8,15 +8,23 @@
  * @author Adam Smith <adam@imaginate.life> (https://github.com/imaginate)
  * @copyright 2017 Adam A Smith <adam@imaginate.life> (https://github.com/imaginate)
  *
- * @see [JSDoc3]{@link http://usejsdoc.org/}
- * @see [Closure Compiler specific JSDoc]{@link https://developers.google.com/closure/compiler/docs/js-for-compiler}
+ * @see [JSDoc3](http://usejsdoc.org)
+ * @see [Closure Compiler JSDoc](https://developers.google.com/closure/compiler/docs/js-for-compiler)
  */
 
 'use strict';
 
+////////////////////////////////////////////////////////////
+// EXPORTS
+////////////////////////////////////////////////////////////
+
 exports['desc'] = 'updates year in entire repo';
 exports['value'] = '2xxx';
 exports['method'] = updateYear;
+
+////////////////////////////////////////////////////////////
+// HELPERS
+////////////////////////////////////////////////////////////
 
 var vitals = require('node-vitals')('base', 'fs');
 var each   = vitals.each;
@@ -26,8 +34,21 @@ var has    = vitals.has;
 var remap  = vitals.remap;
 var to     = vitals.to;
 
+var path = require('path');
+var resolve = path.resolve;
+
+////////////////////////////////////////////////////////////
+// CONSTANTS
+////////////////////////////////////////////////////////////
+
+var ROOT = resolve(__dirname, '..');
+
 var CPRT = /(copyright )2[0-9]{3}/ig;
 var YEAR = /^2[0-9]{3}$/;
+
+////////////////////////////////////////////////////////////
+// PUBLIC METHODS
+////////////////////////////////////////////////////////////
 
 /**
  * @public
@@ -49,6 +70,10 @@ function updateYear(year) {
   });
   insertYears(filepaths, year);
 }
+
+////////////////////////////////////////////////////////////
+// PRIVATE METHODS
+////////////////////////////////////////////////////////////
 
 /**
  * @private
