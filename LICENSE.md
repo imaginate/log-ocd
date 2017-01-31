@@ -1,6 +1,6 @@
 ## License for [log-ocd](http://www.algorithmiv.com/log-ocd)
 
-**Copyright 2016 Adam A Smith [github.com/imaginate](https://github.com/imaginate)**
+**Copyright 2017 Adam A Smith [github.com/imaginate](https://github.com/imaginate)**
 
 Licensed under the **Apache License**, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
