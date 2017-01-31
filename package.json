@@ -19,7 +19,6 @@
   },
   "devDependencies": {
     "node-act": "1.x",
-    "log-ocd": ">1.0.0-beta",
     "mocha": "3.x"
   },
   "scripts": {
