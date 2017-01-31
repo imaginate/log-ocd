@@ -25,6 +25,9 @@ var has    = vitals.has;
 var remap  = vitals.remap;
 var to     = vitals.to;
 
+var CPRT = /(copyright )2[0-9]{3}/ig;
+var YEAR = /^2[0-9]{3}$/;
+
 /**
  * @public
  * @param {string} year
@@ -32,34 +35,18 @@ var to     = vitals.to;
 function updateYear(year) {
 
   /** @type {!Array<string>} */
-  var files;
-  /** @type {!Object} */
-  var opts;
+  var filepaths;
 
   if ( !isYear(year) ) throw new Error('invalid `year` - should be `2xxx`');
 
-  opts = {
+  filepaths = get.filepaths('.', {
     basepath:    true,
-    validExts:   'js',
-    invalidExts: 'json'
-  };
-
-  files = get.filepaths('.', opts);
-  each(files, function(file) {
-    insertYear(file, year);
+    recursive:   true,
+    validExts:   'js|md',
+    invalidExts: 'json',
+    invalidDirs: '.*|node_modules|tmp'
   });
-
-  opts.deep = true;
-
-  files = get.filepaths('src', opts);
-  each(files, function(file) {
-    insertYear(file, year);
-  });
-
-  files = get.filepaths('example', opts);
-  each(files, function(file) {
-    insertYear(file, year);
-  });
+  insertYears(filepaths, year);
 }
 
 /**
@@ -68,7 +55,19 @@ function updateYear(year) {
  * @return {boolean}
  */
 function isYear(year) {
-  return !!year && has(year, /^2[0-9]{3}$/);
+  return !!year && has(year, YEAR);
+}
+
+/**
+ * @private
+ * @param {!Array<string>} filepaths
+ * @param {string} year
+ */
+function insertYears(filepaths, year) {
+  year = fuse('$1', year);
+  each(filepaths, function(filepath) {
+    insertYear(filepath, year);
+  });
 }
 
 /**
@@ -80,12 +79,9 @@ function insertYear(filepath, year) {
 
   /** @type {string} */
   var content;
-  /** @type {!RegExp} */
-  var regex;
 
-  regex = /(\@copyright )2[0-9]{3}/g;
-  year = fuse('$1', year);
   content = get.file(filepath);
-  content = remap(content, regex, year);
+  content = remap(content, CPRT, year);
   to.file(content, filepath);
 }
+
