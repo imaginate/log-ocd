@@ -139,6 +139,6 @@ function execLog(method, header, msg, vals, stack) {
   lines  = getLines(format.linesBefore);
   result = fuse(lines, header, msg, vals, stack);
   lines  = getLines(format.linesAfter);
-  result = fuse(result, lines);
+  result = fuse(result, lines, '\n');
   config.logger(result);
 }
