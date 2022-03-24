@@ -4,8 +4,8 @@
  * -----------------------------------------------------------------------------
  * @see [log-ocd](https://github.com/imaginate/log-ocd)
  *
- * @author Adam Smith <adam@imaginate.life> (https://github.com/imaginate)
- * @copyright 2022 Adam A Smith <adam@imaginate.life> (https://github.com/imaginate)
+ * @author Adam Smith <imagineadamsmith@gmail.com> (https://github.com/imaginate)
+ * @copyright 2022 Adam A Smith <imagineadamsmith@gmail.com> (https://github.com/imaginate)
  *
  * Supporting Libraries:
  * @see [chalk]{@link https://github.com/chalk/chalk}
