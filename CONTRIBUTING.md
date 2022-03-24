@@ -22,10 +22,8 @@ All OCD contributions for _[log-ocd](https://github.com/imaginate/log-ocd)_ are 
 
 ## Contact
 - **bugs and improvements:** [open an issue](https://github.com/imaginate/log-ocd/issues)
-- **all other questions:** adam@imaginate.life
+- **all other questions:** imagineadamsmith@gmail.com
 
 
---
-**Live OCD,**
-
-<a href="http://www.algorithmiv.com/log-ocd"><img src="http://www.algorithmiv.com/images/aIV-logo.png" alt="Algorithm IV Logo" /></a>
+----
+**Live OCD**

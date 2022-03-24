@@ -4,8 +4,6 @@
 
 [see example code](https://github.com/imaginate/log-ocd/blob/master/example/index.js)
 
-<a href="https://github.com/imaginate/log-ocd/blob/master/example/index.js"><img src="http://www.algorithmiv.com/images/log-ocd/example-8c57cb990f748484ace0.png" alt="log-ocd example" /></a>
-
 
 ## Install
 ```bash
@@ -20,10 +18,8 @@ The docs for version 1.0.0 will be ready with the live launch (i.e. currently in
 ## Other Details
 **contributing:** [see contributing guideline](https://github.com/imaginate/log-ocd/blob/master/CONTRIBUTING.md)<br>
 **bugs/improvements:** [open an issue](https://github.com/imaginate/log-ocd/issues)<br>
-**questions:** learn@algorithmiv.com
+**questions:** imagineadamsmith@gmail.com
 
 
---
-**Happy Developing,**
-
-<a href="http://www.algorithmiv.com/log-ocd"><img src="http://www.algorithmiv.com/images/aIV-logo.png" alt="Algorithm IV Logo" /></a>
+----
+**Happy Developing**
