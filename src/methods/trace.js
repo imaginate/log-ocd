@@ -24,6 +24,7 @@ var is   = help.is;
 var fuse = help.fuse;
 
 var newStack = require('../helpers/new-stack');
+var getStack = require('../helpers/new-stack/get-stack');
 
 var setupSettings = require('./helpers/setup-settings');
 var typeError = require('./helpers/type-error');
@@ -55,8 +56,12 @@ module.exports = function logTrace(error) {
   config = this.trace.config;
   format = this.trace.format;
 
-  stack = newStack(error);
-  result = stackToString.call(this, 'trace', stack);
+  try {
+    stack = newStack(error);
+    result = stackToString.call(this, 'trace', stack);
+  } catch (err) {
+    result = getStack(error).join('\n');
+  }
   lines  = getLines(format.linesBefore);
   result = fuse(lines, result);
   lines  = getLines(format.linesAfter);
