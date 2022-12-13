@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------------
  * LOG-OCD: STACK-TO-STRING FALLBACK
  * -----------------------------------------------------------------------------
- * @version 1.0.0-beta.10
+ * @version 1.0.0-beta.11
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
  *
  * @author Adam Smith <adam@imaginate.life> (https://github.com/imaginate)

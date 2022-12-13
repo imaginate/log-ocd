@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------------
  * LOG-OCD: NUMBER-TO-STRING
  * -----------------------------------------------------------------------------
- * @version 1.0.0-beta.10
+ * @version 1.0.0-beta.11
  * @see [log-ocd]{@link https://github.com/imaginate/log-ocd}
  *
  * @author Adam Smith <imagineadamsmith@gmail.com> (https://github.com/imaginate)

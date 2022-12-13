@@ -9,7 +9,7 @@
  * ACT TASK: test
  * -----------------------------------------------------------------------------
  * @file Use `$ act test` to access this file.
- * @version 1.0.0-beta.10
+ * @version 1.0.0-beta.11
  *
  * @author Adam Smith <imagineadamsmith@gmail.com> (https://github.com/imaginate)
  * @copyright 2022 Adam A Smith <imagineadamsmith@gmail.com> (https://github.com/imaginate)
