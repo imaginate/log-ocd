@@ -24,13 +24,13 @@ var is   = help.is;
 var fuse = help.fuse;
 
 var newStack = require('../helpers/new-stack');
-var getStack = require('../helpers/new-stack/get-stack');
 
 var setupSettings = require('./helpers/setup-settings');
 var typeError = require('./helpers/type-error');
 var getLines = require('./helpers/get-lines');
 
 var stackToString = require('../to-string/stack');
+var stackToStringFallback = require('../to-string/stack/fallback');
 
 /**
  * @this {!Settings}
@@ -60,7 +60,7 @@ module.exports = function logTrace(error) {
     stack = newStack(error);
     result = stackToString.call(this, 'trace', stack);
   } catch (err) {
-    result = getStack(error).join('\n');
+    result = stackToStringFallback(error);
   }
   lines  = getLines(format.linesBefore);
   result = fuse(lines, result);

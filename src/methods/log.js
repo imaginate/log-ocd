@@ -33,6 +33,7 @@ var getLines = require('./helpers/get-lines');
 
 var headerToString = require('../to-string/header');
 var stackToString = require('../to-string/stack');
+var stackToStringFallback = require('../to-string/stack/fallback');
 var msgToString = require('../to-string/msg');
 var toString = require('../to-string');
 
@@ -86,9 +87,13 @@ module.exports = function log(method, vals) {
     error = fuse(error, msg);
     error = new Error(error);
   }
-  stack = config.stack ? newStack(error) : null;
+  try {
+    stack = config.stack ? newStack(error) : null;
+  } catch (err) {
+    stack = null;
+  }
 
-  execLog.call(this, method, header, msg, vals, stack);
+  execLog.call(this, method, header, msg, vals, stack, error);
 
   if ( config['throw'] ) throw error;
   if ( config['exit'] ) process.exit(1);
@@ -104,8 +109,9 @@ module.exports = function log(method, vals) {
  * @param {string} msg
  * @param {!Array} vals
  * @param {?Stack} stack
+ * @param {?Error=} error
  */
-function execLog(method, header, msg, vals, stack) {
+function execLog(method, header, msg, vals, stack, error) {
 
   /** @type {!Config} */
   var config;
@@ -128,8 +134,18 @@ function execLog(method, header, msg, vals, stack) {
   }, this);
 
   header = config.header ? headerToString.call(this, method, header) : '';
-  stack  = stack         ? stackToString.call(this, method, stack)   : '';
-  msg    = config.msg    ? msgToString.call(this, method, msg)       : '';
+  if (stack) {
+    try {
+      stack = stackToString.call(this, method, stack);
+    } catch (err) {
+      stack = stackToStringFallback(error);
+    }
+  } else if (config.stack) {
+    stack = stackToStringFallback(error);
+  } else {
+    stack = '';
+  }
+  msg = config.msg ? msgToString.call(this, method, msg) : '';
 
   if ( header && (msg || vals || stack) ) header = fuse(header, '\n');
   if ( msg && (vals || stack) ) msg = fuse(msg, '\n\n');
